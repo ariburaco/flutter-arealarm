@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/init/notification/local_notification.dart';
 import '../../../core/base/extension/context_extension.dart';
@@ -24,7 +25,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final GlobalKey<ScaffoldState> _scaffoldyKey = GlobalKey();
-
+  var platform = const MethodChannel('com.example.flutter_template/messages');
   @override
   void initState() {
     super.initState();
@@ -65,6 +66,19 @@ class _HomeViewState extends State<HomeView> {
         .showOngoingNotification(title: "$now", body: "$now", id: hash);
   }
 
+  Future<void> startService() async {
+
+    try {
+      final result = await platform.invokeMethod('startService');
+      print("Service Started");
+    } on PlatformException catch (e) {
+      print(e.toString() + " Service NOT Started");
+    }
+
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     print("Reload?");
@@ -77,13 +91,12 @@ class _HomeViewState extends State<HomeView> {
       onPageBuilder: (BuildContext context, HomeViewModel viewModel) =>
           SafeArea(
         child: Scaffold(
-          // floatingActionButton: FloatingActionButton(
-          //   child: IconNormal(icon: Icons.add_alert),
-          //   onPressed: () {
-          //     LocalNotifications.instance
-          //         .showOngoingNotification(id: 1, title: "5", body: "asdsa");
-          //   },
-          // ),
+           floatingActionButton: FloatingActionButton(
+             child: IconNormal(icon: Icons.add_alert),
+             onPressed: () {
+               startService();
+             },
+           ),
           body: Observer(builder: (_) {
             return viewModel.buildPageView();
           }),
