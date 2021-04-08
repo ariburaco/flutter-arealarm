@@ -19,7 +19,6 @@ class _GoogleMapViewState extends State<GoogleMapView>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   AnimationController _controller;
   Animation<Offset> _offsetFloat;
-  double radius = 50;
 
   GoogleMapViewModel mapsViewModel = GoogleMapViewModel();
 
@@ -130,8 +129,10 @@ class _GoogleMapViewState extends State<GoogleMapView>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       buildCustomSlider(context),
-                      Container(
-                          child: Text(radius.toStringAsFixed(0) + " meters")),
+                      Container(child: Observer(builder: (_) {
+                        return Text(mapsViewModel.radius.toStringAsFixed(0) +
+                            " meters");
+                      })),
                     ],
                   ),
                   Container(
@@ -172,19 +173,19 @@ class _GoogleMapViewState extends State<GoogleMapView>
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
           overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0),
         ),
-        child: Slider(
-          value: radius,
-          min: 0,
-          max: 2000,
-          divisions: 4,
-          label: radius.round().toString() + " meters",
-          activeColor: context.colors.secondary,
-          onChanged: (double value) {
-            setState(() {
-              radius = value;
-            });
-          },
-        ));
+        child: Observer(builder: (_) {
+          return Slider(
+            value: mapsViewModel.radius,
+            min: 0,
+            max: 2000,
+            divisions: 4,
+            label: mapsViewModel.radius.round().toString() + " meters",
+            activeColor: context.colors.secondary,
+            onChanged: (double value) {
+              mapsViewModel.changeRadius(value);
+            },
+          );
+        }));
   }
 
   BoxDecoration buildBoxDecoration(BuildContext context) {
@@ -259,7 +260,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
     Circle circle = new Circle(
         circleId: CircleId("circle_${mapsViewModel.count}"),
         center: position,
-        radius: radius,
+        radius: mapsViewModel.radius,
         strokeWidth: 5,
         strokeColor: context.colors.secondaryVariant);
 

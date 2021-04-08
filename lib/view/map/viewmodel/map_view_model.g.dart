@@ -102,6 +102,21 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     });
   }
 
+  final _$radiusAtom = Atom(name: '_GoogleMapViewModelBase.radius');
+
+  @override
+  double get radius {
+    _$radiusAtom.reportRead();
+    return super.radius;
+  }
+
+  @override
+  set radius(double value) {
+    _$radiusAtom.reportWrite(value, super.radius, () {
+      super.radius = value;
+    });
+  }
+
   final _$getCurrenPositionAsyncAction =
       AsyncAction('_GoogleMapViewModelBase.getCurrenPosition');
 
@@ -119,6 +134,17 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
         name: '_GoogleMapViewModelBase.navigateToPosition');
     try {
       return super.navigateToPosition(pos);
+    } finally {
+      _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void changeRadius(double val) {
+    final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
+        name: '_GoogleMapViewModelBase.changeRadius');
+    try {
+      return super.changeRadius(val);
     } finally {
       _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -165,7 +191,8 @@ pinLocationIcon: ${pinLocationIcon},
 markers: ${markers},
 circles: ${circles},
 currentPosition: ${currentPosition},
-selectedPlaces: ${selectedPlaces}
+selectedPlaces: ${selectedPlaces},
+radius: ${radius}
     ''';
   }
 }

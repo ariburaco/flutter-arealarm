@@ -29,6 +29,9 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @observable
   List<MapPlace> selectedPlaces = [];
 
+  @observable
+  double radius = 50;
+
   @override
   void init() {}
 
@@ -42,6 +45,11 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     if (mapController != null) {
       mapController.animateCamera(CameraUpdate.newLatLng(pos));
     }
+  }
+
+  @action
+  void changeRadius(double val) {
+    radius = val;
   }
 
   LatLngBounds _bounds(Set<Marker> markers) {
