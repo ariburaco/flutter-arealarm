@@ -55,6 +55,21 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     });
   }
 
+  final _$circlesAtom = Atom(name: '_GoogleMapViewModelBase.circles');
+
+  @override
+  Set<Circle> get circles {
+    _$circlesAtom.reportRead();
+    return super.circles;
+  }
+
+  @override
+  set circles(Set<Circle> value) {
+    _$circlesAtom.reportWrite(value, super.circles, () {
+      super.circles = value;
+    });
+  }
+
   final _$currentPositionAtom =
       Atom(name: '_GoogleMapViewModelBase.currentPosition');
 
@@ -68,6 +83,22 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
   set currentPosition(LatLng value) {
     _$currentPositionAtom.reportWrite(value, super.currentPosition, () {
       super.currentPosition = value;
+    });
+  }
+
+  final _$selectedPlacesAtom =
+      Atom(name: '_GoogleMapViewModelBase.selectedPlaces');
+
+  @override
+  List<MapPlace> get selectedPlaces {
+    _$selectedPlacesAtom.reportRead();
+    return super.selectedPlaces;
+  }
+
+  @override
+  set selectedPlaces(List<MapPlace> value) {
+    _$selectedPlacesAtom.reportWrite(value, super.selectedPlaces, () {
+      super.selectedPlaces = value;
     });
   }
 
@@ -94,6 +125,17 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
   }
 
   @override
+  dynamic moveToBounderies() {
+    final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
+        name: '_GoogleMapViewModelBase.moveToBounderies');
+    try {
+      return super.moveToBounderies();
+    } finally {
+      _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void navigateToCurrentPosition() {
     final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
         name: '_GoogleMapViewModelBase.navigateToCurrentPosition');
@@ -105,12 +147,25 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
   }
 
   @override
+  void addMapPlaces(MapPlace currentMapPlace) {
+    final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
+        name: '_GoogleMapViewModelBase.addMapPlaces');
+    try {
+      return super.addMapPlaces(currentMapPlace);
+    } finally {
+      _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 count: ${count},
 pinLocationIcon: ${pinLocationIcon},
 markers: ${markers},
-currentPosition: ${currentPosition}
+circles: ${circles},
+currentPosition: ${currentPosition},
+selectedPlaces: ${selectedPlaces}
     ''';
   }
 }

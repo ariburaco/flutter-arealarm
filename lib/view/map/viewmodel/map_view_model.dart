@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/view/map/model/map_place_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/base/model/base_view_model.dart';
@@ -20,7 +21,13 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   Set<Marker> markers = {};
 
   @observable
+  Set<Circle> circles = {};
+
+  @observable
   LatLng currentPosition;
+
+  @observable
+  List<MapPlace> selectedPlaces = [];
 
   @override
   void init() {}
@@ -37,14 +44,50 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     }
   }
 
+  LatLngBounds _bounds(Set<Marker> markers) {
+    if (markers == null || markers.isEmpty) return null;
+    return _createBounds(markers.map((m) => m.position).toList());
+  }
+
+  @action
+  moveToBounderies() {
+    mapController
+        .animateCamera(CameraUpdate.newLatLngBounds(_bounds(markers), 100));
+  }
+
+  LatLngBounds _createBounds(List<LatLng> positions) {
+    final southwestLat = positions.map((p) => p.latitude).reduce(
+        (value, element) => value < element ? value : element); // smallest
+    final southwestLon = positions
+        .map((p) => p.longitude)
+        .reduce((value, element) => value < element ? value : element);
+    final northeastLat = positions.map((p) => p.latitude).reduce(
+        (value, element) => value > element ? value : element); // biggest
+    final northeastLon = positions
+        .map((p) => p.longitude)
+        .reduce((value, element) => value > element ? value : element);
+    return LatLngBounds(
+        southwest: LatLng(southwestLat, southwestLon),
+        northeast: LatLng(northeastLat, northeastLon));
+  }
+
   @action
   void navigateToCurrentPosition() {
     getCurrenPosition();
     if (mapController != null) {
       if (currentPosition != null) {
         mapController.animateCamera(CameraUpdate.newLatLng(currentPosition));
-        addMarker();
       }
+    }
+  }
+
+  @action
+  void addMapPlaces(MapPlace currentMapPlace) {
+    if (pinLocationIcon != null) {
+      selectedPlaces.add(currentMapPlace);
+      count++;
+    } else {
+      print("************************************icon not found!");
     }
   }
 
@@ -106,22 +149,11 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     }
   }
 
-  void addMarkerConstant(LatLng pos) {
-    if (pinLocationIcon != null) {
-      markers.add(Marker(
-          markerId: MarkerId("marker_$count"),
-          position: pos,
-          zIndex: 10,
-          onTap: () {},
-          infoWindow: InfoWindow(),
-          icon: pinLocationIcon));
-      count++;
-      print("************************************ marker_$count added at $pos");
-    } else {
-      print("************************************icon not found!");
-    }
-    //mapController.getVisibleRegion();
-  }
+  // void addMarkerConstant(LatLng pos) {
+  //   addMapPlaces("place", pos, 100);
+
+  //   //mapController.getVisibleRegion();
+  // }
 }
 
 extension ConvertToLatLng on Position {

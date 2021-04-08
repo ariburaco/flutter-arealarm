@@ -16,15 +16,7 @@ import 'core/init/notifier/theme_notifier.dart';
 import 'view/home/view/home_view.dart';
 
 void main() async {
-
-  //int result = await platform.invokeMethod('startService');
   WidgetsFlutterBinding.ensureInitialized();
-
-  // IsolateNameServer.registerPortWithName(
-  //   port.sendPort,
-  //   isolateName,
-  // );
-
   LocalNotifications.instance.initNotifications();
 
   runApp(MultiProvider(

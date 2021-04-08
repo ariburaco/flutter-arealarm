@@ -17,16 +17,23 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugins.GeneratedPluginRegistrant;
-import io.flutter.view.FlutterMain;
+
 
 import static io.flutter.view.FlutterMain.startInitialization;
 
 public class MainActivity extends FlutterActivity {
 
     private Intent servIntent;
-    private String CHANNEL = "com.example.flutter_template/messages";
+    private String CHANNEL = "com.example.flutter_template/location";
     public static Context context;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+        //stopService(servIntent);
+
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,13 +48,14 @@ public class MainActivity extends FlutterActivity {
 
     public void getLocationAnswer() {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
+
     }
 
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
+
             String message = intent.getStringExtra("Status");
             Bundle b = intent.getBundleExtra("float");
             float distance = (float) b.getFloat("float");

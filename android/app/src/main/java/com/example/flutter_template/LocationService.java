@@ -19,6 +19,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -37,19 +40,31 @@ public class LocationService extends Service implements LocationListener {
     Location location; // location
     double latitude = 0; // latitude
     double longitude = 0; // longitude
+    float counter = 0;
     String provider;
 
     // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
 
     // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1 * MINUTE;
+    private static final long MIN_TIME_BW_UPDATES = 5 * 1000;
 
     // Declaring a Location Manager
     protected LocationManager locationManager;
 
     NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
+
+    Timer timer = new Timer();
+
+    class UpdateBallTask extends TimerTask {
+
+        public void run() {
+            counter++;
+            sendMessageToActivity(counter, "fromService");
+        }
+    }
+
 
     @Override
     public void onCreate() {
@@ -60,7 +75,13 @@ public class LocationService extends Service implements LocationListener {
             getNotification();
 
             startForeground(101, builder.build());
+
+
+            TimerTask updateBall = new UpdateBallTask();
+            timer.scheduleAtFixedRate(updateBall, 0, 1000);
+
             getLocation();
+
         }
     }
 
@@ -76,7 +97,7 @@ public class LocationService extends Service implements LocationListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        return START_STICKY;
+        return START_NOT_STICKY;
 
     }
 
@@ -107,10 +128,11 @@ public class LocationService extends Service implements LocationListener {
 
             } else {
                 this.canGetLocation = true;
+
                 if (isNetworkEnabled) {
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
                             this);
-                    Log.d("Network", "Network Enabled");
+                   // Log.d("Network", "Network Enabled");
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (location != null) {
@@ -120,10 +142,11 @@ public class LocationService extends Service implements LocationListener {
                     }
                 }
 
+
                 // if GPS Enabled get lat/long using GPS Services
                 if (isGPSEnabled) {
                     if (location == null) {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
                                 this);
                         Log.d("GPS", "GPS Enabled");
                         if (locationManager != null) {
@@ -148,8 +171,8 @@ public class LocationService extends Service implements LocationListener {
 
 
     @Override
-    public void onLocationChanged(Location arg0) {
-        Location loc = getLocation();
+    public void onLocationChanged(Location loc) {
+        //Location loc = getLocation();
 
         double longs = loc.getLongitude();
         double lat = loc.getLatitude();
@@ -230,6 +253,6 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
+    }
 
 }

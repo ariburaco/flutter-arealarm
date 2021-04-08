@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_template/core/constants/services/service_constants.dart';
 import '../../alarms/view/alarms_view.dart';
 import '../../map/view/map_view.dart';
 import '../../../core/base/model/base_view_model.dart';
@@ -9,8 +11,17 @@ class HomeViewModel = _HomeViewModelBase with _$HomeViewModel;
 
 abstract class _HomeViewModelBase with Store, BaseViewModel {
   List<Widget> pages;
+  var platform = const MethodChannel(ServiceConstants.LocationServiceChannel);
 
   PageController pageController;
+
+  Future<void> startLocationService() async {
+    try {
+      final result = await platform.invokeMethod('startService');
+    } on PlatformException catch (e) {
+      print(e.toString() + " Service NOT Started");
+    }
+  }
 
   @override
   void setContext(BuildContext context) => this.context = context;
