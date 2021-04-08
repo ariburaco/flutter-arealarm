@@ -50,12 +50,12 @@ class _HomeViewState extends State<HomeView> {
       onPageBuilder: (BuildContext context, HomeViewModel viewModel) =>
           SafeArea(
         child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            child: IconNormal(icon: Icons.add_alert),
-            onPressed: () {
-              viewModel.startLocationService();
-            },
-          ),
+          // floatingActionButton: FloatingActionButton(
+          //   child: IconNormal(icon: Icons.add_alert),
+          //   onPressed: () {
+          //     viewModel.startLocationService();
+          //   },
+          // ),
           body: Observer(builder: (_) {
             return viewModel.buildPageView();
           }),

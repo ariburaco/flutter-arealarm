@@ -19,7 +19,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   AnimationController _controller;
   Animation<Offset> _offsetFloat;
-  double widthSlide;
+  double radius = 50;
 
   GoogleMapViewModel mapsViewModel = GoogleMapViewModel();
 
@@ -34,10 +34,10 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
     _offsetFloat = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0, 0.8),
+      end: const Offset(0, 2),
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.elasticIn,
+      curve: Curves.easeInOut,
     ));
     _controller.forward();
     _offsetFloat.addListener(() {});
@@ -65,40 +65,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
                 alignment: Alignment.center,
                 children: <Widget>[
                   buildGoogleMap(),
-                  SlideTransition(
-                    position: _offsetFloat,
-                    child: GestureDetector(
-                      onTap: () {
-                        _controller.forward();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 180.0),
-                        child: Container(
-                          height: 150,
-                          width: 320,
-                          // color: context.colors.background,
-                          decoration: BoxDecoration(
-                            color: context.colors.background,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.8),
-                                spreadRadius: 2,
-                                blurRadius: 2,
-                                offset:
-                                    Offset(1, 2), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: Text("asdasdas"),
-                        ),
-                      ),
-                    ),
-                  ),
+                  buildAlarmCard(context),
                 ],
               ),
               floatingActionButton: Row(
@@ -116,6 +83,127 @@ class _GoogleMapViewState extends State<GoogleMapView>
                 ],
               ),
             ));
+  }
+
+  // _onTapDown(DragDownDetails details) {
+  //   _controller.forward();
+  //   var x = details.globalPosition.dx;
+  //   var y = details.globalPosition.dy;
+  //   // or user the local position method to get the offset
+  //   print(details.localPosition);
+  //   print("tap down " + x.toString() + ", " + y.toString());
+  // }
+
+  SlideTransition buildAlarmCard(BuildContext context) {
+    return SlideTransition(
+      position: _offsetFloat,
+      child: GestureDetector(
+        // onTapDown: (TapDownDetails details) => _onTapDown(details),
+        //onVerticalDragDown: (DragDownDetails details) => _onTapDown(details),
+        child: Padding(
+          padding: EdgeInsets.only(top: 200.0),
+          child: Container(
+            height: 180,
+            width: 320,
+            // color: context.colors.background,
+            decoration: buildBoxDecoration(context),
+            child: Padding(
+              padding: context.paddingLow,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Configure Alarm Settings",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      IconButton(
+                          onPressed: () {
+                            _controller.forward();
+                          },
+                          icon: Icon(Icons.close)),
+                    ],
+                  )),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      buildCustomSlider(context),
+                      Container(
+                          child: Text(radius.toStringAsFixed(0) + " meters")),
+                    ],
+                  ),
+                  Container(
+                      child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          print("Pressed");
+                        },
+                        child: Text("delete"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          print("Pressed");
+                        },
+                        child: Text("add"),
+                      ),
+                    ],
+                  )),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  SliderTheme buildCustomSlider(BuildContext context) {
+    return SliderTheme(
+        data: SliderTheme.of(context).copyWith(
+          valueIndicatorColor: Colors.blue, // This is what you are asking for
+          inactiveTrackColor: Color(0xFF8D8E98), // Custom Gray Color
+          activeTrackColor: Colors.white,
+          thumbColor: Colors.red,
+          overlayColor: Color(0x29EB1555), // Custom Thumb overlay Color
+          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+          overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0),
+        ),
+        child: Slider(
+          value: radius,
+          min: 0,
+          max: 2000,
+          divisions: 4,
+          label: radius.round().toString() + " meters",
+          activeColor: context.colors.secondary,
+          onChanged: (double value) {
+            setState(() {
+              radius = value;
+            });
+          },
+        ));
+  }
+
+  BoxDecoration buildBoxDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: context.colors.background,
+      borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.8),
+          spreadRadius: 2,
+          blurRadius: 2,
+          offset: Offset(1, 2), // changes position of shadow
+        ),
+      ],
+    );
   }
 
   Widget buildGoogleMap() {
@@ -160,7 +248,8 @@ class _GoogleMapViewState extends State<GoogleMapView>
         markerId: MarkerId("marker_${mapsViewModel.count}"),
         position: position,
         zIndex: 10,
-        infoWindow: InfoWindow(),
+        //TODO add GeoCode API to InfoWindow
+        //infoWindow: InfoWindow(title: "at $position"),
         onTap: () {
           _controller.reverse();
           List<Marker> markers = getMarkers().toList();
@@ -170,7 +259,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
     Circle circle = new Circle(
         circleId: CircleId("circle_${mapsViewModel.count}"),
         center: position,
-        radius: 500,
+        radius: radius,
         strokeWidth: 5,
         strokeColor: context.colors.secondaryVariant);
 
