@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/view/map/model/map_place_model.dart';
+import '../model/map_place_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/base/model/base_view_model.dart';
@@ -36,7 +36,9 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   double radius = 50;
 
   @override
-  void init() {}
+  void init() {
+    askLocationPermissions();
+  }
 
   @override
   void setContext(BuildContext context) {
@@ -135,6 +137,21 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
 
   @action
   Future<void> getCurrenPosition() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best);
+
+    currentPosition = position.latlng;
+  }
+
+  Future<void> setCustomMapPin() async {
+    final ImageConfiguration imageConfiguration =
+        createLocalImageConfiguration(context);
+    var bitmap = await BitmapDescriptor.fromAssetImage(
+        imageConfiguration, 'assets/imgs/loc.png');
+    pinLocationIcon = bitmap;
+  }
+
+  Future<void> askLocationPermissions() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -155,42 +172,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
         return Future.error('Location permissions are denied');
       }
     }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best);
-
-    currentPosition = position.latlng;
   }
-
-  Future<void> setCustomMapPin() async {
-    final ImageConfiguration imageConfiguration =
-        createLocalImageConfiguration(context);
-    var bitmap = await BitmapDescriptor.fromAssetImage(
-        imageConfiguration, 'assets/imgs/loc.png');
-    pinLocationIcon = bitmap;
-  }
-
-  // void addMarker() {
-  //   if (pinLocationIcon != null) {
-  //     markers.add(Marker(
-  //         markerId: MarkerId("marker_$count"),
-  //         position: currentPosition,
-  //         zIndex: 10,
-  //         infoWindow: InfoWindow(title: "at $currentPosition"),
-  //         icon: pinLocationIcon));
-  //     count++;
-  //     print(
-  //         "************************************ marker_$count added at $currentPosition ");
-  //   } else {
-  //     print("************************************icon not found!");
-  //   }
-  // }
-
-  // void addMarkerConstant(LatLng pos) {
-  //   addMapPlaces("place", pos, 100);
-
-  //   //mapController.getVisibleRegion();
-  // }
 }
 
 extension ConvertToLatLng on Position {

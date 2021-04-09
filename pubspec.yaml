@@ -30,7 +30,6 @@ dependencies:
   # mockito: ^4.1.4
   # pedantic: ^1.9.2
   provider: ^4.3.3
- 
   shimmer: ^1.1.2
   
 

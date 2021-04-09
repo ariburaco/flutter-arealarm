@@ -2,11 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_template/view/map/model/map_place_model.dart';
+import '../model/map_place_model.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../core/components/icons/icon_normal.dart';
-// import 'package:flutter_template/view/map/model/map_place_model.dart';
 import 'package:flutter_template/view/map/viewmodel/map_view_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -19,27 +18,14 @@ class _GoogleMapViewState extends State<GoogleMapView>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   AnimationController _controller;
   Animation<Offset> _offsetFloat;
-
   GoogleMapViewModel mapsViewModel = GoogleMapViewModel();
 
   @override
   void initState() {
     super.initState();
     mapsViewModel.setContext(context);
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _offsetFloat = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, 2),
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-    _controller.forward();
-    _offsetFloat.addListener(() {});
+    mapsViewModel.init();
+    animationControllerInit();
   }
 
   @override
@@ -326,6 +312,23 @@ class _GoogleMapViewState extends State<GoogleMapView>
         () => new EagerGestureRecognizer(),
       ),
     ];
+  }
+
+  void animationControllerInit() {
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _offsetFloat = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 2),
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+    _controller.forward();
+    _offsetFloat.addListener(() {});
   }
 
   Set<Marker> getMarkers() {

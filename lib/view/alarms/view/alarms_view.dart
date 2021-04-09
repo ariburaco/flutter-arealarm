@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/base/extension/context_extension.dart';
@@ -17,6 +15,19 @@ class AlarmsView extends StatefulWidget {
 
 class _AlarmsViewState extends State<AlarmsView>
     with AutomaticKeepAliveClientMixin {
+  AlarmsViewModel alarmsViewModel = new AlarmsViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -34,12 +45,11 @@ class _AlarmsViewState extends State<AlarmsView>
                 children: [
                   Observer(builder: (_) {
                     return Container(
-                        padding: context.paddingLow,
-                        child: buildNextAlarm(context, viewModel));
+                        padding: context.paddingLow, child: buildNextAlarm());
                   }),
                   Observer(builder: (_) {
                     return Expanded(
-                      child: buildAlarmList(viewModel),
+                      child: buildAlarmList(),
                     );
                   })
                 ],
@@ -53,10 +63,10 @@ class _AlarmsViewState extends State<AlarmsView>
             ));
   }
 
-  Widget buildAlarmList(AlarmsViewModel viewModel) {
-    if (viewModel.hasActiveAlarm) {
+  Widget buildAlarmList() {
+    if (alarmsViewModel.hasActiveAlarm) {
       return ListView.builder(
-        itemCount: viewModel.alarmList.length,
+        itemCount: alarmsViewModel.alarmList.length,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
             padding: context.paddingLow,
@@ -74,15 +84,15 @@ class _AlarmsViewState extends State<AlarmsView>
           icon: Icon(Icons.add),
           iconSize: context.highValue,
           onPressed: () {
-            viewModel.addNewAlarm();
+            alarmsViewModel.addNewAlarm();
           },
         )),
       );
     }
   }
 
-  Widget buildNextAlarm(BuildContext context, AlarmsViewModel viewModel) {
-    if (viewModel.hasActiveAlarm) {
+  Widget buildNextAlarm() {
+    if (alarmsViewModel.hasActiveAlarm) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

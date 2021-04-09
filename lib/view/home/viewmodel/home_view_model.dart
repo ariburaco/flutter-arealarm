@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_template/core/constants/services/service_constants.dart';
+import '../../../core/constants/services/service_constants.dart';
 import '../../alarms/view/alarms_view.dart';
 import '../../map/view/map_view.dart';
 import '../../../core/base/model/base_view_model.dart';
