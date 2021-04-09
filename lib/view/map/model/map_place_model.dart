@@ -2,9 +2,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapPlace {
   final String name;
-  final LatLng position;
-  final Circle circle;
-  final Marker marker;
+  LatLng position;
+  Circle circle;
+  Marker marker;
+
   MapPlace(this.name, this.position, this.circle, this.marker);
 }
 

@@ -30,6 +30,9 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   List<MapPlace> selectedPlaces = [];
 
   @observable
+  MapPlace selectedPlace;
+
+  @observable
   double radius = 50;
 
   @override
@@ -50,6 +53,20 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @action
   void changeRadius(double val) {
     radius = val;
+    if (selectedPlace != null) {
+      var matchedCircle = circles.where((element) =>
+          (element.circleId.value == selectedPlace.circle.circleId.value));
+
+      if (matchedCircle.length > 0) {
+        print("radius " + matchedCircle.first.radius.toString());
+
+//        Set<int> updated = set.map((item) => item == 1 ? 0 : item).toSet();
+
+        //circles = matchedCircle.first.copyWith(radiusParam: val);
+      } else {
+        print("No Match");
+      }
+    }
   }
 
   LatLngBounds _bounds(Set<Marker> markers) {
@@ -141,21 +158,21 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     pinLocationIcon = bitmap;
   }
 
-  void addMarker() {
-    if (pinLocationIcon != null) {
-      markers.add(Marker(
-          markerId: MarkerId("marker_$count"),
-          position: currentPosition,
-          zIndex: 10,
-          infoWindow: InfoWindow(title: "at $currentPosition"),
-          icon: pinLocationIcon));
-      count++;
-      print(
-          "************************************ marker_$count added at $currentPosition ");
-    } else {
-      print("************************************icon not found!");
-    }
-  }
+  // void addMarker() {
+  //   if (pinLocationIcon != null) {
+  //     markers.add(Marker(
+  //         markerId: MarkerId("marker_$count"),
+  //         position: currentPosition,
+  //         zIndex: 10,
+  //         infoWindow: InfoWindow(title: "at $currentPosition"),
+  //         icon: pinLocationIcon));
+  //     count++;
+  //     print(
+  //         "************************************ marker_$count added at $currentPosition ");
+  //   } else {
+  //     print("************************************icon not found!");
+  //   }
+  // }
 
   // void addMarkerConstant(LatLng pos) {
   //   addMapPlaces("place", pos, 100);

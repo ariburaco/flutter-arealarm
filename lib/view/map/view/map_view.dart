@@ -63,8 +63,12 @@ class _GoogleMapViewState extends State<GoogleMapView>
               body: Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
-                  buildGoogleMap(),
-                  buildAlarmCard(context),
+                  Observer(
+                    builder: (_) => buildGoogleMap(),
+                  ),
+                  Observer(
+                    builder: (_) => buildAlarmCard(context),
+                  ),
                 ],
               ),
               floatingActionButton: Row(
@@ -93,7 +97,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
   //   print("tap down " + x.toString() + ", " + y.toString());
   // }
 
-  SlideTransition buildAlarmCard(BuildContext context) {
+  Widget buildAlarmCard(BuildContext context) {
     return SlideTransition(
       position: _offsetFloat,
       child: GestureDetector(
@@ -245,20 +249,22 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   void addPlace(LatLng position) {
     _controller.reverse();
+    String placeId = "place_${mapsViewModel.count}";
     Marker marker = new Marker(
-        markerId: MarkerId("marker_${mapsViewModel.count}"),
+        markerId: MarkerId(placeId),
         position: position,
         zIndex: 10,
         //TODO add GeoCode API to InfoWindow
         //infoWindow: InfoWindow(title: "at $position"),
         onTap: () {
           _controller.reverse();
-          List<Marker> markers = getMarkers().toList();
-          print(markers[0].markerId);
+
+          onMarkerTapped(MarkerId(placeId));
+          //print(markers[0].markerId);
         },
         icon: mapsViewModel.pinLocationIcon);
     Circle circle = new Circle(
-        circleId: CircleId("circle_${mapsViewModel.count}"),
+        circleId: CircleId(placeId),
         center: position,
         radius: mapsViewModel.radius,
         strokeWidth: 5,
@@ -267,11 +273,26 @@ class _GoogleMapViewState extends State<GoogleMapView>
     mapsViewModel.markers.add(marker);
     mapsViewModel.circles.add(circle);
 
-    MapPlace currentMapPlace =
-        new MapPlace("${mapsViewModel.count}", position, circle, marker);
+    MapPlace currentMapPlace = new MapPlace(placeId, position, circle, marker);
     mapsViewModel.addMapPlaces(currentMapPlace);
+
     if (mapsViewModel.selectedPlaces.length > 1) {
       mapsViewModel.moveToBounderies();
+    }
+  }
+
+  void onMarkerTapped(MarkerId markerId) {
+    //List<Marker> markers = getMarkers().toList();
+
+    var matchedPlace = mapsViewModel.selectedPlaces
+        .where((element) => (element.marker.markerId.value == markerId.value));
+
+    if (matchedPlace.length > 0) {
+      print("match at " + matchedPlace.first.position.toString());
+
+      mapsViewModel.selectedPlace = matchedPlace.first;
+    } else {
+      print("No Match");
     }
   }
 

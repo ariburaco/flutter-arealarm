@@ -102,6 +102,22 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     });
   }
 
+  final _$selectedPlaceAtom =
+      Atom(name: '_GoogleMapViewModelBase.selectedPlace');
+
+  @override
+  MapPlace get selectedPlace {
+    _$selectedPlaceAtom.reportRead();
+    return super.selectedPlace;
+  }
+
+  @override
+  set selectedPlace(MapPlace value) {
+    _$selectedPlaceAtom.reportWrite(value, super.selectedPlace, () {
+      super.selectedPlace = value;
+    });
+  }
+
   final _$radiusAtom = Atom(name: '_GoogleMapViewModelBase.radius');
 
   @override
@@ -192,6 +208,7 @@ markers: ${markers},
 circles: ${circles},
 currentPosition: ${currentPosition},
 selectedPlaces: ${selectedPlaces},
+selectedPlace: ${selectedPlace},
 radius: ${radius}
     ''';
   }
