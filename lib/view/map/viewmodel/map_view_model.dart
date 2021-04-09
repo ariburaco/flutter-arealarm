@@ -10,7 +10,7 @@ class GoogleMapViewModel = _GoogleMapViewModelBase with _$GoogleMapViewModel;
 
 abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @observable
-  int count = 0;
+  int count = 1;
 
   GoogleMapController mapController;
 
@@ -51,20 +51,32 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   }
 
   @action
-  void changeRadius(double val) {
-    radius = val;
+  void deletePlace() {
+    if (selectedPlace != null) {
+      var matchedCircle = circles.where((element) =>
+          (element.circleId.value == selectedPlace.circle.circleId.value));
+      var matchedMarker = markers.where((element) =>
+          (element.markerId.value == selectedPlace.marker.markerId.value));
+
+      if (matchedMarker.length > 0 && matchedCircle.length > 0) {
+        circles.remove(matchedCircle.first);
+        markers.remove(matchedMarker.first);
+        selectedPlaces.remove(selectedPlace);
+      }
+    }
+  }
+
+  @action
+  void changeRadius(Circle _circle) {
     if (selectedPlace != null) {
       var matchedCircle = circles.where((element) =>
           (element.circleId.value == selectedPlace.circle.circleId.value));
 
       if (matchedCircle.length > 0) {
-        print("radius " + matchedCircle.first.radius.toString());
-
-//        Set<int> updated = set.map((item) => item == 1 ? 0 : item).toSet();
-
-        //circles = matchedCircle.first.copyWith(radiusParam: val);
+        circles.remove(matchedCircle.first);
+        circles.add(_circle);
       } else {
-        print("No Match");
+        print("No Match circle");
       }
     }
   }
@@ -112,7 +124,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
       selectedPlaces.add(currentMapPlace);
       count++;
     } else {
-      print("************************************icon not found!");
+      print("icon not found!");
     }
   }
 

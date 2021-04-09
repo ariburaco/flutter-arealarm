@@ -63,12 +63,8 @@ class _GoogleMapViewState extends State<GoogleMapView>
               body: Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
-                  Observer(
-                    builder: (_) => buildGoogleMap(),
-                  ),
-                  Observer(
-                    builder: (_) => buildAlarmCard(context),
-                  ),
+                  buildGoogleMap(),
+                  buildAlarmCard(context),
                 ],
               ),
               floatingActionButton: Row(
@@ -80,7 +76,11 @@ class _GoogleMapViewState extends State<GoogleMapView>
                           child: IconNormal(icon: Icons.location_pin),
                           onPressed: () {
                             setState(() {
-                              mapsViewModel.navigateToCurrentPosition();
+                              if (mapsViewModel.selectedPlaces.length > 1) {
+                                mapsViewModel.moveToBounderies();
+                              } else {
+                                mapsViewModel.navigateToCurrentPosition();
+                              }
                             });
                           })),
                 ],
@@ -104,7 +104,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
         // onTapDown: (TapDownDetails details) => _onTapDown(details),
         //onVerticalDragDown: (DragDownDetails details) => _onTapDown(details),
         child: Padding(
-          padding: EdgeInsets.only(top: 200.0),
+          padding: EdgeInsets.only(top: 400.0),
           child: Container(
             height: 180,
             width: 320,
@@ -120,8 +120,11 @@ class _GoogleMapViewState extends State<GoogleMapView>
                       child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Configure Alarm Settings",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Observer(builder: (_) {
+                        return Text(
+                            "Configure Alarm #${mapsViewModel.selectedPlace != null ? mapsViewModel.selectedPlace.id : ""}",
+                            style: TextStyle(fontWeight: FontWeight.bold));
+                      }),
                       IconButton(
                           onPressed: () {
                             _controller.forward();
@@ -129,6 +132,13 @@ class _GoogleMapViewState extends State<GoogleMapView>
                           icon: Icon(Icons.close)),
                     ],
                   )),
+                  // Observer(builder: (_) {
+                  //   return Container(
+                  //     child: Text(mapsViewModel.selectedPlace == null
+                  //         ? mapsViewModel.selectedPlace.address
+                  //         : "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA"),
+                  //   );
+                  // }),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -145,15 +155,18 @@ class _GoogleMapViewState extends State<GoogleMapView>
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          print("Pressed");
+                          setState(() {
+                            mapsViewModel.deletePlace();
+                            _controller.forward();
+                          });
                         },
-                        child: Text("delete"),
+                        child: Text("Remove Place"),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           print("Pressed");
                         },
-                        child: Text("add"),
+                        child: Text("Add Alarm"),
                       ),
                     ],
                   )),
@@ -168,28 +181,112 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   SliderTheme buildCustomSlider(BuildContext context) {
     return SliderTheme(
-        data: SliderTheme.of(context).copyWith(
-          valueIndicatorColor: Colors.blue, // This is what you are asking for
-          inactiveTrackColor: Color(0xFF8D8E98), // Custom Gray Color
-          activeTrackColor: Colors.white,
-          thumbColor: Colors.red,
-          overlayColor: Color(0x29EB1555), // Custom Thumb overlay Color
-          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
-          overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0),
-        ),
+        data: buildSliderThemeData(),
         child: Observer(builder: (_) {
           return Slider(
             value: mapsViewModel.radius,
-            min: 0,
-            max: 2000,
-            divisions: 4,
+            min: 50,
+            max: 1000,
+            divisions: 19,
             label: mapsViewModel.radius.round().toString() + " meters",
             activeColor: context.colors.secondary,
             onChanged: (double value) {
-              mapsViewModel.changeRadius(value);
+              setState(() {
+                changeSelectedPlaceRadius(value);
+              });
             },
           );
         }));
+  }
+
+  void changeSelectedPlaceRadius(double value) {
+    mapsViewModel.radius = value;
+    mapsViewModel.selectedPlace.radius = mapsViewModel.radius;
+    Circle newCircle = Circle(
+      circleId: mapsViewModel.selectedPlace.circle.circleId,
+      radius: mapsViewModel.selectedPlace.radius,
+      center: mapsViewModel.selectedPlace.position,
+      strokeWidth: 5,
+      strokeColor: context.colors.secondaryVariant,
+    );
+    mapsViewModel.changeRadius(newCircle);
+  }
+
+  Widget buildGoogleMap() {
+    return GoogleMap(
+      myLocationEnabled: true,
+      myLocationButtonEnabled: true,
+      markers: getMarkers(),
+      circles: getCircles(),
+      compassEnabled: true,
+      gestureRecognizers: googleGestures.toSet(),
+      mapType: MapType.normal,
+      onTap: (LatLng pos) {
+        _controller.forward();
+      },
+      onLongPress: (LatLng pos) {
+        setState(() {
+          addPlace(pos);
+        });
+      },
+      onMapCreated: (map) => mapsViewModel.mapsInit(map),
+      initialCameraPosition: CameraPosition(
+        target: LatLng(41.029291, 28.887751),
+        zoom: 15,
+      ),
+    );
+  }
+
+  void addPlace(LatLng position) {
+    _controller.reverse();
+    mapsViewModel.navigateToPosition(position);
+    String placeId = "place_${mapsViewModel.count}";
+    Marker marker = new Marker(
+        markerId: MarkerId(placeId),
+        position: position,
+        zIndex: 14,
+        //TODO add GeoCode API to InfoWindow
+        //infoWindow: InfoWindow(title: "at $position"),
+        onTap: () {
+          _controller.reverse();
+          onMarkerTapped(MarkerId(placeId));
+          //print(markers[0].markerId);
+        },
+        icon: mapsViewModel.pinLocationIcon);
+    Circle circle = new Circle(
+        circleId: CircleId(placeId),
+        center: position,
+        radius: mapsViewModel.radius,
+        strokeWidth: 5,
+        strokeColor: context.colors.secondaryVariant);
+
+    mapsViewModel.markers.add(marker);
+    mapsViewModel.circles.add(circle);
+
+    MapPlace currentMapPlace = new MapPlace(mapsViewModel.count, placeId,
+        position, circle, marker, mapsViewModel.radius, "N/A");
+
+    mapsViewModel.selectedPlace = currentMapPlace;
+    mapsViewModel.addMapPlaces(currentMapPlace);
+
+    if (mapsViewModel.selectedPlaces.length > 1) {
+      mapsViewModel.moveToBounderies();
+    }
+  }
+
+  void onMarkerTapped(MarkerId markerId) {
+    //List<Marker> markers = getMarkers().toList();
+
+    var matchedPlace = mapsViewModel.selectedPlaces
+        .where((element) => (element.marker.markerId.value == markerId.value));
+
+    if (matchedPlace.length > 0) {
+      mapsViewModel.selectedPlace = matchedPlace.first;
+      mapsViewModel.radius = mapsViewModel.selectedPlace.radius;
+      print("selected place radius: ${mapsViewModel.radius}");
+    } else {
+      print("No Match for marker");
+    }
   }
 
   BoxDecoration buildBoxDecoration(BuildContext context) {
@@ -211,31 +308,15 @@ class _GoogleMapViewState extends State<GoogleMapView>
     );
   }
 
-  Widget buildGoogleMap() {
-    return GoogleMap(
-      myLocationEnabled: true,
-      myLocationButtonEnabled: true,
-      markers: getMarkers(),
-      circles: getCircles(),
-      compassEnabled: true,
-      gestureRecognizers: googleGestures.toSet(),
-      mapType: MapType.normal,
-      onTap: (LatLng pos) {
-        _controller.forward();
-      },
-      onLongPress: (LatLng pos) {
-        // mapsViewModel.addMarkerConstant(pos);
-        setState(() {
-          mapsViewModel.navigateToPosition(pos);
-
-          addPlace(pos);
-        });
-      },
-      onMapCreated: (map) => mapsViewModel.mapsInit(map),
-      initialCameraPosition: CameraPosition(
-        target: LatLng(41.029291, 28.887751),
-        zoom: 15,
-      ),
+  SliderThemeData buildSliderThemeData() {
+    return SliderTheme.of(context).copyWith(
+      valueIndicatorColor: Colors.blue, // This is what you are asking for
+      inactiveTrackColor: Color(0xFF8D8E98), // Custom Gray Color
+      activeTrackColor: Colors.white,
+      thumbColor: Colors.red,
+      overlayColor: Color(0x29EB1555), // Custom Thumb overlay Color
+      thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+      overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0),
     );
   }
 
@@ -245,55 +326,6 @@ class _GoogleMapViewState extends State<GoogleMapView>
         () => new EagerGestureRecognizer(),
       ),
     ];
-  }
-
-  void addPlace(LatLng position) {
-    _controller.reverse();
-    String placeId = "place_${mapsViewModel.count}";
-    Marker marker = new Marker(
-        markerId: MarkerId(placeId),
-        position: position,
-        zIndex: 10,
-        //TODO add GeoCode API to InfoWindow
-        //infoWindow: InfoWindow(title: "at $position"),
-        onTap: () {
-          _controller.reverse();
-
-          onMarkerTapped(MarkerId(placeId));
-          //print(markers[0].markerId);
-        },
-        icon: mapsViewModel.pinLocationIcon);
-    Circle circle = new Circle(
-        circleId: CircleId(placeId),
-        center: position,
-        radius: mapsViewModel.radius,
-        strokeWidth: 5,
-        strokeColor: context.colors.secondaryVariant);
-
-    mapsViewModel.markers.add(marker);
-    mapsViewModel.circles.add(circle);
-
-    MapPlace currentMapPlace = new MapPlace(placeId, position, circle, marker);
-    mapsViewModel.addMapPlaces(currentMapPlace);
-
-    if (mapsViewModel.selectedPlaces.length > 1) {
-      mapsViewModel.moveToBounderies();
-    }
-  }
-
-  void onMarkerTapped(MarkerId markerId) {
-    //List<Marker> markers = getMarkers().toList();
-
-    var matchedPlace = mapsViewModel.selectedPlaces
-        .where((element) => (element.marker.markerId.value == markerId.value));
-
-    if (matchedPlace.length > 0) {
-      print("match at " + matchedPlace.first.position.toString());
-
-      mapsViewModel.selectedPlace = matchedPlace.first;
-    } else {
-      print("No Match");
-    }
   }
 
   Set<Marker> getMarkers() {

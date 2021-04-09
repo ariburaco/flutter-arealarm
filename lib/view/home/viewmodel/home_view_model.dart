@@ -15,9 +15,10 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
 
   PageController pageController;
 
+  @action
   Future<void> startLocationService() async {
     try {
-      final result = await platform.invokeMethod('startService');
+      final results = await platform.invokeMethod('startService');
     } on PlatformException catch (e) {
       print(e.toString() + " Service NOT Started");
     }
@@ -47,7 +48,7 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
   }
 
   @observable
-  int currentPageIndex = 1;
+  int currentPageIndex = 0;
 
   @action
   void changePage(int index) {

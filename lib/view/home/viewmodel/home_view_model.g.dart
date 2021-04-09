@@ -25,6 +25,15 @@ mixin _$HomeViewModel on _HomeViewModelBase, Store {
     });
   }
 
+  final _$startLocationServiceAsyncAction =
+      AsyncAction('_HomeViewModelBase.startLocationService');
+
+  @override
+  Future<void> startLocationService() {
+    return _$startLocationServiceAsyncAction
+        .run(() => super.startLocationService());
+  }
+
   final _$_HomeViewModelBaseActionController =
       ActionController(name: '_HomeViewModelBase');
 

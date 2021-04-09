@@ -156,11 +156,22 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
   }
 
   @override
-  void changeRadius(double val) {
+  void deletePlace() {
+    final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
+        name: '_GoogleMapViewModelBase.deletePlace');
+    try {
+      return super.deletePlace();
+    } finally {
+      _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void changeRadius(Circle _circle) {
     final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
         name: '_GoogleMapViewModelBase.changeRadius');
     try {
-      return super.changeRadius(val);
+      return super.changeRadius(_circle);
     } finally {
       _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
     }
