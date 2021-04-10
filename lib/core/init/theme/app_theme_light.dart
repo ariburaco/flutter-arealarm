@@ -4,7 +4,7 @@ import 'app_theme.dart';
 import 'light/light_theme_interface.dart';
 
 class AppThemeLight extends AppTheme with ILightTheme {
-  static AppThemeLight _instance;
+  static AppThemeLight? _instance;
   static AppThemeLight get instance {
     return _instance ??= AppThemeLight._init();
   }
@@ -47,7 +47,7 @@ class AppThemeLight extends AppTheme with ILightTheme {
     return TabBarTheme(
       labelPadding: insets.lowPaddingAll,
       labelColor: _appColorScheme.onSecondary,
-      labelStyle: textThemeLight.headline5,
+      labelStyle: textThemeLight!.headline5,
       unselectedLabelColor: _appColorScheme.onSecondary.withOpacity(0.2),
       // unselectedLabelStyle: textThemeLight.headline4.copyWith(color: colorSchemeLight.red),
     );
@@ -55,20 +55,20 @@ class AppThemeLight extends AppTheme with ILightTheme {
 
   TextTheme textTheme() {
     return ThemeData.light().textTheme.copyWith(
-        headline1: textThemeLight.headline1,
-        headline2: textThemeLight.headline2,
-        overline: textThemeLight.headline3);
+        headline1: textThemeLight!.headline1,
+        headline2: textThemeLight!.headline2,
+        overline: textThemeLight!.headline3);
   }
 
   ColorScheme get _appColorScheme {
     return ColorScheme(
-        primary: colorSchemeLight.black,
+        primary: colorSchemeLight!.black,
         primaryVariant: Colors.white,
         secondary: Colors.green,
-        secondaryVariant: colorSchemeLight.azure,
+        secondaryVariant: colorSchemeLight!.azure,
         surface: Colors.blue,
         background: Color(0xfff6f9fc),
-        error: Colors.red[900],
+        error: Colors.red[900]!,
         onPrimary: Colors.greenAccent,
         onSecondary: Colors.black,
         onSurface: Colors.white30,

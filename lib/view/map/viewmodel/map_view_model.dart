@@ -12,10 +12,10 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @observable
   int count = 1;
 
-  GoogleMapController mapController;
+  GoogleMapController? mapController;
 
   @observable
-  BitmapDescriptor pinLocationIcon;
+  BitmapDescriptor? pinLocationIcon;
 
   @observable
   Set<Marker> markers = {};
@@ -24,13 +24,13 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   Set<Circle> circles = {};
 
   @observable
-  LatLng currentPosition;
+  LatLng? currentPosition;
 
   @observable
   List<MapPlace> selectedPlaces = [];
 
   @observable
-  MapPlace selectedPlace;
+  MapPlace? selectedPlace;
 
   @observable
   double radius = 50;
@@ -48,7 +48,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @action
   void navigateToPosition(LatLng pos) {
     if (mapController != null) {
-      mapController.animateCamera(CameraUpdate.newLatLng(pos));
+      mapController!.animateCamera(CameraUpdate.newLatLng(pos));
     }
   }
 
@@ -56,9 +56,9 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   void deletePlace() {
     if (selectedPlace != null) {
       var matchedCircle = circles.where((element) =>
-          (element.circleId.value == selectedPlace.circle.circleId.value));
+          (element.circleId.value == selectedPlace!.circle.circleId.value));
       var matchedMarker = markers.where((element) =>
-          (element.markerId.value == selectedPlace.marker.markerId.value));
+          (element.markerId.value == selectedPlace!.marker.markerId.value));
 
       if (matchedMarker.length > 0 && matchedCircle.length > 0) {
         circles.remove(matchedCircle.first);
@@ -72,7 +72,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   void changeRadius(Circle _circle) {
     if (selectedPlace != null) {
       var matchedCircle = circles.where((element) =>
-          (element.circleId.value == selectedPlace.circle.circleId.value));
+          (element.circleId.value == selectedPlace!.circle.circleId.value));
 
       if (matchedCircle.length > 0) {
         circles.remove(matchedCircle.first);
@@ -83,15 +83,15 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     }
   }
 
-  LatLngBounds _bounds(Set<Marker> markers) {
-    if (markers == null || markers.isEmpty) return null;
+  LatLngBounds? _bounds(Set<Marker> markers) {
+    if (markers.isEmpty) return null;
     return _createBounds(markers.map((m) => m.position).toList());
   }
 
   @action
   moveToBounderies() {
-    mapController
-        .animateCamera(CameraUpdate.newLatLngBounds(_bounds(markers), 100));
+    mapController!
+        .animateCamera(CameraUpdate.newLatLngBounds(_bounds(markers)!, 100));
   }
 
   LatLngBounds _createBounds(List<LatLng> positions) {
@@ -115,7 +115,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     getCurrenPosition();
     if (mapController != null) {
       if (currentPosition != null) {
-        mapController.animateCamera(CameraUpdate.newLatLng(currentPosition));
+        mapController!.animateCamera(CameraUpdate.newLatLng(currentPosition!));
       }
     }
   }

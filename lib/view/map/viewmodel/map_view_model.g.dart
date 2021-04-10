@@ -28,13 +28,13 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
       Atom(name: '_GoogleMapViewModelBase.pinLocationIcon');
 
   @override
-  BitmapDescriptor get pinLocationIcon {
+  BitmapDescriptor? get pinLocationIcon {
     _$pinLocationIconAtom.reportRead();
     return super.pinLocationIcon;
   }
 
   @override
-  set pinLocationIcon(BitmapDescriptor value) {
+  set pinLocationIcon(BitmapDescriptor? value) {
     _$pinLocationIconAtom.reportWrite(value, super.pinLocationIcon, () {
       super.pinLocationIcon = value;
     });
@@ -74,13 +74,13 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
       Atom(name: '_GoogleMapViewModelBase.currentPosition');
 
   @override
-  LatLng get currentPosition {
+  LatLng? get currentPosition {
     _$currentPositionAtom.reportRead();
     return super.currentPosition;
   }
 
   @override
-  set currentPosition(LatLng value) {
+  set currentPosition(LatLng? value) {
     _$currentPositionAtom.reportWrite(value, super.currentPosition, () {
       super.currentPosition = value;
     });
@@ -106,13 +106,13 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
       Atom(name: '_GoogleMapViewModelBase.selectedPlace');
 
   @override
-  MapPlace get selectedPlace {
+  MapPlace? get selectedPlace {
     _$selectedPlaceAtom.reportRead();
     return super.selectedPlace;
   }
 
   @override
-  set selectedPlace(MapPlace value) {
+  set selectedPlace(MapPlace? value) {
     _$selectedPlaceAtom.reportWrite(value, super.selectedPlace, () {
       super.selectedPlace = value;
     });

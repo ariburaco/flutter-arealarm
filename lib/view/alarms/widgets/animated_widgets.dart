@@ -4,15 +4,15 @@ import 'package:shimmer/shimmer.dart';
 
 class ShimmerText extends StatelessWidget {
   const ShimmerText({
-    Key key,
-    @required this.text,
-    @required this.duration,
+    Key? key,
+    required this.text,
+    required this.duration,
     this.fontSize,
   }) : super(key: key);
 
   final String text;
   final int duration;
-  final double fontSize;
+  final double? fontSize;
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ import '../model/map_place_model.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../core/components/icons/icon_normal.dart';
-import 'package:flutter_template/view/map/viewmodel/map_view_model.dart';
+import '../viewmodel/map_view_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class GoogleMapView extends StatefulWidget {
@@ -16,8 +16,8 @@ class GoogleMapView extends StatefulWidget {
 
 class _GoogleMapViewState extends State<GoogleMapView>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<Offset> _offsetFloat;
+  late AnimationController _controller;
+  late Animation<Offset> _offsetFloat;
   GoogleMapViewModel mapsViewModel = GoogleMapViewModel();
 
   @override
@@ -108,7 +108,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
                     children: [
                       Observer(builder: (_) {
                         return Text(
-                            "Configure Alarm #${mapsViewModel.selectedPlace != null ? mapsViewModel.selectedPlace.id : ""}",
+                            "Configure Alarm #${mapsViewModel.selectedPlace != null ? mapsViewModel.selectedPlace!.id : ""}",
                             style: TextStyle(fontWeight: FontWeight.bold));
                       }),
                       IconButton(
@@ -187,11 +187,11 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   void changeSelectedPlaceRadius(double value) {
     mapsViewModel.radius = value;
-    mapsViewModel.selectedPlace.radius = mapsViewModel.radius;
+    mapsViewModel.selectedPlace!.radius = mapsViewModel.radius;
     Circle newCircle = Circle(
-      circleId: mapsViewModel.selectedPlace.circle.circleId,
-      radius: mapsViewModel.selectedPlace.radius,
-      center: mapsViewModel.selectedPlace.position,
+      circleId: mapsViewModel.selectedPlace!.circle.circleId,
+      radius: mapsViewModel.selectedPlace!.radius,
+      center: mapsViewModel.selectedPlace!.position,
       strokeWidth: 5,
       strokeColor: context.colors.secondaryVariant,
     );
@@ -238,7 +238,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
           onMarkerTapped(MarkerId(placeId));
           //print(markers[0].markerId);
         },
-        icon: mapsViewModel.pinLocationIcon);
+        icon: mapsViewModel.pinLocationIcon!);
     Circle circle = new Circle(
         circleId: CircleId(placeId),
         center: position,
@@ -268,7 +268,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
     if (matchedPlace.length > 0) {
       mapsViewModel.selectedPlace = matchedPlace.first;
-      mapsViewModel.radius = mapsViewModel.selectedPlace.radius;
+      mapsViewModel.radius = mapsViewModel.selectedPlace!.radius;
       print("selected place radius: ${mapsViewModel.radius}");
     } else {
       print("No Match for marker");

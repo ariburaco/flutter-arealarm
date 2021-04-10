@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobx/mobx.dart';
+import '../../../core/base/model/base_view_model.dart';
 import '../../../core/constants/services/service_constants.dart';
 import '../../alarms/view/alarms_view.dart';
 import '../../map/view/map_view.dart';
-import '../../../core/base/model/base_view_model.dart';
-import 'package:mobx/mobx.dart';
+
 part 'home_view_model.g.dart';
 
 class HomeViewModel = _HomeViewModelBase with _$HomeViewModel;
 
 abstract class _HomeViewModelBase with Store, BaseViewModel {
-  List<Widget> pages;
+  late List<Widget> pages;
   var platform = const MethodChannel(ServiceConstants.LocationServiceChannel);
 
-  PageController pageController;
+  PageController? pageController;
 
   @action
   Future<void> startLocationService() async {

@@ -7,7 +7,7 @@ import '../viewmodel/alarms_view_model.dart';
 import '../widgets/animated_widgets.dart';
 
 class AlarmsView extends StatefulWidget {
-  AlarmsView({Key key}) : super(key: key);
+  AlarmsView({Key? key}) : super(key: key);
 
   @override
   _AlarmsViewState createState() => _AlarmsViewState();

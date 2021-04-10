@@ -9,7 +9,7 @@ import '../../../core/components/icons/icon_normal.dart';
 import '../viewmodel/home_view_model.dart';
 
 class HomeView extends StatefulWidget {
-  HomeView({Key key}) : super(key: key);
+  HomeView({Key? key}) : super(key: key);
 
   @override
   _HomeViewState createState() => _HomeViewState();
@@ -56,9 +56,7 @@ class _HomeViewState extends State<HomeView> {
           //     viewModel.startLocationService();
           //   },
           // ),
-          body: Observer(builder: (_) {
-            return viewModel.buildPageView();
-          }),
+          body: viewModel.buildPageView(),
           bottomNavigationBar: Observer(builder: (_) {
             return buildCurvedNaviationBar(context, viewModel);
           }),
@@ -78,7 +76,7 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: Colors.transparent,
         animationDuration: context.lowDuration,
         onTap: (index) {
-          viewModel.pageController.animateToPage(index,
+          viewModel.pageController!.animateToPage(index,
               duration: context.lowDuration, curve: Curves.linear);
         },
         items: [

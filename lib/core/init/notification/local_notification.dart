@@ -1,13 +1,11 @@
 import 'dart:typed_data';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotifications {
-  static LocalNotifications _instace;
+  static LocalNotifications? _instace;
   static LocalNotifications get instance {
     if (_instace == null) _instace = LocalNotifications._init();
-    return _instace;
+    return _instace!;
   }
 
   LocalNotifications._init();
@@ -23,7 +21,7 @@ class LocalNotifications {
         onSelectNotification: onSelectNotification);
   }
 
-  Future onSelectNotification(String payload) {
+  Future onSelectNotification(String? payload) {
     return notifications.cancelAll();
   }
 
@@ -44,8 +42,8 @@ class LocalNotifications {
   }
 
   Future showSilentNotification({
-    @required String title,
-    @required String body,
+    required String title,
+    required String body,
     int id = 0,
   }) =>
       _showNotification(title: title, body: body, id: id, type: _noSound);
@@ -85,16 +83,16 @@ class LocalNotifications {
   }
 
   Future showOngoingNotification({
-    @required String title,
-    @required String body,
+    required String title,
+    required String body,
     int id = 100,
   }) =>
       _showNotification(title: title, body: body, id: id, type: _ongoing);
 
   Future _showNotification({
-    @required String title,
-    @required String body,
-    @required NotificationDetails type,
+    required String title,
+    required String body,
+    required NotificationDetails type,
     int id = 0,
     //Color ledColor = const Color.fromARGB(255, 0, 255, 0),
   }) =>

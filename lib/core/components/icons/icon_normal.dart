@@ -3,8 +3,8 @@ import '../../base/extension/context_extension.dart';
 
 class IconNormal extends StatelessWidget {
   const IconNormal({
-    Key key,
-    @required this.icon,
+    Key? key,
+    required this.icon,
   }) : super(key: key);
 
   final IconData icon;
