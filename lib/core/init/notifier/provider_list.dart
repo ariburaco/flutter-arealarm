@@ -1,3 +1,4 @@
+import 'package:flutter_template/core/init/database/database_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -16,6 +17,9 @@ class ApplicationProvider {
   List<SingleChildWidget> dependItems = [
     ChangeNotifierProvider(
       create: (context) => ThemeNotifier(),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => DatabaseManager.instance,
     ),
     // Provider.value(value: NavigationService.instance)
   ];

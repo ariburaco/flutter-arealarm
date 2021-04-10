@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/core/init/database/database_manager.dart';
+import 'package:flutter_template/view/alarms/model/alarms_model.dart';
 import '../model/map_place_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -38,6 +40,26 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @override
   void init() {
     askLocationPermissions();
+    DatabaseManager.instance.databaseInit();
+  }
+
+  @action
+  Future<void> addPlaceToDB() async {
+    Alarm newAlarm = new Alarm(
+        alarmId: selectedPlace?.id.toString(),
+        placeName: selectedPlace?.name,
+        isAlarmActive: 1,
+        radius: selectedPlace?.radius,
+        lat: selectedPlace?.position.latitude,
+        long: selectedPlace?.position.longitude,
+        address: selectedPlace?.address);
+
+    final result = await DatabaseManager.instance.addAlarm(newAlarm);
+    if (result) {
+      print("alarm added!");
+    } else {
+      print("alarm couldn't add");
+    }
   }
 
   @override

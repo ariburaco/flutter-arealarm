@@ -20,6 +20,8 @@ class _AlarmsViewState extends State<AlarmsView>
   @override
   void initState() {
     super.initState();
+    alarmsViewModel.setContext(context);
+    alarmsViewModel.init();
   }
 
   @override
@@ -33,8 +35,8 @@ class _AlarmsViewState extends State<AlarmsView>
     return BaseView<AlarmsViewModel>(
         viewModel: AlarmsViewModel(),
         onModelReady: (viewModel) {
-          viewModel.setContext(context);
-          //viewModel.init();
+          // viewModel.setContext(context);
+          // viewModel.init();
         },
         onPageBuilder: (BuildContext context, AlarmsViewModel viewModel) =>
             Scaffold(
@@ -55,9 +57,9 @@ class _AlarmsViewState extends State<AlarmsView>
               ),
               floatingActionButton: FloatingActionButton(
                   backgroundColor: context.colors.secondaryVariant,
-                  child: IconNormal(icon: Icons.add),
+                  child: IconNormal(icon: Icons.delete),
                   onPressed: () {
-                    viewModel.addNewAlarm();
+                    alarmsViewModel.deleteAllAlarms();
                   }),
             ));
   }
@@ -83,7 +85,7 @@ class _AlarmsViewState extends State<AlarmsView>
           icon: Icon(Icons.add),
           iconSize: context.highValue,
           onPressed: () {
-            alarmsViewModel.addNewAlarm();
+            alarmsViewModel.getAlarmList();
           },
         )),
       );

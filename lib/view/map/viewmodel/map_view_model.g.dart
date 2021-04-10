@@ -133,6 +133,14 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     });
   }
 
+  final _$addPlaceToDBAsyncAction =
+      AsyncAction('_GoogleMapViewModelBase.addPlaceToDB');
+
+  @override
+  Future<void> addPlaceToDB() {
+    return _$addPlaceToDBAsyncAction.run(() => super.addPlaceToDB());
+  }
+
   final _$getCurrenPositionAsyncAction =
       AsyncAction('_GoogleMapViewModelBase.getCurrenPosition');
 
