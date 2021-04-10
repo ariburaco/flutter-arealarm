@@ -19,7 +19,7 @@ class LocalNotifications {
             onSelectNotification(payload));
 
     notifications.initialize(
-        InitializationSettings(settingsAndroid, settingsIOS),
+        InitializationSettings(android: settingsAndroid, iOS: settingsIOS),
         onSelectNotification: onSelectNotification);
   }
 
@@ -39,7 +39,8 @@ class LocalNotifications {
     );
     final iOSChannelSpecifics = IOSNotificationDetails(presentSound: false);
 
-    return NotificationDetails(androidChannelSpecifics, iOSChannelSpecifics);
+    return NotificationDetails(
+        android: androidChannelSpecifics, iOS: iOSChannelSpecifics);
   }
 
   Future showSilentNotification({
@@ -59,8 +60,8 @@ class LocalNotifications {
     vibrationPattern[3] = 2000;
     final androidChannelSpecifics = AndroidNotificationDetails(
       'new id', 'new name', 'new description',
-      importance: Importance.Max,
-      priority: Priority.High,
+      importance: Importance.max,
+      priority: Priority.high,
 
       // ongoing: true,
       autoCancel: false,
@@ -79,7 +80,8 @@ class LocalNotifications {
       // ledOffMs: 500,
     );
     final iOSChannelSpecifics = IOSNotificationDetails();
-    return NotificationDetails(androidChannelSpecifics, iOSChannelSpecifics);
+    return NotificationDetails(
+        android: androidChannelSpecifics, iOS: iOSChannelSpecifics);
   }
 
   Future showOngoingNotification({
@@ -94,7 +96,7 @@ class LocalNotifications {
     @required String body,
     @required NotificationDetails type,
     int id = 0,
-    Color ledColor = const Color.fromARGB(255, 0, 255, 0),
+    //Color ledColor = const Color.fromARGB(255, 0, 255, 0),
   }) =>
       notifications.show(id, title, body, type);
 }

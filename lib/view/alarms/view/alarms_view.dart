@@ -24,7 +24,6 @@ class _AlarmsViewState extends State<AlarmsView>
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -107,7 +106,9 @@ class _AlarmsViewState extends State<AlarmsView>
           ),
         ],
       );
-    } else {}
+    } else {
+      return Text("N/A");
+    }
   }
 
   AppBar buildAppBar() {

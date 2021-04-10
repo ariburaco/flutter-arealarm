@@ -18,7 +18,7 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
   @action
   Future<void> startLocationService() async {
     try {
-      final results = await platform.invokeMethod('startService');
+      await platform.invokeMethod('startService');
     } on PlatformException catch (e) {
       print(e.toString() + " Service NOT Started");
     }
