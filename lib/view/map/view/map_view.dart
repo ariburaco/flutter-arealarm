@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_template/core/init/database/database_manager.dart';
 import '../model/map_place_model.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';

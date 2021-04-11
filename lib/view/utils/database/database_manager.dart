@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_template/view/alarms/model/alarms_model.dart';
+import '../../alarms/model/alarms_model.dart';
 import 'package:sqflite/sqflite.dart';
 
-class DatabaseManager extends ChangeNotifier {
+class DatabaseManager {
   static DatabaseManager? _instace;
   static DatabaseManager get instance {
     if (_instace == null) _instace = DatabaseManager._init();
@@ -50,14 +49,14 @@ class DatabaseManager extends ChangeNotifier {
     if (database == null) databaseInit();
     final isAdded = await database!.insert(_alarmTable, _alarm.toJson());
     getAlarmList();
-    notifyListeners();
+
     return isAdded >= 0 ? true : false;
   }
 
   Future<List<Alarm>> getAlarmList() async {
     if (database == null) databaseInit();
     List<Map<String, dynamic>> alarmList = await database!.query(_alarmTable);
-    notifyListeners();
+
     return alarmList.map((e) => Alarm.fromJson(e)).toList();
   }
 

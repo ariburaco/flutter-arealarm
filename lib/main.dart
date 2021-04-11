@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'core/constants/application/app_constants.dart';
 import 'core/init/lang/language_manager.dart';
 import 'core/init/navigation/navigation_route/navigation_route.dart';

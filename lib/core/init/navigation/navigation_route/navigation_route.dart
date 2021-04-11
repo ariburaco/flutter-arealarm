@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../view/home/view/home_view.dart';
 
+import '../../../../view/home/view/home_view.dart';
 import '../../../components/cards/not_found_navigation_widget.dart';
 import '../../../constants/navigation/navigation_constants.dart';
 

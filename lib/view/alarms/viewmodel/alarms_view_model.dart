@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/core/init/database/database_manager.dart';
-import 'package:flutter_template/view/alarms/model/alarms_model.dart';
+import 'package:flutter_template/view/utils/database/database_manager.dart';
+import '../model/alarms_model.dart';
 import '../../../core/base/model/base_view_model.dart';
 import 'package:mobx/mobx.dart';
 part 'alarms_view_model.g.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/core/init/database/database_manager.dart';
-import 'package:flutter_template/view/alarms/model/alarms_model.dart';
+import 'package:flutter_template/view/utils/database/database_manager.dart';
+import '../../alarms/model/alarms_model.dart';
 import '../model/map_place_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
