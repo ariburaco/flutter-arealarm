@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template/view/utils/database/database_manager.dart';
+import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import 'package:provider/provider.dart';
 import '../model/alarms_model.dart';
 import '../../../core/base/model/base_view_model.dart';
 import 'package:mobx/mobx.dart';
@@ -11,11 +13,13 @@ abstract class _AlarmsViewModelBase with Store, BaseViewModel {
   @observable
   bool isLoading = false;
 
-  @observable
-  bool hasActiveAlarm = false;
+  @computed
+  bool get hasActiveAlarm =>
+      Provider.of<AlarmProdivder>(context, listen: false).hasActiveAlarm;
 
-  @observable
-  int alarmCount = 0;
+  @computed
+  int get alarmCount =>
+      Provider.of<AlarmProdivder>(context, listen: false).alarmCount;
 
   @observable
   List<Alarm> alarmList = [];
@@ -32,13 +36,8 @@ abstract class _AlarmsViewModelBase with Store, BaseViewModel {
 
   @action
   Future<void> getAlarmList() async {
-    alarmList = await DatabaseManager.instance.getAlarmList();
-    alarmCount = alarmList.length;
-    if (alarmList.length > 0)
-      hasActiveAlarm = true;
-    else
-      hasActiveAlarm = false;
-    print(alarmList.length);
+    alarmList = await Provider.of<AlarmProdivder>(context, listen: false)
+        .getAlarmList();
   }
 
   @action
@@ -48,7 +47,6 @@ abstract class _AlarmsViewModelBase with Store, BaseViewModel {
 
   @action
   Future<void> deleteAllAlarms() async {
-    await DatabaseManager.instance.deleteAllAlarm();
-    getAlarmList();
+    await Provider.of<AlarmProdivder>(context, listen: false).deleteAllAlarms();
   }
 }

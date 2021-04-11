@@ -9,6 +9,21 @@ part of 'alarms_view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$AlarmsViewModel on _AlarmsViewModelBase, Store {
+  Computed<bool>? _$hasActiveAlarmComputed;
+
+  @override
+  bool get hasActiveAlarm =>
+      (_$hasActiveAlarmComputed ??= Computed<bool>(() => super.hasActiveAlarm,
+              name: '_AlarmsViewModelBase.hasActiveAlarm'))
+          .value;
+  Computed<int>? _$alarmCountComputed;
+
+  @override
+  int get alarmCount =>
+      (_$alarmCountComputed ??= Computed<int>(() => super.alarmCount,
+              name: '_AlarmsViewModelBase.alarmCount'))
+          .value;
+
   final _$isLoadingAtom = Atom(name: '_AlarmsViewModelBase.isLoading');
 
   @override
@@ -21,37 +36,6 @@ mixin _$AlarmsViewModel on _AlarmsViewModelBase, Store {
   set isLoading(bool value) {
     _$isLoadingAtom.reportWrite(value, super.isLoading, () {
       super.isLoading = value;
-    });
-  }
-
-  final _$hasActiveAlarmAtom =
-      Atom(name: '_AlarmsViewModelBase.hasActiveAlarm');
-
-  @override
-  bool get hasActiveAlarm {
-    _$hasActiveAlarmAtom.reportRead();
-    return super.hasActiveAlarm;
-  }
-
-  @override
-  set hasActiveAlarm(bool value) {
-    _$hasActiveAlarmAtom.reportWrite(value, super.hasActiveAlarm, () {
-      super.hasActiveAlarm = value;
-    });
-  }
-
-  final _$alarmCountAtom = Atom(name: '_AlarmsViewModelBase.alarmCount');
-
-  @override
-  int get alarmCount {
-    _$alarmCountAtom.reportRead();
-    return super.alarmCount;
-  }
-
-  @override
-  set alarmCount(int value) {
-    _$alarmCountAtom.reportWrite(value, super.alarmCount, () {
-      super.alarmCount = value;
     });
   }
 
@@ -104,9 +88,9 @@ mixin _$AlarmsViewModel on _AlarmsViewModelBase, Store {
   String toString() {
     return '''
 isLoading: ${isLoading},
+alarmList: ${alarmList},
 hasActiveAlarm: ${hasActiveAlarm},
-alarmCount: ${alarmCount},
-alarmList: ${alarmList}
+alarmCount: ${alarmCount}
     ''';
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import 'package:provider/provider.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../core/components/icons/icon_normal.dart';
@@ -15,13 +17,11 @@ class AlarmsView extends StatefulWidget {
 
 class _AlarmsViewState extends State<AlarmsView>
     with AutomaticKeepAliveClientMixin {
-  AlarmsViewModel alarmsViewModel = new AlarmsViewModel();
+  //AlarmsViewModel alarmsViewModel = new AlarmsViewModel();
 
   @override
   void initState() {
     super.initState();
-    alarmsViewModel.setContext(context);
-    alarmsViewModel.init();
   }
 
   @override
@@ -35,8 +35,8 @@ class _AlarmsViewState extends State<AlarmsView>
     return BaseView<AlarmsViewModel>(
         viewModel: AlarmsViewModel(),
         onModelReady: (viewModel) {
-          // viewModel.setContext(context);
-          // viewModel.init();
+          viewModel.setContext(context);
+          viewModel.init();
         },
         onPageBuilder: (BuildContext context, AlarmsViewModel viewModel) =>
             Scaffold(
@@ -44,30 +44,28 @@ class _AlarmsViewState extends State<AlarmsView>
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Observer(builder: (_) {
-                    return Container(
-                        padding: context.paddingLow, child: buildNextAlarm());
-                  }),
-                  Observer(builder: (_) {
-                    return Expanded(
-                      child: buildAlarmList(),
-                    );
-                  })
+                  Container(
+                    padding: context.paddingLow,
+                    child: buildNextAlarm(viewModel),
+                  ),
+                  Expanded(
+                    child: buildAlarmList(viewModel),
+                  )
                 ],
               ),
               floatingActionButton: FloatingActionButton(
                   backgroundColor: context.colors.secondaryVariant,
                   child: IconNormal(icon: Icons.delete),
                   onPressed: () {
-                    alarmsViewModel.deleteAllAlarms();
+                    viewModel.deleteAllAlarms();
                   }),
             ));
   }
 
-  Widget buildAlarmList() {
-    if (alarmsViewModel.hasActiveAlarm) {
+  Widget buildAlarmList(AlarmsViewModel viewModel) {
+    if (!viewModel.hasActiveAlarm) {
       return ListView.builder(
-        itemCount: alarmsViewModel.alarmList.length,
+        itemCount: context.read<AlarmProdivder>().alarmCount,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
             padding: context.paddingLow,
@@ -85,15 +83,16 @@ class _AlarmsViewState extends State<AlarmsView>
           icon: Icon(Icons.add),
           iconSize: context.highValue,
           onPressed: () {
-            alarmsViewModel.getAlarmList();
+            context.read<AlarmProdivder>().getAlarmList();
+            //Provider.of<AlarmProdivder>(context, listen: false).getAlarmList();
           },
         )),
       );
     }
   }
 
-  Widget buildNextAlarm() {
-    if (alarmsViewModel.hasActiveAlarm) {
+  Widget buildNextAlarm(AlarmsViewModel viewModel) {
+    if (viewModel.hasActiveAlarm) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

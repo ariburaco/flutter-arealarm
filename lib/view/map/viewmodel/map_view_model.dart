@@ -40,7 +40,6 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @override
   void init() {
     askLocationPermissions();
-    DatabaseManager.instance.databaseInit();
   }
 
   @action

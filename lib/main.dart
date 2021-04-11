@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_template/view/utils/database/database_manager.dart';
 import 'package:provider/provider.dart';
 
 import 'core/constants/application/app_constants.dart';
@@ -13,8 +14,9 @@ import 'view/home/view/home_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  LocalNotifications.instance.initNotifications();
   await EasyLocalization.ensureInitialized();
+  LocalNotifications.instance.initNotifications();
+  DatabaseManager.instance.databaseInit();
 
   runApp(MultiProvider(
     providers: [...ApplicationProvider.instance.dependItems],
