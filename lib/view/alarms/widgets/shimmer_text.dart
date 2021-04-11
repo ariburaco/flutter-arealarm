@@ -22,7 +22,6 @@ class ShimmerText extends StatelessWidget {
         baseColor: context.colors.primary,
         highlightColor: context.colors.secondary,
         child: Container(
-          padding: context.paddingNormal,
           child: Text(
             text,
             style: TextStyle(

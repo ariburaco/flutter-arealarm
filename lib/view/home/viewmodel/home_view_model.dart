@@ -16,6 +16,9 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
 
   PageController? pageController;
 
+  @observable
+  int currentPageIndex = 0;
+
   @action
   Future<void> startLocationService() async {
     try {
@@ -47,9 +50,6 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
         },
         children: pages);
   }
-
-  @observable
-  int currentPageIndex = 0;
 
   @action
   void changePage(int index) {

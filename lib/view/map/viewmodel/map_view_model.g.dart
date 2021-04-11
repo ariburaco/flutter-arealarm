@@ -77,13 +77,14 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     return _$addPlaceToDBAsyncAction.run(() => super.addPlaceToDB());
   }
 
-  final _$addPlaceAsyncAction = AsyncAction('_GoogleMapViewModelBase.addPlace');
+  final _$addPlaceMarkerAsyncAction =
+      AsyncAction('_GoogleMapViewModelBase.addPlaceMarker');
 
   @override
-  Future<void> addPlace(
+  Future<void> addPlaceMarker(
       LatLng position, BuildContext context, AnimationController _controller) {
-    return _$addPlaceAsyncAction
-        .run(() => super.addPlace(position, context, _controller));
+    return _$addPlaceMarkerAsyncAction
+        .run(() => super.addPlaceMarker(position, context, _controller));
   }
 
   final _$_GoogleMapViewModelBaseActionController =

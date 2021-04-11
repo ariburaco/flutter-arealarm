@@ -40,7 +40,6 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    print("Reload?");
     return BaseView<HomeViewModel>(
       viewModel: HomeViewModel(),
       onModelReady: (viewModel) {
@@ -50,12 +49,6 @@ class _HomeViewState extends State<HomeView> {
       onPageBuilder: (BuildContext context, HomeViewModel viewModel) =>
           SafeArea(
         child: Scaffold(
-          // floatingActionButton: FloatingActionButton(
-          //   child: IconNormal(icon: Icons.add_alert),
-          //   onPressed: () {
-          //     viewModel.startLocationService();
-          //   },
-          // ),
           body: viewModel.buildPageView(),
           bottomNavigationBar: Observer(builder: (_) {
             return buildCurvedNaviationBar(context, viewModel);

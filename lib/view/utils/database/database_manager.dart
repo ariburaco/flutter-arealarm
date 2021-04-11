@@ -27,12 +27,12 @@ class DatabaseManager {
 
   Future<void> databaseInit() async {
     database = await openDatabase(_alarmDatabaseName, version: _version,
-        onCreate: (db, version) {
-      _createDatabase(db);
+        onCreate: (db, version) async {
+      await _createDatabase(db);
     });
   }
 
-  void _createDatabase(Database db) {
+  Future<void> _createDatabase(Database db) async {
     String sql =
         '''CREATE TABLE IF NOT EXISTS $_alarmTable ( id INTEGER PRIMARY KEY AUTOINCREMENT,
          $alarmId VARCHAR(10),
@@ -42,7 +42,7 @@ class DatabaseManager {
          $long DOUBLE,
          $radius DOUBLE,
          $address TEXT )''';
-    db.execute(sql);
+    await db.execute(sql);
   }
 
   Future<bool> addAlarm(Alarm _alarm) async {

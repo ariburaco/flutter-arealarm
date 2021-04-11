@@ -66,7 +66,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   }
 
   @action
-  Future<void> addPlace(LatLng position, BuildContext context,
+  Future<void> addPlaceMarker(LatLng position, BuildContext context,
       AnimationController _controller) async {
     _controller.reverse();
     navigateToPosition(position);

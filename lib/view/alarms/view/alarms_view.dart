@@ -1,12 +1,14 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../core/components/icons/icon_normal.dart';
 import '../viewmodel/alarms_view_model.dart';
-import '../widgets/animated_widgets.dart';
+import '../widgets/shimmer_text.dart';
 
 class AlarmsView extends StatefulWidget {
   AlarmsView({Key? key}) : super(key: key);
@@ -44,11 +46,14 @@ class _AlarmsViewState extends State<AlarmsView>
                 children: [
                   Container(
                     padding: context.paddingLow,
-                    child: buildNextAlarm(viewModel),
+                    child: buildNextAlarmIndicator(viewModel),
                   ),
                   Expanded(
-                    child: buildAlarmList(viewModel),
-                  )
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 50.0),
+                      child: buildAlarmList(viewModel),
+                    ),
+                  ),
                 ],
               ),
               floatingActionButton: FloatingActionButton(
@@ -68,27 +73,80 @@ class _AlarmsViewState extends State<AlarmsView>
         itemCount:
             Provider.of<AlarmProdivder>(context, listen: true).alarmCount,
         itemBuilder: (BuildContext context, int index) {
+          final placeName =
+              context.read<AlarmProdivder>().alarmList[index].placeName!;
+
+          final radius =
+              context.read<AlarmProdivder>().alarmList[index].radius!.toInt();
+          LatLng position = new LatLng(
+              context.read<AlarmProdivder>().alarmList[index].lat!,
+              context.read<AlarmProdivder>().alarmList[index].long!);
+          final address =
+              context.read<AlarmProdivder>().alarmList[index].address!;
           return Padding(
-            padding: context.paddingLow,
+            padding: context.paddingLowest,
             child: Container(
-              height: context.highValue,
-              color: context.colors.secondaryVariant,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+              decoration: buildBorderRadiusDecoration(context, 10),
+              height: context.highestValue,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(context
-                      .read<AlarmProdivder>()
-                      .alarmList[index]
-                      .placeName!),
-                  Text(context
-                      .read<AlarmProdivder>()
-                      .alarmList[index]
-                      .radius
-                      .toString()),
-                  Text(
-                      "Lat: ${context.read<AlarmProdivder>().alarmList[index].lat} - Long: ${context.read<AlarmProdivder>().alarmList[index].long}"),
-                  Text(
-                      context.read<AlarmProdivder>().alarmList[index].address!),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.location_pin,
+                        size: 50,
+                        color: context.randomColor,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: AutoSizeText(
+                            placeName,
+                            maxLines: 1,
+                            minFontSize: 18,
+                            style: context.textTheme.subtitle2,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            address.toString(),
+                            style: context.textTheme.subtitle1,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "${radius.toString()} meters",
+                            style: context.textTheme.headline5,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: context.theme.hintColor,
+                            size: 30,
+                          ),
+                          onPressed: () {},
+                        )),
+                  ),
                 ],
               ),
             ),
@@ -110,21 +168,54 @@ class _AlarmsViewState extends State<AlarmsView>
     }
   }
 
-  Widget buildNextAlarm(AlarmsViewModel viewModel) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          "Next Alarm",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  BoxDecoration buildBorderRadiusDecoration(
+      BuildContext context, double radius) {
+    return BoxDecoration(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(radius),
+            topRight: Radius.circular(radius),
+            bottomLeft: Radius.circular(radius),
+            bottomRight: Radius.circular(radius)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.8),
+            spreadRadius: 2,
+            blurRadius: 2,
+            offset: Offset(1, 2), // changes position of shadow
+          ),
+        ],
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [context.colors.onPrimary, context.colors.onError],
+        ));
+  }
+
+  Widget buildNextAlarmIndicator(AlarmsViewModel viewModel) {
+    if (Provider.of<AlarmProdivder>(context, listen: true).alarmCount > 0) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Nearest Alarm",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          ShimmerText(
+            text: "in 200 meters",
+            fontSize: 20,
+            duration: 3000,
+          ),
+        ],
+      );
+    } else {
+      return Center(
+        child: ShimmerText(
+          text: "text",
+          duration: 2000,
+          fontSize: 50,
         ),
-        ShimmerText(
-          text: "in 200 meters",
-          fontSize: 20,
-          duration: 3000,
-        ),
-      ],
-    );
+      );
+    }
   }
 
   AppBar buildAppBar() {
