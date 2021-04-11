@@ -9,21 +9,6 @@ part of 'alarms_view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$AlarmsViewModel on _AlarmsViewModelBase, Store {
-  Computed<bool>? _$hasActiveAlarmComputed;
-
-  @override
-  bool get hasActiveAlarm =>
-      (_$hasActiveAlarmComputed ??= Computed<bool>(() => super.hasActiveAlarm,
-              name: '_AlarmsViewModelBase.hasActiveAlarm'))
-          .value;
-  Computed<int>? _$alarmCountComputed;
-
-  @override
-  int get alarmCount =>
-      (_$alarmCountComputed ??= Computed<int>(() => super.alarmCount,
-              name: '_AlarmsViewModelBase.alarmCount'))
-          .value;
-
   final _$isLoadingAtom = Atom(name: '_AlarmsViewModelBase.isLoading');
 
   @override
@@ -54,22 +39,6 @@ mixin _$AlarmsViewModel on _AlarmsViewModelBase, Store {
     });
   }
 
-  final _$getAlarmListAsyncAction =
-      AsyncAction('_AlarmsViewModelBase.getAlarmList');
-
-  @override
-  Future<void> getAlarmList() {
-    return _$getAlarmListAsyncAction.run(() => super.getAlarmList());
-  }
-
-  final _$deleteAllAlarmsAsyncAction =
-      AsyncAction('_AlarmsViewModelBase.deleteAllAlarms');
-
-  @override
-  Future<void> deleteAllAlarms() {
-    return _$deleteAllAlarmsAsyncAction.run(() => super.deleteAllAlarms());
-  }
-
   final _$_AlarmsViewModelBaseActionController =
       ActionController(name: '_AlarmsViewModelBase');
 
@@ -88,9 +57,7 @@ mixin _$AlarmsViewModel on _AlarmsViewModelBase, Store {
   String toString() {
     return '''
 isLoading: ${isLoading},
-alarmList: ${alarmList},
-hasActiveAlarm: ${hasActiveAlarm},
-alarmCount: ${alarmCount}
+alarmList: ${alarmList}
     ''';
   }
 }

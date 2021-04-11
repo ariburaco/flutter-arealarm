@@ -13,14 +13,6 @@ abstract class _AlarmsViewModelBase with Store, BaseViewModel {
   @observable
   bool isLoading = false;
 
-  @computed
-  bool get hasActiveAlarm =>
-      Provider.of<AlarmProdivder>(context, listen: false).hasActiveAlarm;
-
-  @computed
-  int get alarmCount =>
-      Provider.of<AlarmProdivder>(context, listen: false).alarmCount;
-
   @observable
   List<Alarm> alarmList = [];
 
@@ -30,23 +22,12 @@ abstract class _AlarmsViewModelBase with Store, BaseViewModel {
   @override
   void init() {
     changeLoading();
-    getAlarmList();
+    Provider.of<AlarmProdivder>(context, listen: false).getAlarmList();
     changeLoading();
-  }
-
-  @action
-  Future<void> getAlarmList() async {
-    alarmList = await Provider.of<AlarmProdivder>(context, listen: false)
-        .getAlarmList();
   }
 
   @action
   void changeLoading() {
     isLoading = !isLoading;
-  }
-
-  @action
-  Future<void> deleteAllAlarms() async {
-    await Provider.of<AlarmProdivder>(context, listen: false).deleteAllAlarms();
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/view/utils/database/database_manager.dart';
+import '../../../core/base/extension/context_extension.dart';
+import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import 'package:provider/provider.dart';
 import '../../alarms/model/alarms_model.dart';
 import '../model/map_place_model.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,22 +18,18 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
 
   GoogleMapController? mapController;
 
-  @observable
   BitmapDescriptor? pinLocationIcon;
 
   @observable
-  Set<Marker> markers = {};
+  ObservableSet<Marker> markers = ObservableSet();
 
   @observable
-  Set<Circle> circles = {};
+  ObservableSet<Circle> circles = ObservableSet();
 
-  @observable
   LatLng? currentPosition;
 
-  @observable
   List<MapPlace> selectedPlaces = [];
 
-  @observable
   MapPlace? selectedPlace;
 
   @observable
@@ -53,12 +51,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
         long: selectedPlace?.position.longitude,
         address: selectedPlace?.address);
 
-    final result = await DatabaseManager.instance.addAlarm(newAlarm);
-    if (result) {
-      print("alarm added!");
-    } else {
-      print("alarm couldn't add");
-    }
+    Provider.of<AlarmProdivder>(context, listen: false).addAlarmToDB(newAlarm);
   }
 
   @override
@@ -66,10 +59,64 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     this.context = context;
   }
 
-  @action
   void navigateToPosition(LatLng pos) {
     if (mapController != null) {
       mapController!.animateCamera(CameraUpdate.newLatLng(pos));
+    }
+  }
+
+  @action
+  Future<void> addPlace(LatLng position, BuildContext context,
+      AnimationController _controller) async {
+    _controller.reverse();
+    navigateToPosition(position);
+    String placeId = "place_${count}";
+    Marker marker = new Marker(
+        markerId: MarkerId(placeId),
+        position: position,
+        zIndex: 14,
+        //TODO add GeoCode API to InfoWindow
+        //infoWindow: InfoWindow(title: "at $position"),
+        onTap: () {
+          _controller.reverse();
+          onMarkerTapped(MarkerId(placeId));
+          //print(markers[0].markerId);
+        },
+        icon: pinLocationIcon!);
+    Circle circle = new Circle(
+        circleId: CircleId(placeId),
+        center: position,
+        radius: radius,
+        strokeWidth: 5,
+        strokeColor: context.colors.secondaryVariant);
+
+    markers.add(marker);
+    circles.add(circle);
+
+    MapPlace currentMapPlace =
+        new MapPlace(count, placeId, position, circle, marker, radius, "N/A");
+
+    selectedPlace = currentMapPlace;
+    addMapPlaces(currentMapPlace);
+
+    if (selectedPlaces.length > 1) {
+      moveToBounderies();
+    }
+  }
+
+  @action
+  void onMarkerTapped(MarkerId markerId) {
+    //List<Marker> markers = getMarkers().toList();
+
+    var matchedPlace = selectedPlaces
+        .where((element) => (element.marker.markerId.value == markerId.value));
+
+    if (matchedPlace.length > 0) {
+      selectedPlace = matchedPlace.first;
+      radius = selectedPlace!.radius;
+      print("selected place radius: ${radius}");
+    } else {
+      print("No Match for marker");
     }
   }
 
@@ -104,15 +151,13 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     }
   }
 
-  LatLngBounds? _bounds(Set<Marker> markers) {
-    if (markers.isEmpty) return null;
+  LatLngBounds _bounds(ObservableSet<Marker> markers) {
     return _createBounds(markers.map((m) => m.position).toList());
   }
 
-  @action
   moveToBounderies() {
     mapController!
-        .animateCamera(CameraUpdate.newLatLngBounds(_bounds(markers)!, 100));
+        .animateCamera(CameraUpdate.newLatLngBounds(_bounds(markers), 100));
   }
 
   LatLngBounds _createBounds(List<LatLng> positions) {
@@ -131,7 +176,6 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
         northeast: LatLng(northeastLat, northeastLon));
   }
 
-  @action
   void navigateToCurrentPosition() {
     getCurrenPosition();
     if (mapController != null) {
@@ -141,7 +185,6 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     }
   }
 
-  @action
   void addMapPlaces(MapPlace currentMapPlace) {
     if (pinLocationIcon != null) {
       selectedPlaces.add(currentMapPlace);
@@ -156,7 +199,6 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     await setCustomMapPin();
   }
 
-  @action
   Future<void> getCurrenPosition() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);

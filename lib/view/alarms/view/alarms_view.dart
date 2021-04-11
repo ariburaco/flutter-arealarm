@@ -17,8 +17,6 @@ class AlarmsView extends StatefulWidget {
 
 class _AlarmsViewState extends State<AlarmsView>
     with AutomaticKeepAliveClientMixin {
-  //AlarmsViewModel alarmsViewModel = new AlarmsViewModel();
-
   @override
   void initState() {
     super.initState();
@@ -56,22 +54,43 @@ class _AlarmsViewState extends State<AlarmsView>
               floatingActionButton: FloatingActionButton(
                   backgroundColor: context.colors.secondaryVariant,
                   child: IconNormal(icon: Icons.delete),
-                  onPressed: () {
-                    viewModel.deleteAllAlarms();
+                  onPressed: () async {
+                    await Provider.of<AlarmProdivder>(context, listen: false)
+                        .deleteAllAlarms();
+                    // gbvoppppppppppppppppppppppppppppppppppp888888888888888888888888889(() {});
                   }),
             ));
   }
 
   Widget buildAlarmList(AlarmsViewModel viewModel) {
-    if (!viewModel.hasActiveAlarm) {
+    if (Provider.of<AlarmProdivder>(context, listen: true).alarmCount > 0) {
       return ListView.builder(
-        itemCount: context.read<AlarmProdivder>().alarmCount,
+        itemCount:
+            Provider.of<AlarmProdivder>(context, listen: true).alarmCount,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
             padding: context.paddingLow,
             child: Container(
               height: context.highValue,
-              color: context.randomColor,
+              color: context.colors.secondaryVariant,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(context
+                      .read<AlarmProdivder>()
+                      .alarmList[index]
+                      .placeName!),
+                  Text(context
+                      .read<AlarmProdivder>()
+                      .alarmList[index]
+                      .radius
+                      .toString()),
+                  Text(
+                      "Lat: ${context.read<AlarmProdivder>().alarmList[index].lat} - Long: ${context.read<AlarmProdivder>().alarmList[index].long}"),
+                  Text(
+                      context.read<AlarmProdivder>().alarmList[index].address!),
+                ],
+              ),
             ),
           );
         },
@@ -83,7 +102,7 @@ class _AlarmsViewState extends State<AlarmsView>
           icon: Icon(Icons.add),
           iconSize: context.highValue,
           onPressed: () {
-            context.read<AlarmProdivder>().getAlarmList();
+            //context.read<AlarmProdivder>().getAlarmList();
             //Provider.of<AlarmProdivder>(context, listen: false).getAlarmList();
           },
         )),
@@ -92,24 +111,20 @@ class _AlarmsViewState extends State<AlarmsView>
   }
 
   Widget buildNextAlarm(AlarmsViewModel viewModel) {
-    if (viewModel.hasActiveAlarm) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Next Alarm",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          ShimmerText(
-            text: "in 200 meters",
-            fontSize: 20,
-            duration: 3000,
-          ),
-        ],
-      );
-    } else {
-      return Text("N/A");
-    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "Next Alarm",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        ShimmerText(
+          text: "in 200 meters",
+          fontSize: 20,
+          duration: 3000,
+        ),
+      ],
+    );
   }
 
   AppBar buildAppBar() {

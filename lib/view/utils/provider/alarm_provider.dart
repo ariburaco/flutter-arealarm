@@ -22,8 +22,16 @@ class AlarmProdivder extends ChangeNotifier {
 
   Future<void> deleteAllAlarms() async {
     await DatabaseManager.instance.deleteAllAlarm();
-    alarmCount = 0;
-    //getAlarmList();
-    notifyListeners();
+    getAlarmList();
+  }
+
+  Future<void> addAlarmToDB(Alarm newAlarm) async {
+    final result = await DatabaseManager.instance.addAlarm(newAlarm);
+    if (result) {
+      print("alarm added!");
+    } else {
+      print("alarm couldn't add");
+    }
+    getAlarmList();
   }
 }
