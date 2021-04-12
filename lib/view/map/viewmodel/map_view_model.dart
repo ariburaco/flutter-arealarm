@@ -275,7 +275,11 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   }
 
   LatLngBounds _bounds(ObservableSet<Marker> markers) {
-    return _createBounds(markers.map((m) => m.position).toList());
+    var markerPositions = markers.map((m) => m.position).toList();
+
+    getCurrentPosition();
+    markerPositions.add(currentPosition!);
+    return _createBounds(markerPositions);
   }
 
   moveToBounderies() {
@@ -325,7 +329,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     await establishExistentAlarms(_controller);
     await getAlarmCount();
 
-    if (count > 0) moveToBounderies();
+    if (count > 1) moveToBounderies();
   }
 
   Future<LatLng> getCurrentPosition() async {

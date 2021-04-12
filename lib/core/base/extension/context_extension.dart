@@ -15,7 +15,7 @@ extension MediaQueryExtension on BuildContext {
   double get normalValue => height * 0.04;
   double get mediumValue => height * 0.06;
   double get highValue => height * 0.12;
-  double get highestValue => height * 0.15;
+  double get highestValue => height * 0.2;
 }
 
 extension ThemeExtension on BuildContext {

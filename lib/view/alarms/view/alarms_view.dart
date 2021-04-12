@@ -75,7 +75,7 @@ class _AlarmsViewState extends State<AlarmsView>
             Provider.of<AlarmProdivder>(context, listen: true).alarmList.length,
         itemBuilder: (BuildContext context, int index) {
           final placeName =
-              context.read<AlarmProdivder>().alarmList[index].placeName!;
+              context.read<AlarmProdivder>().alarmList[index].alarmId!;
 
           final radius =
               context.read<AlarmProdivder>().alarmList[index].radius!.toInt();
@@ -112,7 +112,7 @@ class _AlarmsViewState extends State<AlarmsView>
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: AutoSizeText(
-                            placeName,
+                            "Alarm #$placeName",
                             maxLines: 1,
                             minFontSize: 18,
                             style: context.textTheme.subtitle2,
