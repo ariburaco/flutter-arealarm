@@ -9,8 +9,8 @@ class DatabaseManager {
     return _instace!;
   }
 
-  int _version = 2;
-  String _alarmDatabaseName = "alarms_db";
+  int _version = 3;
+  String _alarmDatabaseName = "alarms_db1";
   String _alarmTable = "alarms_table";
 
   // Alarm Table Columns
@@ -35,7 +35,7 @@ class DatabaseManager {
   Future<void> _createDatabase(Database db) async {
     String sql =
         '''CREATE TABLE IF NOT EXISTS $_alarmTable ( id INTEGER PRIMARY KEY AUTOINCREMENT,
-         $alarmId VARCHAR(10),
+         $alarmId INTEGER,
          $placeName VARCHAR(100),
          $isAlarmActive INTEGER,
          $lat DOUBLE,
@@ -84,6 +84,21 @@ class DatabaseManager {
     );
 
     return alarms > 0 ? true : false;
+  }
+
+  Future<int> getAlarmCount() async {
+    if (database == null) databaseInit();
+    final alarms = await database!.query(
+      _alarmTable,
+    );
+
+    var alarmList = alarms.map((e) => Alarm.fromJson(e)).toList();
+    if (alarmList.length > 0) {
+      alarmList.sort((a, b) => a.alarmId!.compareTo(b.alarmId!));
+      return alarmList.last.alarmId! + 1;
+    } else {
+      return 1;
+    }
   }
 
   Future<bool> deleteAllAlarm() async {

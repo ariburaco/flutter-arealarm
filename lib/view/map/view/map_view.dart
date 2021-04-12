@@ -92,7 +92,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
         onLongPress: (LatLng pos) {
           viewmodel.addPlaceMarker(pos, context, _controller);
         },
-        onMapCreated: (map) => viewmodel.mapsInit(map),
+        onMapCreated: (map) => viewmodel.mapsInit(map, _controller),
         initialCameraPosition: CameraPosition(
           target: LatLng(41.029291, 28.887751),
           zoom: 15,

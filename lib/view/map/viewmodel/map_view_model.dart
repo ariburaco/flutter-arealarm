@@ -26,11 +26,16 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @observable
   ObservableSet<Circle> circles = ObservableSet();
 
+  @observable
   LatLng? currentPosition;
 
   List<MapPlace> selectedPlaces = [];
 
+  @observable
   MapPlace? selectedPlace;
+
+  @observable
+  bool isSelectedPlaceAlive = false;
 
   @observable
   double radius = 50;
@@ -38,20 +43,115 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   @override
   void init() {
     askLocationPermissions();
+    getCurrentPosition();
+  }
+
+  Future<void> getAlarmCount() async {
+    count = await Provider.of<AlarmProdivder>(context, listen: false)
+        .getAlarmCount();
+    print("Total Alarm Count! $count ");
+  }
+
+  Future<void> establishExistentAlarms(AnimationController _controller) async {
+    final existentAlarms =
+        await Provider.of<AlarmProdivder>(context, listen: false)
+            .getAlarmList();
+
+    for (var alarm in existentAlarms) {
+      int id = alarm.alarmId!;
+      String name = "place_$id";
+      LatLng position = new LatLng(alarm.lat!, alarm.long!);
+      double radius = alarm.radius!;
+      String address = alarm.address!;
+
+      Marker marker = new Marker(
+          markerId: MarkerId(name),
+          position: position,
+          zIndex: 14,
+          //TODO add GeoCode API to InfoWindow
+          //infoWindow: InfoWindow(title: "at $position"),
+          onTap: () {
+            _controller.reverse();
+            onMarkerTapped(MarkerId(name));
+            //print(markers[0].markerId);
+          },
+          icon: pinLocationIcon!);
+      Circle circle = new Circle(
+          circleId: CircleId(name),
+          center: position,
+          radius: radius,
+          strokeWidth: 4,
+          fillColor: context.colors.onPrimary.withOpacity(0.2),
+          strokeColor: context.colors.secondaryVariant);
+
+      markers.add(marker);
+      circles.add(circle);
+
+      final alarmToMapPlace =
+          MapPlace(id, name, position, circle, marker, radius, address);
+
+      selectedPlaces.add(alarmToMapPlace);
+    }
   }
 
   @action
   Future<void> addPlaceToDB() async {
-    Alarm newAlarm = new Alarm(
-        alarmId: selectedPlace?.id.toString(),
-        placeName: selectedPlace?.name,
-        isAlarmActive: 1,
-        radius: selectedPlace?.radius,
-        lat: selectedPlace?.position.latitude,
-        long: selectedPlace?.position.longitude,
-        address: selectedPlace?.address);
+    var isExsist = await checkSelectedIsPlaceAddedToDB();
+    if (isExsist == null) {
+      Alarm newAlarm = new Alarm(
+          alarmId: selectedPlace?.id,
+          placeName: selectedPlace?.name,
+          isAlarmActive: 1,
+          radius: selectedPlace?.radius,
+          lat: selectedPlace?.position.latitude,
+          long: selectedPlace?.position.longitude,
+          address: selectedPlace?.address);
 
-    Provider.of<AlarmProdivder>(context, listen: false).addAlarmToDB(newAlarm);
+      Provider.of<AlarmProdivder>(context, listen: false)
+          .addAlarmToDB(newAlarm);
+    } else {
+      // TODO Show Snackbar Alarm Added or Not!
+    }
+    checkSelectedIsPlaceAddedToDB();
+  }
+
+  @action
+  Future<void> updateSelectedAlarm() async {
+    if (isSelectedPlaceAlive) {
+      Alarm newAlarm = new Alarm(
+          alarmId: selectedPlace?.id,
+          placeName: selectedPlace?.name,
+          isAlarmActive: 1,
+          radius: selectedPlace?.radius,
+          lat: selectedPlace?.position.latitude,
+          long: selectedPlace?.position.longitude,
+          address: selectedPlace?.address);
+
+      Provider.of<AlarmProdivder>(context, listen: false)
+          .updateAlarm(selectedPlace!.id, newAlarm);
+    } else {
+      // TODO Show Snackbar Alarm Updated or Not!
+    }
+    checkSelectedIsPlaceAddedToDB();
+  }
+
+  @action
+  Future<Alarm?> checkSelectedIsPlaceAddedToDB() async {
+    var currentList = await Provider.of<AlarmProdivder>(context, listen: false)
+        .getAlarmList();
+
+    if (selectedPlace == null) return null;
+
+    var isExist =
+        currentList.where((element) => element.alarmId == selectedPlace!.id);
+
+    if (isExist.isEmpty) {
+      isSelectedPlaceAlive = false;
+      return null;
+    } else {
+      isSelectedPlaceAlive = true;
+      return isExist.first;
+    }
   }
 
   @override
@@ -87,7 +187,8 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
         circleId: CircleId(placeId),
         center: position,
         radius: radius,
-        strokeWidth: 5,
+        strokeWidth: 4,
+        fillColor: context.colors.onPrimary.withOpacity(0.2),
         strokeColor: context.colors.secondaryVariant);
 
     markers.add(marker);
@@ -98,7 +199,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
 
     selectedPlace = currentMapPlace;
     addMapPlaces(currentMapPlace);
-
+    await checkSelectedIsPlaceAddedToDB();
     if (selectedPlaces.length > 1) {
       moveToBounderies();
     }
@@ -118,6 +219,27 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     } else {
       print("No Match for marker");
     }
+    checkSelectedIsPlaceAddedToDB();
+  }
+
+  @action
+  void removeAlarmAndPlace() {
+    if (selectedPlace != null) {
+      var matchedCircle = circles.where((element) =>
+          (element.circleId.value == selectedPlace!.circle.circleId.value));
+      var matchedMarker = markers.where((element) =>
+          (element.markerId.value == selectedPlace!.marker.markerId.value));
+
+      if (matchedMarker.length > 0 && matchedCircle.length > 0) {
+        circles.remove(matchedCircle.first);
+        markers.remove(matchedMarker.first);
+        Provider.of<AlarmProdivder>(context, listen: false)
+            .deleteSelectedAlarm(selectedPlace!.id.toInt());
+        selectedPlaces.remove(selectedPlace);
+      }
+    }
+
+    checkSelectedIsPlaceAddedToDB();
   }
 
   @action
@@ -131,9 +253,10 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
       if (matchedMarker.length > 0 && matchedCircle.length > 0) {
         circles.remove(matchedCircle.first);
         markers.remove(matchedMarker.first);
-        selectedPlaces.remove(selectedPlace);
       }
     }
+
+    checkSelectedIsPlaceAddedToDB();
   }
 
   @action
@@ -177,7 +300,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   }
 
   void navigateToCurrentPosition() {
-    getCurrenPosition();
+    getCurrentPosition();
     if (mapController != null) {
       if (currentPosition != null) {
         mapController!.animateCamera(CameraUpdate.newLatLng(currentPosition!));
@@ -194,16 +317,24 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     }
   }
 
-  Future<void> mapsInit(GoogleMapController controller) async {
+  Future<void> mapsInit(
+      GoogleMapController controller, AnimationController _controller) async {
     this.mapController = controller;
+
     await setCustomMapPin();
+    await establishExistentAlarms(_controller);
+    await getAlarmCount();
+
+    if (count > 0) moveToBounderies();
   }
 
-  Future<void> getCurrenPosition() async {
+  Future<LatLng> getCurrentPosition() async {
+    askLocationPermissions();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
 
     currentPosition = position.latlng;
+    return currentPosition!;
   }
 
   Future<void> setCustomMapPin() async {

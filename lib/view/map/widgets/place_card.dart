@@ -33,11 +33,14 @@ Widget buildPlaceCard(
                     child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                        "Configure Alarm #${viewmodel.selectedPlace != null ? viewmodel.selectedPlace!.id : ""}",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Observer(builder: (_) {
+                      return Text(
+                          "Configure Alarm #${viewmodel.selectedPlace != null ? viewmodel.selectedPlace!.id : ""}",
+                          style: TextStyle(fontWeight: FontWeight.bold));
+                    }),
                     IconButton(
                         onPressed: () {
+                          //viewmodel.deletePlace();
                           _controller.forward();
                         },
                         icon: Icon(Icons.close)),
@@ -60,25 +63,15 @@ Widget buildPlaceCard(
                     })),
                   ],
                 ),
-                Container(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        viewmodel.deletePlace();
-                        _controller.forward();
-                      },
-                      child: Text("Remove Place"),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        viewmodel.addPlaceToDB();
-                      },
-                      child: Text("Add Alarm"),
-                    ),
-                  ],
-                )),
+                Container(child: Observer(builder: (_) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      buildRemovePlaceButton(viewmodel, _controller),
+                      buildAddPlaceButton(viewmodel),
+                    ],
+                  );
+                })),
               ],
             ),
           ),
@@ -86,6 +79,39 @@ Widget buildPlaceCard(
       ),
     ),
   );
+}
+
+ElevatedButton buildAddPlaceButton(GoogleMapViewModel viewmodel) {
+  if ((viewmodel.isSelectedPlaceAlive == false)) {
+    return ElevatedButton(
+      onPressed: () {
+        viewmodel.addPlaceToDB();
+      },
+      child: Text("Add Alarm"),
+    );
+  } else {
+    return ElevatedButton(
+      onPressed: () {
+        viewmodel.updateSelectedAlarm();
+      },
+      child: Text("Update Alarm"),
+    );
+  }
+}
+
+Widget buildRemovePlaceButton(
+    GoogleMapViewModel viewmodel, AnimationController _controller) {
+  if (viewmodel.isSelectedPlaceAlive == true) {
+    return ElevatedButton(
+      onPressed: () {
+        viewmodel.removeAlarmAndPlace();
+        _controller.forward();
+      },
+      child: Text("Remove Alarm"),
+    );
+  } else {
+    return Text("");
+  }
 }
 
 SliderTheme buildCustomSlider(
@@ -115,7 +141,8 @@ void changeSelectedPlaceRadius(
     circleId: viewmodel.selectedPlace!.circle.circleId,
     radius: viewmodel.selectedPlace!.radius,
     center: viewmodel.selectedPlace!.position,
-    strokeWidth: 5,
+    strokeWidth: 4,
+    fillColor: context.colors.onPrimary.withOpacity(0.2),
     strokeColor: context.colors.secondaryVariant,
   );
   viewmodel.changeRadius(newCircle);

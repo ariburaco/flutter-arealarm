@@ -68,10 +68,11 @@ class _AlarmsViewState extends State<AlarmsView>
   }
 
   Widget buildAlarmList(AlarmsViewModel viewModel) {
-    if (Provider.of<AlarmProdivder>(context, listen: true).alarmCount > 0) {
+    if (Provider.of<AlarmProdivder>(context, listen: true).alarmList.length >
+        0) {
       return ListView.builder(
         itemCount:
-            Provider.of<AlarmProdivder>(context, listen: true).alarmCount,
+            Provider.of<AlarmProdivder>(context, listen: true).alarmList.length,
         itemBuilder: (BuildContext context, int index) {
           final placeName =
               context.read<AlarmProdivder>().alarmList[index].placeName!;

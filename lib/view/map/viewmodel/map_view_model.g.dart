@@ -54,6 +54,39 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     });
   }
 
+  final _$selectedPlaceAtom =
+      Atom(name: '_GoogleMapViewModelBase.selectedPlace');
+
+  @override
+  MapPlace? get selectedPlace {
+    _$selectedPlaceAtom.reportRead();
+    return super.selectedPlace;
+  }
+
+  @override
+  set selectedPlace(MapPlace? value) {
+    _$selectedPlaceAtom.reportWrite(value, super.selectedPlace, () {
+      super.selectedPlace = value;
+    });
+  }
+
+  final _$isSelectedPlaceAliveAtom =
+      Atom(name: '_GoogleMapViewModelBase.isSelectedPlaceAlive');
+
+  @override
+  bool get isSelectedPlaceAlive {
+    _$isSelectedPlaceAliveAtom.reportRead();
+    return super.isSelectedPlaceAlive;
+  }
+
+  @override
+  set isSelectedPlaceAlive(bool value) {
+    _$isSelectedPlaceAliveAtom.reportWrite(value, super.isSelectedPlaceAlive,
+        () {
+      super.isSelectedPlaceAlive = value;
+    });
+  }
+
   final _$radiusAtom = Atom(name: '_GoogleMapViewModelBase.radius');
 
   @override
@@ -77,6 +110,24 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     return _$addPlaceToDBAsyncAction.run(() => super.addPlaceToDB());
   }
 
+  final _$updateSelectedAlarmAsyncAction =
+      AsyncAction('_GoogleMapViewModelBase.updateSelectedAlarm');
+
+  @override
+  Future<void> updateSelectedAlarm() {
+    return _$updateSelectedAlarmAsyncAction
+        .run(() => super.updateSelectedAlarm());
+  }
+
+  final _$checkSelectedIsPlaceAddedToDBAsyncAction =
+      AsyncAction('_GoogleMapViewModelBase.checkSelectedIsPlaceAddedToDB');
+
+  @override
+  Future<Alarm?> checkSelectedIsPlaceAddedToDB() {
+    return _$checkSelectedIsPlaceAddedToDBAsyncAction
+        .run(() => super.checkSelectedIsPlaceAddedToDB());
+  }
+
   final _$addPlaceMarkerAsyncAction =
       AsyncAction('_GoogleMapViewModelBase.addPlaceMarker');
 
@@ -96,6 +147,17 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
         name: '_GoogleMapViewModelBase.onMarkerTapped');
     try {
       return super.onMarkerTapped(markerId);
+    } finally {
+      _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeAlarmAndPlace() {
+    final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
+        name: '_GoogleMapViewModelBase.removeAlarmAndPlace');
+    try {
+      return super.removeAlarmAndPlace();
     } finally {
       _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -129,6 +191,8 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
 count: ${count},
 markers: ${markers},
 circles: ${circles},
+selectedPlace: ${selectedPlace},
+isSelectedPlaceAlive: ${isSelectedPlaceAlive},
 radius: ${radius}
     ''';
   }

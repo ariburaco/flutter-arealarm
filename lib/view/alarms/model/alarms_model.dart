@@ -1,5 +1,5 @@
 class Alarm {
-  String? alarmId;
+  int? alarmId;
   int? isAlarmActive;
   String? placeName;
   double? lat;
@@ -36,5 +36,30 @@ class Alarm {
     data['radius'] = this.radius;
     data['address'] = this.address;
     return data;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Alarm &&
+        other.alarmId == alarmId &&
+        other.isAlarmActive == isAlarmActive &&
+        other.placeName == placeName &&
+        other.lat == lat &&
+        other.long == long &&
+        other.radius == radius &&
+        other.address == address;
+  }
+
+  @override
+  int get hashCode {
+    return alarmId.hashCode ^
+        isAlarmActive.hashCode ^
+        placeName.hashCode ^
+        lat.hashCode ^
+        long.hashCode ^
+        radius.hashCode ^
+        address.hashCode;
   }
 }
