@@ -41,6 +41,7 @@ Widget buildPlaceCard(
                     IconButton(
                         onPressed: () {
                           //viewmodel.deletePlace();
+
                           _controller.forward();
                         },
                         icon: Icon(Icons.close)),

@@ -278,7 +278,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     var markerPositions = markers.map((m) => m.position).toList();
 
     getCurrentPosition();
-    markerPositions.add(currentPosition!);
+    if (currentPosition != null) markerPositions.add(currentPosition!);
     return _createBounds(markerPositions);
   }
 

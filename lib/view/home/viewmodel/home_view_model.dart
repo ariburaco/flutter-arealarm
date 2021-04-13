@@ -12,21 +12,11 @@ class HomeViewModel = _HomeViewModelBase with _$HomeViewModel;
 
 abstract class _HomeViewModelBase with Store, BaseViewModel {
   late List<Widget> pages;
-  var platform = const MethodChannel(ServiceConstants.LocationServiceChannel);
 
   PageController? pageController;
 
   @observable
   int currentPageIndex = 0;
-
-  @action
-  Future<void> startLocationService() async {
-    try {
-      await platform.invokeMethod('startService');
-    } on PlatformException catch (e) {
-      print(e.toString() + " Service NOT Started");
-    }
-  }
 
   @override
   void setContext(BuildContext context) => this.context = context;
