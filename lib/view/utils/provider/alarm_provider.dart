@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_template/view/alarms/model/alarms_model.dart';
 import 'package:flutter_template/view/utils/database/database_manager.dart';
+import 'package:provider/provider.dart';
+
+import 'background_service_provider.dart';
 
 class AlarmProdivder extends ChangeNotifier {
   List<Alarm> alarmList = [];
@@ -42,8 +45,8 @@ class AlarmProdivder extends ChangeNotifier {
 
   Future<void> addAlarmToDB(Alarm newAlarm) async {
     await DatabaseManager.instance.addAlarm(newAlarm);
-
     getAlarmList();
+    addAlarmAddedToBG(newAlarm);
   }
 
   Future<void> updateAlarm(int id, Alarm newAlarm) async {
@@ -54,5 +57,9 @@ class AlarmProdivder extends ChangeNotifier {
       print("alarm couldn't updated");
     }
     getAlarmList();
+  }
+
+  void addAlarmAddedToBG(Alarm newAlarm) {
+    BackgroundServiceProdiver.instance.addAlarmToBGService(newAlarm);
   }
 }

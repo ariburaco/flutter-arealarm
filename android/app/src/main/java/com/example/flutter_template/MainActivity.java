@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,7 +49,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     public void getLocationAnswer() {
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
+       // LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
 
     }
 
@@ -75,8 +77,10 @@ public class MainActivity extends FlutterActivity {
 
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(
                 (call, result) -> {
-                    if (call.method.equals("startService")) {
+                    if (call.method.equals("startAlarmService")) {
                         startService();
+                        double radius = call.argument("radius");
+                        Log.d("RADIUS", "RAD: " + radius);
                         result.success("Services Started!");
                     } else {
 

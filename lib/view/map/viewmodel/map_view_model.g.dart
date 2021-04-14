@@ -54,6 +54,22 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
     });
   }
 
+  final _$currentPositionAtom =
+      Atom(name: '_GoogleMapViewModelBase.currentPosition');
+
+  @override
+  LatLng? get currentPosition {
+    _$currentPositionAtom.reportRead();
+    return super.currentPosition;
+  }
+
+  @override
+  set currentPosition(LatLng? value) {
+    _$currentPositionAtom.reportWrite(value, super.currentPosition, () {
+      super.currentPosition = value;
+    });
+  }
+
   final _$selectedPlaceAtom =
       Atom(name: '_GoogleMapViewModelBase.selectedPlace');
 
@@ -191,6 +207,7 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
 count: ${count},
 markers: ${markers},
 circles: ${circles},
+currentPosition: ${currentPosition},
 selectedPlace: ${selectedPlace},
 isSelectedPlaceAlive: ${isSelectedPlaceAlive},
 radius: ${radius}
