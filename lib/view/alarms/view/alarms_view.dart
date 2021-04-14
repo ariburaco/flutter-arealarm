@@ -62,7 +62,6 @@ class _AlarmsViewState extends State<AlarmsView>
                   onPressed: () async {
                     await Provider.of<AlarmProdivder>(context, listen: false)
                         .deleteAllAlarms();
-                    // gbvoppppppppppppppppppppppppppppppppppp888888888888888888888888889(() {});
                   }),
             ));
   }

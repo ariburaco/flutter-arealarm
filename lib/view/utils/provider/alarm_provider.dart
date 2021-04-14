@@ -26,6 +26,7 @@ class AlarmProdivder extends ChangeNotifier {
   Future<void> deleteAllAlarms() async {
     await DatabaseManager.instance.deleteAllAlarm();
     getAlarmList();
+    await BackgroundServiceProdiver.instance.stopAllAlarmServices();
   }
 
   Future<int> getAlarmCount() async {

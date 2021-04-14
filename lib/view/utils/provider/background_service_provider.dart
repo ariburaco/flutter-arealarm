@@ -19,48 +19,47 @@ class BackgroundServiceProdiver {
   Map<String, dynamic>? alarmArguments;
 
   Future<void> addAlarmToBGService(Alarm alarm) async {
-    if (alarm != null) {
-      alarmArguments = (<String, dynamic>{
-        'alarmId': alarm.alarmId,
-        'isActive': alarm.isAlarmActive,
-        'latitude': alarm.lat,
-        'longitude': alarm.long,
-        'radius': alarm.radius,
-      });
-    } else {
-      print("alarmList is null");
-    }
+    alarmArguments = <String, dynamic>{
+      'alarmId': alarm.alarmId,
+      'isActive': alarm.isAlarmActive,
+      'latitude': alarm.lat,
+      'longitude': alarm.long,
+      'radius': alarm.radius,
+    };
 
     sendAlarmsToService();
   }
 
   Future<void> sendAlarmsToService() async {
     try {
-      await platform.invokeMethod('startAlarmService', alarmArguments);
+      await platform.invokeMethod(
+          ServiceConstants.StartAlarmService, alarmArguments);
     } on PlatformException catch (e) {
-      print(e.toString() + " Service NOT Started");
+      print(e.toString() + "Service NOT Started");
     }
   }
 
-  Future<void> stopAlarmService() async {
+  Future<void> stopAlarmService(Alarm alarm) async {
+    alarmArguments = <String, dynamic>{
+      'alarmId': alarm.alarmId,
+    };
+
     try {
-      await platform.invokeMethod('stopAlarmService', alarmArguments);
+      await platform.invokeMethod(
+          ServiceConstants.StopAlarmService, alarmArguments);
     } on PlatformException catch (e) {
-      print(e.toString() + " Service couldn't stopped!");
+      print(e.toString() + "Service couldn't stopped!");
     }
   }
 
   Future<void> stopAllAlarmServices() async {
     try {
-      await platform.invokeMethod('stopAllAlarmServices');
+      await platform.invokeMethod(ServiceConstants.StopAllAlarmServices);
     } on PlatformException catch (e) {
-      print(e.toString() + " Service couldn't stopped!");
+      print(e.toString() + "All Service couldn't stopped!");
     }
   }
 }
-
-
-
 
 
 /*

@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,67 +37,54 @@ public class LocationService extends Service implements LocationListener {
     boolean isNetworkEnabled = false;
     boolean canGetLocation = false;
 
-    Location location; // location
+    static Location location; // location
     double latitude = 0; // latitude
     double longitude = 0; // longitude
-    float counter = 0;
+
+    public static void addAlarmPTolaceList(AlarmPlace alarmPlace) {
 
 
-    // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
+        if (alarmPlace != null) {
+            AlarmPlace.AlarmPlaces.add(alarmPlace);
+            AlarmPlace.updateAlarmListDistances(location);
+            AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
+            Log.d("alarmPlace", "alarmPlace id: " + nearestPlace.alarmId);
+        }
 
-    // The minimum time between updates in milliseconds
+    }
+
+    public void stopService() {
+        stopForeground(true);
+        stopSelf();
+    }
+
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
     private static final long MIN_TIME_BW_UPDATES = 5 * 1000;
-
-    // Declaring a Location Manager
     protected LocationManager locationManager;
 
     NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
-
-    Timer timer = new Timer();
-
-    class UpdateBallTask extends TimerTask {
-
-        public void run() {
-            counter++;
-            sendMessageToActivity(counter, "fromService");
-        }
-    }
-
 
     @Override
     public void onCreate() {
         super.onCreate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-
-            getNotification();
-
-            startForeground(101, builder.build());
-
-
-            // TimerTask updateBall = new UpdateBallTask();
-            // timer.scheduleAtFixedRate(updateBall, 0, 1000);
-
             getLocation();
+            getNotification();
+            startForeground(101, builder.build());
 
         }
     }
 
 
-    // Binder given to clients
-
-
-
-
-    private static void sendMessageToActivity(float l, String msg) {
+    private static void sendMessageToActivity(double distance, String msg) {
         Intent intent = new Intent("GPSLocationUpdates");
         // You can also include some extra data.
         intent.putExtra("Status", msg);
         Bundle b = new Bundle();
-        b.putFloat("float", l);
-        intent.putExtra("float", b);
+        b.putDouble("double", distance);
+        intent.putExtra("double", b);
         LocalBroadcastManager.getInstance(MainActivity.context).sendBroadcast(intent);
     }
 
@@ -116,11 +105,10 @@ public class LocationService extends Service implements LocationListener {
 
             } else {
                 this.canGetLocation = true;
-
                 if (isNetworkEnabled) {
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
                             this);
-                   // Log.d("Network", "Network Enabled");
+                    // Log.d("Network", "Network Enabled");
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (location != null) {
@@ -152,8 +140,6 @@ public class LocationService extends Service implements LocationListener {
             e.printStackTrace();
         }
         //  Log.i("LOCATION", "Latitude: " + latitude + "- Longitude: " + longitude);
-
-
         return location;
     }
 
@@ -161,27 +147,17 @@ public class LocationService extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location loc) {
         //Location loc = getLocation();
-
         double longs = loc.getLongitude();
         double lat = loc.getLatitude();
         builder.setContentText("Lat: " + lat + "Long: " + longs);
         mNotificationManager.notify(101, builder.build());
 
-        Location targetLocation = new Location("Target Location");
-        //41.033123, 28.886396
-        /*
-        targetLocation.setLatitude(41.033123);
-        targetLocation.setLongitude(28.886396);
-         */
-        targetLocation.setLatitude(41.019238);
-        targetLocation.setLongitude(28.890771);
-
-        float distance = location.distanceTo(targetLocation);
+      AlarmPlace.updateAlarmListDistances(loc);
+      AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
 
 
-        sendMessageToActivity(distance, "fromService");
-        Log.i("LOCATION CHANGED", "Distance to target: " + distance);
-
+        sendMessageToActivity(nearestPlace.distance, "fromService");
+        Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.alarmId);
     }
 
 
@@ -245,10 +221,10 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return START_NOT_STICKY;
-
+        return START_STICKY;
     }
+
+
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
     }

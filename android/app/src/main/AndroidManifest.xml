@@ -80,7 +80,7 @@
             android:name=".LocationService"
             android:enabled="true"
             android:exported="true"
-
+            android:stopWithTask="true"
             >
 
         </service>
