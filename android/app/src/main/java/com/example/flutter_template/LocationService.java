@@ -30,8 +30,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import static androidx.core.app.NotificationCompat.PRIORITY_MAX;
 
 public class LocationService extends Service implements LocationListener {
-    public final static int MINUTE = 1000 * 60;
-
 
     boolean isGPSEnabled = false;
     boolean isNetworkEnabled = false;
@@ -41,7 +39,7 @@ public class LocationService extends Service implements LocationListener {
     double latitude = 0; // latitude
     double longitude = 0; // longitude
     float counter = 0;
-    String provider;
+
 
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
@@ -77,8 +75,8 @@ public class LocationService extends Service implements LocationListener {
             startForeground(101, builder.build());
 
 
-            TimerTask updateBall = new UpdateBallTask();
-            timer.scheduleAtFixedRate(updateBall, 0, 1000);
+            // TimerTask updateBall = new UpdateBallTask();
+            // timer.scheduleAtFixedRate(updateBall, 0, 1000);
 
             getLocation();
 
@@ -89,17 +87,7 @@ public class LocationService extends Service implements LocationListener {
     // Binder given to clients
 
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return START_NOT_STICKY;
-
-    }
 
     private static void sendMessageToActivity(float l, String msg) {
         Intent intent = new Intent("GPSLocationUpdates");
@@ -250,7 +238,17 @@ public class LocationService extends Service implements LocationListener {
     public void onProviderEnabled(String arg0) {
     }
 
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        return START_NOT_STICKY;
+
+    }
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
     }

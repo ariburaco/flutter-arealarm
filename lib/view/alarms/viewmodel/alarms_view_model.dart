@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/view/utils/database/database_manager.dart';
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
-import 'package:flutter_template/view/utils/provider/background_service_provider.dart';
+import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/alarms_model.dart';
 import '../../../core/base/model/base_view_model.dart';

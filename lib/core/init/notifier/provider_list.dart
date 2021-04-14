@@ -1,8 +1,7 @@
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
-import 'package:flutter_template/view/utils/provider/background_service_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
+import '../../../view/utils/provider/alarm_provider.dart';
 import 'theme_notifier.dart';
 
 class ApplicationProvider {

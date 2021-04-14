@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_template/core/constants/services/service_constants.dart';
-import 'package:flutter_template/view/alarms/model/alarms_model.dart';
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import '../../../core/constants/services/service_constants.dart';
+import '../../alarms/model/alarms_model.dart';
+import 'alarm_provider.dart';
 import 'package:provider/provider.dart';
 
 class BackgroundServiceProdiver {
@@ -22,6 +22,7 @@ class BackgroundServiceProdiver {
     if (alarm != null) {
       alarmArguments = (<String, dynamic>{
         'alarmId': alarm.alarmId,
+        'isActive': alarm.isAlarmActive,
         'latitude': alarm.lat,
         'longitude': alarm.long,
         'radius': alarm.radius,
@@ -40,7 +41,25 @@ class BackgroundServiceProdiver {
       print(e.toString() + " Service NOT Started");
     }
   }
+
+  Future<void> stopAlarmService() async {
+    try {
+      await platform.invokeMethod('stopAlarmService', alarmArguments);
+    } on PlatformException catch (e) {
+      print(e.toString() + " Service couldn't stopped!");
+    }
+  }
+
+  Future<void> stopAllAlarmServices() async {
+    try {
+      await platform.invokeMethod('stopAllAlarmServices');
+    } on PlatformException catch (e) {
+      print(e.toString() + " Service couldn't stopped!");
+    }
+  }
 }
+
+
 
 
 

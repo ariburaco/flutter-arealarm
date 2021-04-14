@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 
@@ -49,11 +50,8 @@ public class MainActivity extends FlutterActivity {
     }
 
     public void getLocationAnswer() {
-       // LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
-
+       LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
     }
-
-
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -71,6 +69,8 @@ public class MainActivity extends FlutterActivity {
     };
 
 
+
+
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
@@ -78,10 +78,14 @@ public class MainActivity extends FlutterActivity {
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(
                 (call, result) -> {
                     if (call.method.equals("startAlarmService")) {
-                        startService();
-                        double radius = call.argument("radius");
-                        Log.d("RADIUS", "RAD: " + radius);
-                        result.success("Services Started!");
+
+                        AlarmPlace alarmPlace = getCallArguments(call);
+
+                        if(alarmPlace.alarmId != -1){
+                            Log.d("RADIUS", "RAD: " + alarmPlace.location);
+                            startService();
+                            result.success("Services Started!");
+                        }
                     } else {
 
                         result.success("Services Couldn't Started!");
@@ -94,6 +98,21 @@ public class MainActivity extends FlutterActivity {
     }
 
 
+    public AlarmPlace getCallArguments(MethodCall call){
+        AlarmPlace alarmPlace = new AlarmPlace();
+        try {
+           int alarmId = call.argument("alarmId");
+           int isActive = call.argument("isActive");
+           double radius = call.argument("radius");
+           double latitude = call.argument("latitude");
+           double longitude = call.argument("longitude");
+           alarmPlace.setAlarmPlaces(alarmId,isActive,latitude,longitude,radius);
+       }catch (Exception e){
+            Log.d("CALL_EX", e.toString());
+       }
+            return alarmPlace;
+    }
+
     public void startService() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -102,7 +121,7 @@ public class MainActivity extends FlutterActivity {
         } else {
             startService(servIntent);
         }
-        getLocationAnswer();
+        //getLocationAnswer();
 
     }
 }

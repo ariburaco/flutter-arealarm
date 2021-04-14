@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_template/view/map/viewmodel/map_view_model.dart';
+import '../viewmodel/map_view_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/base/extension/context_extension.dart';
 

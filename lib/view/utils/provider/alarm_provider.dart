@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_template/view/alarms/model/alarms_model.dart';
-import 'package:flutter_template/view/utils/database/database_manager.dart';
-import 'package:provider/provider.dart';
-
+import '../../alarms/model/alarms_model.dart';
+import '../database/database_manager.dart';
 import 'background_service_provider.dart';
 
 class AlarmProdivder extends ChangeNotifier {
