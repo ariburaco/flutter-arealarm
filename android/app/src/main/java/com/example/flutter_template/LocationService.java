@@ -2,9 +2,11 @@ package com.example.flutter_template;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -29,6 +32,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 //import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static androidx.core.app.NotificationCompat.PRIORITY_MAX;
 
 public class LocationService extends Service implements LocationListener {
@@ -40,23 +44,6 @@ public class LocationService extends Service implements LocationListener {
     static Location location; // location
     double latitude = 0; // latitude
     double longitude = 0; // longitude
-
-    public static void addAlarmPTolaceList(AlarmPlace alarmPlace) {
-
-
-        if (alarmPlace != null) {
-            AlarmPlace.AlarmPlaces.add(alarmPlace);
-            AlarmPlace.updateAlarmListDistances(location);
-            AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
-            Log.d("alarmPlace", "alarmPlace id: " + nearestPlace.alarmId);
-        }
-
-    }
-
-    public void stopService() {
-        stopForeground(true);
-        stopSelf();
-    }
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
     private static final long MIN_TIME_BW_UPDATES = 5 * 1000;
@@ -75,6 +62,22 @@ public class LocationService extends Service implements LocationListener {
             startForeground(101, builder.build());
 
         }
+    }
+
+
+
+    public static void addAlarmPTolaceList(AlarmPlace alarmPlace) {
+
+
+        if (alarmPlace != null) {
+            AlarmPlace.AlarmPlaces.add(alarmPlace);
+            AlarmPlace.updateAlarmListDistances(location);
+            AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
+            Log.d("alarmPlace", "alarmPlace id: " + nearestPlace.alarmId);
+
+        }
+
+
     }
 
 
@@ -152,12 +155,11 @@ public class LocationService extends Service implements LocationListener {
         builder.setContentText("Lat: " + lat + "Long: " + longs);
         mNotificationManager.notify(101, builder.build());
 
-      AlarmPlace.updateAlarmListDistances(loc);
-      AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
-
+        AlarmPlace.updateAlarmListDistances(loc);
+        AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
 
         sendMessageToActivity(nearestPlace.distance, "fromService");
-        Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.alarmId);
+        Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.distance);
     }
 
 
@@ -170,6 +172,11 @@ public class LocationService extends Service implements LocationListener {
         }
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
+        Intent snoozeIntent = new Intent(this, MainActivity.class);
+        snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
+        PendingIntent snoozePendingIntent =
+                PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
+
         builder = new NotificationCompat.Builder(this, channel)
                 .setSmallIcon(android.R.drawable.ic_menu_mylocation)
                 .setContentTitle("Current Location");
@@ -177,6 +184,7 @@ public class LocationService extends Service implements LocationListener {
                 .setPriority(PRIORITY_MAX)
                 .setSound(uri)
                 .setCategory(Notification.CATEGORY_SERVICE)
+                //.addAction(R.drawable.app_icon, "Stop", snoozePendingIntent)
                 .build();
 
 
@@ -207,6 +215,23 @@ public class LocationService extends Service implements LocationListener {
 
 
     @Override
+    public void onTaskRemoved(Intent rootIntent){
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+
+        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(
+                AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + 3000,
+                restartServicePendingIntent);
+        Log.i("onTaskRemoved", "elapsedRealtime: " + SystemClock.elapsedRealtime());
+        Log.i("getPackageName", "getPackageName: " + getPackageName());
+
+        super.onTaskRemoved(rootIntent);
+    }
+
+    @Override
     public void onProviderDisabled(String arg0) {
     }
 
@@ -221,6 +246,7 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         return START_STICKY;
     }
 

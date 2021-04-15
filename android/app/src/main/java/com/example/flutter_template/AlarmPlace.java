@@ -34,9 +34,10 @@ public class AlarmPlace {
 
     public static void updateAlarmListDistances(Location currentLocation) {
 
-        for (AlarmPlace alarmplace : AlarmPlaces) {
-            alarmplace.distance = currentLocation.distanceTo(alarmplace.location);
-        }
+        if (currentLocation != null)
+            for (AlarmPlace alarmplace : AlarmPlaces) {
+                alarmplace.distance = currentLocation.distanceTo(alarmplace.location);
+            }
 
     }
 
@@ -60,6 +61,8 @@ public class AlarmPlace {
         return nearestAlarmPlace;
 
     }
+
+
 }
 
 /*
