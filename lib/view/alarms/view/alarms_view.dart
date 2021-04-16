@@ -67,6 +67,7 @@ class _AlarmsViewState extends State<AlarmsView>
   }
 
   Widget buildAlarmList(AlarmsViewModel viewModel) {
+    // TODO: Change with Consumer structure
     if (Provider.of<AlarmProdivder>(context, listen: true).alarmList.length >
         0) {
       return ListView.builder(

@@ -15,21 +15,6 @@ class AlarmProdivder extends ChangeNotifier {
 
   StreamSubscription<Position>? positionStream;
 
-  void initListener() {
-    positionStream = Geolocator.getPositionStream(
-            desiredAccuracy: LocationAccuracy.bestForNavigation,
-            distanceFilter: 0,
-            intervalDuration: Duration(seconds: 5))
-        .listen((Position? position) {
-      if (position != null) {
-        print("POS: " + position.toString());
-        calculateDistanceToAlarmPlaces(position);
-      }
-    });
-
-    startLocationStream();
-  }
-
   Future<List<Alarm>> getAlarmList() async {
     await DatabaseManager.instance.databaseInit();
     alarmList = await DatabaseManager.instance.getAlarmList();
@@ -94,14 +79,27 @@ class AlarmProdivder extends ChangeNotifier {
   }
 
   void startLocationStream() {
-    positionStream!.resume();
+    positionStream = Geolocator.getPositionStream(
+            desiredAccuracy: LocationAccuracy.bestForNavigation,
+            distanceFilter: 0,
+            intervalDuration: Duration(seconds: 5))
+        .listen((Position? position) {
+      if (position != null) {
+        print("POS: " + position.toString());
+        calculateDistanceToAlarmPlaces(position);
+      }
+    });
+
+    //startLocationStream();
   }
 
   Future<void> stopLocationStream() async {
     if (positionStream != null) {
-      positionStream!.cancel();
+      await positionStream!.cancel();
+      positionStream = null;
       print("CANCEL THE STREAM");
     }
+    notifyListeners();
   }
 
   void calculateDistanceToAlarmPlaces(Position? currentPosition) {

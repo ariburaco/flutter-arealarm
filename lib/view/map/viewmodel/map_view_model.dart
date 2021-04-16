@@ -44,7 +44,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   void init() {
     askLocationPermissions();
     getCurrentPosition();
-    Provider.of<AlarmProdivder>(context, listen: false).initListener();
+    Provider.of<AlarmProdivder>(context, listen: false).startLocationStream();
   }
 
   Future<void> getAlarmCount() async {

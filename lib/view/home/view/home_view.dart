@@ -17,17 +17,33 @@ class HomeView extends StatefulWidget {
   _HomeViewState createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
+  AppLifecycleState? _lastLifecycleState;
+
   final GlobalKey<ScaffoldState> _scaffoldyKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    _lastLifecycleState = state;
+    if (_lastLifecycleState == AppLifecycleState.paused) {
+      await Provider.of<AlarmProdivder>(context, listen: false)
+          .stopLocationStream();
+    } else if (_lastLifecycleState == AppLifecycleState.resumed) {
+      Provider.of<AlarmProdivder>(context, listen: false).startLocationStream();
+    }
   }
 
   @override
   void dispose() {
-    Provider.of<AlarmProdivder>(context, listen: false).stopLocationStream();
+    WidgetsBinding.instance!.removeObserver(this);
+
+    //
     super.dispose();
   }
 

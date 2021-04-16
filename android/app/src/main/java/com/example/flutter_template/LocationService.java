@@ -45,8 +45,8 @@ public class LocationService extends Service implements LocationListener {
     double latitude = 0; // latitude
     double longitude = 0; // longitude
 
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
-    private static final long MIN_TIME_BW_UPDATES = 30 * 1000;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_TIME_BW_UPDATES = 10 * 1000;
     protected LocationManager locationManager;
 
     static NotificationManager mNotificationManager;

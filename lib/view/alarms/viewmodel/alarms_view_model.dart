@@ -19,8 +19,4 @@ abstract class _AlarmsViewModelBase with Store, BaseViewModel {
   void init() {
     Provider.of<AlarmProdivder>(context, listen: false).getAlarmList();
   }
-
-  void startBackgroundService() {
-    // Provider.of<AlarmProdivder>(context, listen: false).updateAlarmsOfBG();
-  }
 }
