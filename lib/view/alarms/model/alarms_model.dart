@@ -6,6 +6,7 @@ class Alarm {
   double? long;
   double? radius;
   String? address;
+  double? distance = -1;
 
   Alarm(
       {this.alarmId,
@@ -24,6 +25,7 @@ class Alarm {
     long = json['longitude'];
     radius = json['radius'];
     address = json['address'];
+    distance = json['distance'];
   }
 
   Map<String, dynamic> toJson() {
@@ -35,6 +37,7 @@ class Alarm {
     data['longitude'] = this.long;
     data['radius'] = this.radius;
     data['address'] = this.address;
+    data['distance'] = this.distance;
     return data;
   }
 
@@ -49,7 +52,8 @@ class Alarm {
         other.lat == lat &&
         other.long == long &&
         other.radius == radius &&
-        other.address == address;
+        other.address == address &&
+        other.distance == distance;
   }
 
   @override
@@ -60,6 +64,7 @@ class Alarm {
         lat.hashCode ^
         long.hashCode ^
         radius.hashCode ^
-        address.hashCode;
+        address.hashCode ^
+        distance.hashCode;
   }
 }

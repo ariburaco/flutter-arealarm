@@ -9,7 +9,7 @@ class DatabaseManager {
   }
 
   int _version = 3;
-  String _alarmDatabaseName = "alarms_db1";
+  String _alarmDatabaseName = "alarms_db2";
   String _alarmTable = "alarms_table";
 
   // Alarm Table Columns
@@ -20,6 +20,7 @@ class DatabaseManager {
   String long = "longitude";
   String radius = "radius";
   String address = "address";
+  String distance = "distance";
 
   Database? database;
   DatabaseManager._init();
@@ -40,6 +41,7 @@ class DatabaseManager {
          $lat DOUBLE,
          $long DOUBLE,
          $radius DOUBLE,
+         $distance DOUBLE,
          $address TEXT )''';
     await db.execute(sql);
   }

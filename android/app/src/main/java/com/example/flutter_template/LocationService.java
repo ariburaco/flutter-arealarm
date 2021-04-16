@@ -45,8 +45,8 @@ public class LocationService extends Service implements LocationListener {
     double latitude = 0; // latitude
     double longitude = 0; // longitude
 
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
-    private static final long MIN_TIME_BW_UPDATES = 10 * 1000;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
+    private static final long MIN_TIME_BW_UPDATES = 30 * 1000;
     protected LocationManager locationManager;
 
     static NotificationManager mNotificationManager;
@@ -60,6 +60,8 @@ public class LocationService extends Service implements LocationListener {
             getLocation();
             getNotification();
             startForeground(101, builder.build());
+
+        }else{
 
         }
     }
@@ -104,13 +106,15 @@ public class LocationService extends Service implements LocationListener {
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             // getting network status
-            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            //isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-            if (!isGPSEnabled && !isNetworkEnabled) {
+            if (!isGPSEnabled ) { // && !isNetworkEnabled
                 // no network provider is enabled. DEFAULT COORDINATES
 
 
             } else {
+
+               /*
                 this.canGetLocation = true;
                 if (isNetworkEnabled) {
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
@@ -125,7 +129,7 @@ public class LocationService extends Service implements LocationListener {
                     }
                 }
 
-
+                */
                 // if GPS Enabled get lat/long using GPS Services
                 if (isGPSEnabled) {
                     if (location == null) {
@@ -156,6 +160,7 @@ public class LocationService extends Service implements LocationListener {
         //Location loc = getLocation();
         location = loc;
         updateLocation();
+        Log.i("locationCHANGED", "Current Loc. " + location);
 
     }
 
@@ -170,7 +175,7 @@ public class LocationService extends Service implements LocationListener {
             mNotificationManager.notify(101, builder.build());
             // sendMessageToActivity(nearestPlace.distance, "fromService");
 
-            Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.distance + " at " + nearestPlace.alarmId);
+            //Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.distance + " at " + nearestPlace.alarmId);
         } else {
             Log.i("LOCATION CHANGED", "NULL");
         }
@@ -184,7 +189,7 @@ public class LocationService extends Service implements LocationListener {
         else {
             channel = "";
         }
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        //Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         Intent snoozeIntent = new Intent(this, MainActivity.class);
         snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
@@ -215,11 +220,11 @@ public class LocationService extends Service implements LocationListener {
         int importance = NotificationManager.IMPORTANCE_HIGH;
 
         NotificationChannel mChannel = new NotificationChannel("snap map channel", name, importance);
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        //Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        mChannel.enableLights(true);
+       // mChannel.enableLights(true);
 
-        mChannel.setLightColor(Color.BLUE);
+        //mChannel.setLightColor(Color.BLUE);
         if (mNotificationManager != null) {
             mNotificationManager.createNotificationChannel(mChannel);
         } else {
@@ -240,9 +245,6 @@ public class LocationService extends Service implements LocationListener {
                 AlarmManager.ELAPSED_REALTIME,
                 SystemClock.elapsedRealtime() + 3000,
                 restartServicePendingIntent);
-        Log.i("onTaskRemoved", "elapsedRealtime: " + SystemClock.elapsedRealtime());
-        Log.i("getPackageName", "getPackageName: " + getPackageName());
-
         super.onTaskRemoved(rootIntent);
     }
 

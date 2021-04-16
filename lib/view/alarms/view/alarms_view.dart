@@ -78,14 +78,22 @@ class _AlarmsViewState extends State<AlarmsView>
 
           final radius =
               context.read<AlarmProdivder>().alarmList[index].radius!.toInt();
-          LatLng position = new LatLng(
-              context.read<AlarmProdivder>().alarmList[index].lat!,
-              context.read<AlarmProdivder>().alarmList[index].long!);
+
           final address =
               context.read<AlarmProdivder>().alarmList[index].address!;
+          final distance =
+              context.read<AlarmProdivder>().alarmList[index].distance != null
+                  ? context
+                      .read<AlarmProdivder>()
+                      .alarmList[index]
+                      .distance!
+                      .toStringAsFixed(2)
+                  : -1;
+
           return Padding(
             padding: context.paddingLowest,
-            child: Container(
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
               decoration: buildBorderRadiusDecoration(context, 10),
               height: context.highestValue,
               child: Row(
@@ -127,7 +135,7 @@ class _AlarmsViewState extends State<AlarmsView>
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            "${radius.toString()} meters",
+                            "${distance.toString()} meters left",
                             style: context.textTheme.headline5,
                           ),
                         )
@@ -193,6 +201,8 @@ class _AlarmsViewState extends State<AlarmsView>
 
   Widget buildNextAlarmIndicator(AlarmsViewModel viewModel) {
     if (Provider.of<AlarmProdivder>(context, listen: true).alarmCount > 0) {
+      final nearestAlarm =
+          Provider.of<AlarmProdivder>(context, listen: true).nearestAlarm;
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -201,7 +211,9 @@ class _AlarmsViewState extends State<AlarmsView>
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           ShimmerText(
-            text: "in 200 meters",
+            text: nearestAlarm != null
+                ? "in ${nearestAlarm.distance!.toStringAsFixed(2)} meters"
+                : "?",
             fontSize: 20,
             duration: 3000,
           ),

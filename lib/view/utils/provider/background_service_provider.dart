@@ -1,18 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/constants/services/service_constants.dart';
 import '../../alarms/model/alarms_model.dart';
-import 'alarm_provider.dart';
-import 'package:provider/provider.dart';
 
-class BackgroundServiceProdiver {
-  static BackgroundServiceProdiver? _instace;
-  static BackgroundServiceProdiver get instance {
-    if (_instace == null) _instace = BackgroundServiceProdiver._init();
+class BackgroundServiceManager {
+  static BackgroundServiceManager? _instace;
+  static BackgroundServiceManager get instance {
+    if (_instace == null) _instace = BackgroundServiceManager._init();
     return _instace!;
   }
 
-  BackgroundServiceProdiver._init();
+  BackgroundServiceManager._init();
 
   final platform = const MethodChannel(ServiceConstants.LocationServiceChannel);
 

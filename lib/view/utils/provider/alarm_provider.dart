@@ -1,12 +1,34 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../alarms/model/alarms_model.dart';
 import '../database/database_manager.dart';
 import 'background_service_provider.dart';
 
 class AlarmProdivder extends ChangeNotifier {
   List<Alarm> alarmList = [];
+  Alarm? nearestAlarm;
   bool hasActiveAlarm = false;
   int alarmCount = 0;
+  static Position? currentPosition;
+
+  StreamSubscription<Position>? positionStream;
+
+  void initListener() {
+    positionStream = Geolocator.getPositionStream(
+            desiredAccuracy: LocationAccuracy.bestForNavigation,
+            distanceFilter: 0,
+            intervalDuration: Duration(seconds: 5))
+        .listen((Position? position) {
+      if (position != null) {
+        print("POS: " + position.toString());
+        calculateDistanceToAlarmPlaces(position);
+      }
+    });
+
+    startLocationStream();
+  }
 
   Future<List<Alarm>> getAlarmList() async {
     await DatabaseManager.instance.databaseInit();
@@ -27,7 +49,7 @@ class AlarmProdivder extends ChangeNotifier {
   Future<void> deleteAllAlarms() async {
     await DatabaseManager.instance.deleteAllAlarm();
     await getAlarmList();
-    await BackgroundServiceProdiver.instance.stopAllAlarmServices();
+    await BackgroundServiceManager.instance.stopAllAlarmServices();
   }
 
   Future<int> getAlarmCount() async {
@@ -63,11 +85,40 @@ class AlarmProdivder extends ChangeNotifier {
   }
 
   Future<void> addAlarmAddedToBG(Alarm newAlarm) async {
-    await BackgroundServiceProdiver.instance.addAlarmToBGService(newAlarm);
+    await BackgroundServiceManager.instance.addAlarmToBGService(newAlarm);
   }
 
   Future<void> addActiveAlarmsToBGService() async {
     if (alarmList != null) if (alarmList.isNotEmpty)
-      await BackgroundServiceProdiver.instance.checkExistensAlarms(alarmList);
+      await BackgroundServiceManager.instance.checkExistensAlarms(alarmList);
+  }
+
+  void startLocationStream() {
+    positionStream!.resume();
+  }
+
+  Future<void> stopLocationStream() async {
+    if (positionStream != null) {
+      positionStream!.cancel();
+      print("CANCEL THE STREAM");
+    }
+  }
+
+  void calculateDistanceToAlarmPlaces(Position? currentPosition) {
+    if (currentPosition != null) {
+      for (var alarms in alarmList) {
+        alarms.distance = Geolocator.distanceBetween(alarms.lat!, alarms.long!,
+            currentPosition.latitude, currentPosition.longitude);
+      }
+      getNearestAlarm();
+      notifyListeners();
+    }
+  }
+
+  void getNearestAlarm() {
+    if (alarmList.isNotEmpty) {
+      alarmList.sort((a, b) => a.distance!.compareTo(b.distance!));
+      nearestAlarm = alarmList.first;
+    }
   }
 }

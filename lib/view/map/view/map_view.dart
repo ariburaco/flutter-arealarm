@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import 'package:provider/provider.dart';
 import '../widgets/place_card.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
@@ -27,13 +29,12 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("Build Map Context");
     super.build(context);
     return BaseView<GoogleMapViewModel>(
         viewModel: GoogleMapViewModel(),
