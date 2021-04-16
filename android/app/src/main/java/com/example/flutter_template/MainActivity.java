@@ -67,17 +67,20 @@ public class MainActivity extends FlutterActivity {
                             AlarmPlace alarmPlace = getCallArguments(call);
                             if (alarmPlace.alarmId != -1) {
 
-                                startBackgroundAlarmService();
-                                if (isMyServiceRunning(LocationService.class))
-                                    LocationService.addAlarmPTolaceList(alarmPlace);
+
+                                if (!isMyServiceRunning(LocationService.class)) {
+                                    startBackgroundAlarmService();
+                                }
+                                LocationService.addAlarmPTolaceList(alarmPlace);
+
 
                             }
                             break;
                         case STOP_ALARM_SERVICE:
-                            // stopBackgroundService();
+                            stopBackgroundService();
                             break;
                         case STOP_ALL_ALARM_SERVICES:
-                            //stopBackgroundService();
+                            stopBackgroundService();
                             break;
 
                     }
@@ -89,9 +92,13 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void stopBackgroundService() {
-        serviceStopIntent = new Intent(MainActivity.this, LocationService.class);
+
+        LocationService.clearAllAlarmPlaces();
+        /*
+       *  serviceStopIntent = new Intent(MainActivity.this, LocationService.class);
         serviceStopIntent.setAction(Constants.STOPFOREGROUND_ACTION);
         startService(serviceStopIntent);
+       * */
     }
 
     public void getLocationAnswer() {
@@ -104,12 +111,12 @@ public class MainActivity extends FlutterActivity {
 
             String message = intent.getStringExtra("Status");
             Bundle b = intent.getBundleExtra("double");
-            double distance =  b.getDouble("double");
+            double distance = b.getDouble("double");
             if (distance != -1) {
                 //double longu = lastKnownLoc.getLongitude();
                 //double lati = lastKnownLoc.getLatitude();
                 String text = "Distance: " + distance;
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+                // Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -118,7 +125,7 @@ public class MainActivity extends FlutterActivity {
     public AlarmPlace getCallArguments(MethodCall call) {
         AlarmPlace alarmPlace = new AlarmPlace();
         try {
-            if(call != null) {
+            if (call != null) {
                 int alarmId = call.argument("alarmId");
                 int isActive = call.argument("isActive");
                 double radius = call.argument("radius");

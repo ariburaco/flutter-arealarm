@@ -56,6 +56,8 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
     final existentAlarms =
         await Provider.of<AlarmProdivder>(context, listen: false)
             .getAlarmList();
+    await Provider.of<AlarmProdivder>(context, listen: false)
+        .addActiveAlarmsToBGService();
 
     for (var alarm in existentAlarms) {
       int id = alarm.alarmId!;

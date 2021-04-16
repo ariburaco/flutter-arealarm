@@ -16,10 +16,16 @@ class BackgroundServiceProdiver {
 
   final platform = const MethodChannel(ServiceConstants.LocationServiceChannel);
 
-  Map<String, dynamic>? alarmArguments;
+  Future<void> checkExistensAlarms(List<Alarm> alarmList) async {
+    if (alarmList != null) {
+      for (var alarm in alarmList) {
+        await addAlarmToBGService(alarm);
+      }
+    }
+  }
 
   Future<void> addAlarmToBGService(Alarm alarm) async {
-    alarmArguments = <String, dynamic>{
+    Map<String, dynamic>? alarmArguments = <String, dynamic>{
       'alarmId': alarm.alarmId,
       'isActive': alarm.isAlarmActive,
       'latitude': alarm.lat,
@@ -27,10 +33,10 @@ class BackgroundServiceProdiver {
       'radius': alarm.radius,
     };
 
-    sendAlarmsToService();
+    sendAlarmsToService(alarmArguments);
   }
 
-  Future<void> sendAlarmsToService() async {
+  Future<void> sendAlarmsToService(Map<String, dynamic>? alarmArguments) async {
     try {
       await platform.invokeMethod(
           ServiceConstants.StartAlarmService, alarmArguments);
@@ -39,7 +45,8 @@ class BackgroundServiceProdiver {
     }
   }
 
-  Future<void> stopAlarmService(Alarm alarm) async {
+  Future<void> stopAlarmService(
+      Alarm alarm, Map<String, dynamic>? alarmArguments) async {
     alarmArguments = <String, dynamic>{
       'alarmId': alarm.alarmId,
     };

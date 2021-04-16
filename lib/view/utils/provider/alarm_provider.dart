@@ -19,13 +19,14 @@ class AlarmProdivder extends ChangeNotifier {
       hasActiveAlarm = true;
     } else
       hasActiveAlarm = false;
+
     notifyListeners();
     return alarmList;
   }
 
   Future<void> deleteAllAlarms() async {
     await DatabaseManager.instance.deleteAllAlarm();
-    getAlarmList();
+    await getAlarmList();
     await BackgroundServiceProdiver.instance.stopAllAlarmServices();
   }
 
@@ -37,15 +38,18 @@ class AlarmProdivder extends ChangeNotifier {
     Alarm alarm = (await DatabaseManager.instance.getAlarm(alarmId))!;
 
     alarm.isAlarmActive = 0;
-    updateAlarm(alarmId, alarm);
+    await updateAlarm(alarmId, alarm);
     await DatabaseManager.instance.deleteAlarm(alarmId);
-    getAlarmList();
+    await getAlarmList();
   }
 
   Future<void> addAlarmToDB(Alarm newAlarm) async {
     await DatabaseManager.instance.addAlarm(newAlarm);
-    getAlarmList();
-    addAlarmAddedToBG(newAlarm);
+    await addAlarmAddedToBG(newAlarm);
+    await getAlarmList();
+
+    // await addActiveAlarmsToBGService();
+    //addAlarmAddedToBG(newAlarm);
   }
 
   Future<void> updateAlarm(int id, Alarm newAlarm) async {
@@ -55,10 +59,15 @@ class AlarmProdivder extends ChangeNotifier {
     } else {
       print("alarm couldn't updated");
     }
-    getAlarmList();
+    await getAlarmList();
   }
 
-  void addAlarmAddedToBG(Alarm newAlarm) {
-    BackgroundServiceProdiver.instance.addAlarmToBGService(newAlarm);
+  Future<void> addAlarmAddedToBG(Alarm newAlarm) async {
+    await BackgroundServiceProdiver.instance.addAlarmToBGService(newAlarm);
+  }
+
+  Future<void> addActiveAlarmsToBGService() async {
+    if (alarmList != null) if (alarmList.isNotEmpty)
+      await BackgroundServiceProdiver.instance.checkExistensAlarms(alarmList);
   }
 }

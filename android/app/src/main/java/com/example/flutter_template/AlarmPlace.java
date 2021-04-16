@@ -2,6 +2,7 @@ package com.example.flutter_template;
 
 import android.location.Location;
 import android.os.Build;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,10 +35,14 @@ public class AlarmPlace {
 
     public static void updateAlarmListDistances(Location currentLocation) {
 
-        if (currentLocation != null)
+        if (currentLocation != null) {
             for (AlarmPlace alarmplace : AlarmPlaces) {
                 alarmplace.distance = currentLocation.distanceTo(alarmplace.location);
             }
+
+        }
+        else
+            Log.i("NULL LOCATION", "null");
 
     }
 

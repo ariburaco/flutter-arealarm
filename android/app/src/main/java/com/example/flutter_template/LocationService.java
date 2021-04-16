@@ -45,12 +45,12 @@ public class LocationService extends Service implements LocationListener {
     double latitude = 0; // latitude
     double longitude = 0; // longitude
 
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
-    private static final long MIN_TIME_BW_UPDATES = 5 * 1000;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
+    private static final long MIN_TIME_BW_UPDATES = 10 * 1000;
     protected LocationManager locationManager;
 
-    NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
+    static NotificationManager mNotificationManager;
+    static NotificationCompat.Builder builder;
 
     @Override
     public void onCreate() {
@@ -65,19 +65,23 @@ public class LocationService extends Service implements LocationListener {
     }
 
 
-
     public static void addAlarmPTolaceList(AlarmPlace alarmPlace) {
-
-
         if (alarmPlace != null) {
-            AlarmPlace.AlarmPlaces.add(alarmPlace);
-            AlarmPlace.updateAlarmListDistances(location);
-            AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
-            Log.d("alarmPlace", "alarmPlace id: " + nearestPlace.alarmId);
+            if (!AlarmPlace.AlarmPlaces.contains(alarmPlace)) {
+                AlarmPlace.AlarmPlaces.add(alarmPlace);
 
+                updateLocation();
+
+            } else {
+                Log.i("ALARM", "Alarm Already ADDED BEFORE");
+            }
+
+            Log.i("AlarmPlaces Count", "" + AlarmPlace.AlarmPlaces.size());
         }
+    }
 
-
+    public static void clearAllAlarmPlaces() {
+        AlarmPlace.AlarmPlaces.clear();
     }
 
 
@@ -150,16 +154,26 @@ public class LocationService extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location loc) {
         //Location loc = getLocation();
-        double longs = loc.getLongitude();
-        double lat = loc.getLatitude();
-        builder.setContentText("Lat: " + lat + "Long: " + longs);
-        mNotificationManager.notify(101, builder.build());
+        location = loc;
+        updateLocation();
 
-        AlarmPlace.updateAlarmListDistances(loc);
-        AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
+    }
 
-        sendMessageToActivity(nearestPlace.distance, "fromService");
-        Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.distance);
+    public static void updateLocation() {
+
+        if (location != null) {
+            AlarmPlace.updateAlarmListDistances(location);
+            AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
+            double distance = Math.round(nearestPlace.distance * 100.0) / 100.0;
+            String notfy = "Distance to nearest target: " + distance + " at Alarm #" + nearestPlace.alarmId;
+            builder.setContentText(notfy);
+            mNotificationManager.notify(101, builder.build());
+            // sendMessageToActivity(nearestPlace.distance, "fromService");
+
+            Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.distance + " at " + nearestPlace.alarmId);
+        } else {
+            Log.i("LOCATION CHANGED", "NULL");
+        }
     }
 
 
@@ -179,10 +193,11 @@ public class LocationService extends Service implements LocationListener {
 
         builder = new NotificationCompat.Builder(this, channel)
                 .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-                .setContentTitle("Current Location");
+                .setContentTitle("Next Alarm");
+
         Notification notification = builder
                 .setPriority(PRIORITY_MAX)
-                .setSound(uri)
+                //.setSound(uri)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 //.addAction(R.drawable.app_icon, "Stop", snoozePendingIntent)
                 .build();
@@ -215,8 +230,8 @@ public class LocationService extends Service implements LocationListener {
 
 
     @Override
-    public void onTaskRemoved(Intent rootIntent){
-        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+    public void onTaskRemoved(Intent rootIntent) {
+        Intent restartServiceIntent = new Intent(getApplicationContext(), LocationService.class);
         restartServiceIntent.setPackage(getPackageName());
 
         PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
