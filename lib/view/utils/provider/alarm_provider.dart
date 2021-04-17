@@ -7,7 +7,7 @@ import '../database/database_manager.dart';
 import 'background_service_provider.dart';
 
 class AlarmProdivder extends ChangeNotifier {
-  List<Alarm> alarmList = [];
+  List<Alarm>? alarmList = [];
   Alarm? nearestAlarm;
   bool hasActiveAlarm = false;
   int alarmCount = 0;
@@ -19,7 +19,7 @@ class AlarmProdivder extends ChangeNotifier {
     await DatabaseManager.instance.databaseInit();
     alarmList = await DatabaseManager.instance.getAlarmList();
     alarmList =
-        alarmList.where((element) => element.isAlarmActive == 1).toList();
+        alarmList!.where((element) => element.isAlarmActive == 1).toList();
 
     alarmCount = await getAlarmCount();
     if (alarmCount > 0) {
@@ -28,14 +28,19 @@ class AlarmProdivder extends ChangeNotifier {
       hasActiveAlarm = false;
 
     notifyListeners();
-    return alarmList;
+    return alarmList!;
+  }
+
+  Future<void> deleteSelectedAlarm(Alarm selectedAlarm) async {
+    selectedAlarm.isAlarmActive = 0;
+    await updateAlarm(selectedAlarm.alarmId!, selectedAlarm);
+    await getAlarmList();
   }
 
   Future<void> deleteAllAlarms() async {
     await DatabaseManager.instance.deleteAllAlarm();
     await getAlarmList();
     await BackgroundServiceManager.instance.stopAllAlarmServices();
-    print("alarmCount" + alarmCount.toString());
     if (alarmCount == 0) {
       stopLocationStream();
     }
@@ -45,12 +50,12 @@ class AlarmProdivder extends ChangeNotifier {
     return await DatabaseManager.instance.getAlarmCount();
   }
 
-  Future<void> deleteSelectedAlarm(int alarmId) async {
+  Future<void> deleteSelectedMapPlace(int alarmId) async {
     Alarm alarm = (await DatabaseManager.instance.getAlarm(alarmId))!;
 
     alarm.isAlarmActive = 0;
     await updateAlarm(alarmId, alarm);
-    await DatabaseManager.instance.deleteAlarm(alarmId);
+    // await DatabaseManager.instance.deleteAlarm(alarmId);
     await getAlarmList();
   }
 
@@ -78,8 +83,8 @@ class AlarmProdivder extends ChangeNotifier {
   }
 
   Future<void> addActiveAlarmsToBGService() async {
-    if (alarmList != null) if (alarmList.isNotEmpty)
-      await BackgroundServiceManager.instance.checkExistensAlarms(alarmList);
+    if (alarmList != null) if (alarmList!.isNotEmpty)
+      await BackgroundServiceManager.instance.checkExistensAlarms(alarmList!);
   }
 
   void startLocationStream() {
@@ -110,7 +115,7 @@ class AlarmProdivder extends ChangeNotifier {
     if (currentPosition == null) {
       currentPosition = (await Geolocator.getLastKnownPosition())!;
     }
-    for (var alarms in alarmList) {
+    for (var alarms in alarmList!) {
       alarms.distance = Geolocator.distanceBetween(alarms.lat!, alarms.long!,
           currentPosition.latitude, currentPosition.longitude);
     }
@@ -119,9 +124,9 @@ class AlarmProdivder extends ChangeNotifier {
   }
 
   void getNearestAlarm() {
-    if (alarmList.isNotEmpty) {
-      alarmList.sort((a, b) => a.distance!.compareTo(b.distance!));
-      nearestAlarm = alarmList.first;
+    if (alarmList!.isNotEmpty) {
+      alarmList!.sort((a, b) => a.distance!.compareTo(b.distance!));
+      nearestAlarm = alarmList!.first;
     }
   }
 }

@@ -8,11 +8,13 @@ class ShimmerText extends StatelessWidget {
     required this.text,
     required this.duration,
     this.fontSize,
+    this.textStyle,
   }) : super(key: key);
 
   final String text;
   final int duration;
   final double? fontSize;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +26,12 @@ class ShimmerText extends StatelessWidget {
         child: Container(
           child: Text(
             text,
-            style: TextStyle(
-              color: context.colors.primary,
-              fontSize: fontSize,
-            ),
+            style: textStyle == null
+                ? TextStyle(
+                    color: context.colors.primary,
+                    fontSize: fontSize,
+                  )
+                : textStyle,
           ),
         ),
       ),

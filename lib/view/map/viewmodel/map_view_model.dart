@@ -237,7 +237,7 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
         circles.remove(matchedCircle.first);
         markers.remove(matchedMarker.first);
         Provider.of<AlarmProdivder>(context, listen: false)
-            .deleteSelectedAlarm(selectedPlace!.id.toInt());
+            .deleteSelectedMapPlace(selectedPlace!.id);
         selectedPlaces.remove(selectedPlace);
       }
     }
