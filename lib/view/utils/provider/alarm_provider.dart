@@ -35,6 +35,10 @@ class AlarmProdivder extends ChangeNotifier {
     await DatabaseManager.instance.deleteAllAlarm();
     await getAlarmList();
     await BackgroundServiceManager.instance.stopAllAlarmServices();
+    print("alarmCount" + alarmCount.toString());
+    if (alarmCount == 0) {
+      stopLocationStream();
+    }
   }
 
   Future<int> getAlarmCount() async {
@@ -102,15 +106,16 @@ class AlarmProdivder extends ChangeNotifier {
     notifyListeners();
   }
 
-  void calculateDistanceToAlarmPlaces(Position? currentPosition) {
-    if (currentPosition != null) {
-      for (var alarms in alarmList) {
-        alarms.distance = Geolocator.distanceBetween(alarms.lat!, alarms.long!,
-            currentPosition.latitude, currentPosition.longitude);
-      }
-      getNearestAlarm();
-      notifyListeners();
+  Future<void> calculateDistanceToAlarmPlaces(Position? currentPosition) async {
+    if (currentPosition == null) {
+      currentPosition = (await Geolocator.getLastKnownPosition())!;
     }
+    for (var alarms in alarmList) {
+      alarms.distance = Geolocator.distanceBetween(alarms.lat!, alarms.long!,
+          currentPosition.latitude, currentPosition.longitude);
+    }
+    getNearestAlarm();
+    notifyListeners();
   }
 
   void getNearestAlarm() {
