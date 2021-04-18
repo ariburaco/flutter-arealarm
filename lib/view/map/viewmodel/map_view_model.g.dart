@@ -154,6 +154,14 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
         .run(() => super.addPlaceMarker(position, context, _controller));
   }
 
+  final _$deletePlaceAsyncAction =
+      AsyncAction('_GoogleMapViewModelBase.deletePlace');
+
+  @override
+  Future<void> deletePlace() {
+    return _$deletePlaceAsyncAction.run(() => super.deletePlace());
+  }
+
   final _$_GoogleMapViewModelBaseActionController =
       ActionController(name: '_GoogleMapViewModelBase');
 
@@ -174,17 +182,6 @@ mixin _$GoogleMapViewModel on _GoogleMapViewModelBase, Store {
         name: '_GoogleMapViewModelBase.removeAlarmAndPlace');
     try {
       return super.removeAlarmAndPlace();
-    } finally {
-      _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void deletePlace() {
-    final _$actionInfo = _$_GoogleMapViewModelBaseActionController.startAction(
-        name: '_GoogleMapViewModelBase.deletePlace');
-    try {
-      return super.deletePlace();
     } finally {
       _$_GoogleMapViewModelBaseActionController.endAction(_$actionInfo);
     }

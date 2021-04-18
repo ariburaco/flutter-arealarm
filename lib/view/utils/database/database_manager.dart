@@ -96,9 +96,9 @@ class DatabaseManager {
     var alarmList = alarms.map((e) => Alarm.fromJson(e)).toList();
     if (alarmList.length > 0) {
       alarmList.sort((a, b) => a.alarmId!.compareTo(b.alarmId!));
-      return alarmList.last.alarmId! + 1;
+      return alarmList.last.alarmId!;
     } else {
-      return 1;
+      return 0;
     }
   }
 

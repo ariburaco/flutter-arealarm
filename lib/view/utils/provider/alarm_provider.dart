@@ -91,7 +91,7 @@ class AlarmProdivder extends ChangeNotifier {
     positionStream = Geolocator.getPositionStream(
             desiredAccuracy: LocationAccuracy.bestForNavigation,
             distanceFilter: 0,
-            intervalDuration: Duration(seconds: 5))
+            intervalDuration: Duration(seconds: 10))
         .listen((Position? position) {
       if (position != null) {
         print("POS: " + position.toString());

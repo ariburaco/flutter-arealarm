@@ -44,7 +44,6 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   void init() {
     askLocationPermissions();
     getCurrentPosition();
-    Provider.of<AlarmProdivder>(context, listen: false).startLocationStream();
   }
 
   Future<void> getAlarmCount() async {
@@ -173,7 +172,9 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
       AnimationController _controller) async {
     _controller.reverse();
     navigateToPosition(position);
-    String placeId = "place_${count}";
+
+    count++;
+    String placeId = "place_$count";
     Marker marker = new Marker(
         markerId: MarkerId(placeId),
         position: position,
@@ -246,19 +247,23 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   }
 
   @action
-  void deletePlace() {
+  Future<void> deletePlace() async {
     if (selectedPlace != null) {
-      var matchedCircle = circles.where((element) =>
-          (element.circleId.value == selectedPlace!.circle.circleId.value));
-      var matchedMarker = markers.where((element) =>
-          (element.markerId.value == selectedPlace!.marker.markerId.value));
+      var isMatch = await checkSelectedIsPlaceAddedToDB();
+      //print("isMatch" + isMatch!.placeName!);
+      if (isMatch == null) {
+        var matchedCircle = circles.where((element) =>
+            (element.circleId.value == selectedPlace!.circle.circleId.value));
+        var matchedMarker = markers.where((element) =>
+            (element.markerId.value == selectedPlace!.marker.markerId.value));
 
-      if (matchedMarker.length > 0 && matchedCircle.length > 0) {
-        circles.remove(matchedCircle.first);
-        markers.remove(matchedMarker.first);
+        if (matchedMarker.length > 0 && matchedCircle.length > 0) {
+          circles.remove(matchedCircle.first);
+          markers.remove(matchedMarker.first);
+        }
+        count--;
       }
     }
-
     checkSelectedIsPlaceAddedToDB();
   }
 
@@ -279,9 +284,10 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
 
   LatLngBounds _bounds(ObservableSet<Marker> markers) {
     var markerPositions = markers.map((m) => m.position).toList();
-
-    getCurrentPosition();
-    if (currentPosition != null) markerPositions.add(currentPosition!);
+    if (currentPosition == null) {
+      getCurrentPosition();
+    }
+    markerPositions.add(currentPosition!);
     return _createBounds(markerPositions);
   }
 
@@ -318,25 +324,26 @@ abstract class _GoogleMapViewModelBase with Store, BaseViewModel {
   void addMapPlaces(MapPlace currentMapPlace) {
     if (pinLocationIcon != null) {
       selectedPlaces.add(currentMapPlace);
-      count++;
     } else {
       print("icon not found!");
     }
   }
 
-  Future<void> mapsInit(
-      GoogleMapController controller, AnimationController _controller) async {
-    this.mapController = controller;
+  Future<void> mapsInit(GoogleMapController mapController,
+      AnimationController animationController) async {
+    this.mapController = mapController;
 
     await setCustomMapPin();
-    await establishExistentAlarms(_controller);
+    await establishExistentAlarms(animationController);
     await getAlarmCount();
 
-    if (count > 1) moveToBounderies();
+    if (count > 1) {
+      Provider.of<AlarmProdivder>(context, listen: false).startLocationStream();
+      moveToBounderies();
+    }
   }
 
   Future<LatLng> getCurrentPosition() async {
-    askLocationPermissions();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
 
