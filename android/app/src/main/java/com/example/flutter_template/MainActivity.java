@@ -64,6 +64,7 @@ public class MainActivity extends FlutterActivity {
 
                     switch (call.method) {
                         case START_ALARM_SERVICE:
+                           /*
                             AlarmPlace alarmPlace = getCallArguments(call);
                             if (alarmPlace.alarmId != -1) {
 
@@ -75,12 +76,15 @@ public class MainActivity extends FlutterActivity {
 
 
                             }
+                            */
+
+
                             break;
                         case STOP_ALARM_SERVICE:
-                            stopBackgroundService();
+                           // stopBackgroundService();
                             break;
                         case STOP_ALL_ALARM_SERVICES:
-                            stopBackgroundService();
+                           // stopBackgroundService();
                             break;
 
                     }

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../core/init/notification/local_notification.dart';
 import '../../../core/base/extension/context_extension.dart';
@@ -31,19 +31,17 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     _lastLifecycleState = state;
-    if (_lastLifecycleState == AppLifecycleState.paused) {
-      await Provider.of<AlarmProdivder>(context, listen: false)
-          .stopLocationStream();
-    } else if (_lastLifecycleState == AppLifecycleState.resumed) {
-      Provider.of<AlarmProdivder>(context, listen: false).startLocationStream();
-    }
+    // if (_lastLifecycleState == AppLifecycleState.paused) {
+    //   await Provider.of<AlarmProdivder>(context, listen: false)
+    //       .stopLocationStream();
+    // } else if (_lastLifecycleState == AppLifecycleState.resumed) {
+    //   Provider.of<AlarmProdivder>(context, listen: false).startLocationStream();
+    // }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
-
-    //
     super.dispose();
   }
 

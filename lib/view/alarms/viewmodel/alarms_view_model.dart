@@ -16,7 +16,5 @@ abstract class _AlarmsViewModelBase with Store, BaseViewModel {
   void setContext(BuildContext context) => this.context = context;
 
   @override
-  void init() {
-    Provider.of<AlarmProdivder>(context, listen: false).getAlarmList();
-  }
+  void init() {}
 }

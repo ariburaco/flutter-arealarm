@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
+import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/place_card.dart';
 import '../../../core/base/extension/context_extension.dart';
@@ -18,7 +18,7 @@ class GoogleMapView extends StatefulWidget {
 
 class _GoogleMapViewState extends State<GoogleMapView>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController animationController;
   late Animation<Offset> _offsetFloat;
 
   @override
@@ -29,7 +29,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   @override
   void dispose() {
-    _controller.dispose();
+    animationController.dispose();
     super.dispose();
   }
 
@@ -49,7 +49,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
                 alignment: Alignment.center,
                 children: <Widget>[
                   buildGoogleMap(viewmodel),
-                  buildPlaceCard(context, viewmodel, _offsetFloat, _controller),
+                  buildPlaceCard(context, _offsetFloat, animationController),
                 ],
               ),
               floatingActionButton: Row(
@@ -68,37 +68,33 @@ class _GoogleMapViewState extends State<GoogleMapView>
         backgroundColor: context.colors.secondaryVariant,
         child: IconNormal(icon: Icons.location_pin),
         onPressed: () {
-          if (viewmodel.selectedPlaces.length > 1) {
-            viewmodel.moveToBounderies();
-          } else {
-            viewmodel.navigateToCurrentPosition();
-          }
+          Provider.of<AlarmProvider>(context, listen: false).moveToBounderies();
         });
   }
 
   Widget buildGoogleMap(GoogleMapViewModel viewmodel) {
-    return Observer(builder: (_) {
-      return GoogleMap(
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        markers: viewmodel.markers.toSet(),
-        circles: viewmodel.circles.toSet(),
-        compassEnabled: true,
-        gestureRecognizers: googleGestures.toSet(),
-        mapType: MapType.normal,
-        onTap: (LatLng pos) {
-          _controller.forward();
-        },
-        onLongPress: (LatLng pos) {
-          viewmodel.addPlaceMarker(pos, context, _controller);
-        },
-        onMapCreated: (map) => viewmodel.mapsInit(map, _controller),
-        initialCameraPosition: CameraPosition(
-          target: LatLng(41.029291, 28.887751),
-          zoom: 15,
-        ),
-      );
-    });
+    return GoogleMap(
+      myLocationEnabled: true,
+      myLocationButtonEnabled: true,
+      markers: Provider.of<AlarmProvider>(context, listen: false).markers,
+      circles: Provider.of<AlarmProvider>(context, listen: false).circles,
+      compassEnabled: true,
+      gestureRecognizers: googleGestures.toSet(),
+      mapType: MapType.normal,
+      onTap: (LatLng pos) {
+        animationController.forward();
+      },
+      onLongPress: (LatLng pos) {
+        Provider.of<AlarmProvider>(context, listen: false)
+            .addPlaceMarker(pos, context);
+      },
+      onMapCreated: (map) => Provider.of<AlarmProvider>(context, listen: false)
+          .mapsInit(map, animationController),
+      initialCameraPosition: CameraPosition(
+        target: LatLng(41.029291, 28.887751),
+        zoom: 15,
+      ),
+    );
   }
 
   List<Factory<OneSequenceGestureRecognizer>> get googleGestures {
@@ -110,7 +106,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
   }
 
   void animationControllerInit() {
-    _controller = AnimationController(
+    animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     )..repeat(reverse: true);
@@ -119,10 +115,10 @@ class _GoogleMapViewState extends State<GoogleMapView>
       begin: Offset.zero,
       end: const Offset(0, 2),
     ).animate(CurvedAnimation(
-      parent: _controller,
+      parent: animationController,
       curve: Curves.easeInOut,
     ));
-    _controller.forward();
+    animationController.forward();
     _offsetFloat.addListener(() {});
   }
 

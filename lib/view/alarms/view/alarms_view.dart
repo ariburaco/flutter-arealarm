@@ -1,12 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import '../../utils/provider/alarm_provider.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../core/components/icons/icon_normal.dart';
+import '../../utils/provider/alarm_provider.dart';
 import '../viewmodel/alarms_view_model.dart';
 import '../widgets/shimmer_text.dart';
 
@@ -60,16 +59,16 @@ class _AlarmsViewState extends State<AlarmsView>
                   backgroundColor: context.colors.secondaryVariant,
                   child: IconNormal(icon: Icons.delete),
                   onPressed: () async {
-                    await Provider.of<AlarmProdivder>(context, listen: false)
+                    await Provider.of<AlarmProvider>(context, listen: false)
                         .deleteAllAlarms();
                   }),
             ));
   }
 
   Widget buildAlarmList(AlarmsViewModel viewModel) {
-    if (Provider.of<AlarmProdivder>(context, listen: true).alarmList!.length >
+    if (Provider.of<AlarmProvider>(context, listen: true).alarmList!.length >
         0) {
-      return Consumer<AlarmProdivder>(
+      return Consumer<AlarmProvider>(
           builder: (_, data, __) => ListView.builder(
                 itemCount: data.alarmList!.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -196,9 +195,9 @@ class _AlarmsViewState extends State<AlarmsView>
   }
 
   Widget buildNextAlarmIndicator(AlarmsViewModel viewModel) {
-    if (Provider.of<AlarmProdivder>(context, listen: true).alarmCount > 0) {
+    if (Provider.of<AlarmProvider>(context, listen: true).count > 0) {
       final nearestAlarm =
-          Provider.of<AlarmProdivder>(context, listen: true).nearestAlarm;
+          Provider.of<AlarmProvider>(context, listen: true).nearestAlarm;
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

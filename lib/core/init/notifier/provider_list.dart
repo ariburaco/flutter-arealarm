@@ -19,7 +19,7 @@ class ApplicationProvider {
       create: (context) => ThemeNotifier(),
     ),
     ChangeNotifierProvider(
-      create: (context) => AlarmProdivder(),
+      create: (context) => AlarmProvider(),
     ),
     // ChangeNotifierProvider(
     //   create: (context) => BackgroundServiceProdiver(),

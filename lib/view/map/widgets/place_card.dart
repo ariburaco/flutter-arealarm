@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import '../viewmodel/map_view_model.dart';
+import '../../utils/provider/alarm_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/base/extension/context_extension.dart';
 
 Widget buildPlaceCard(
   BuildContext context,
-  GoogleMapViewModel viewmodel,
   Animation<Offset> _offsetFloat,
-  AnimationController _controller,
+  AnimationController animationController,
 ) {
   return SlideTransition(
     position: _offsetFloat,
@@ -33,45 +33,39 @@ Widget buildPlaceCard(
                     child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Observer(builder: (_) {
-                      return Text(
-                          "Configure Alarm #${viewmodel.selectedPlace != null ? viewmodel.selectedPlace!.id : ""}",
-                          style: TextStyle(fontWeight: FontWeight.bold));
-                    }),
+                    Text(
+                        "Configure Alarm #${Provider.of<AlarmProvider>(context, listen: false).selectedPlace != null ? Provider.of<AlarmProvider>(context, listen: false).selectedPlace!.id : ""}",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     IconButton(
                         onPressed: () {
-                          viewmodel.deletePlace();
-                          _controller.forward();
+                          Provider.of<AlarmProvider>(context, listen: false)
+                              .deletePlace();
+
+                          animationController.forward();
                         },
                         icon: Icon(Icons.close)),
                   ],
                 )),
-                // Observer(builder: (_) {
-                //   return Container(
-                //     child: Text(mapsViewModel.selectedPlace == null
-                //         ? mapsViewModel.selectedPlace.address
-                //         : "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA"),
-                //   );
-                // }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    buildCustomSlider(context, viewmodel),
-                    Container(child: Observer(builder: (_) {
-                      return Text(
-                          viewmodel.radius.toStringAsFixed(0) + " meters");
-                    })),
+                    buildCustomSlider(context),
+                    Container(
+                        child: Text(
+                            Provider.of<AlarmProvider>(context, listen: false)
+                                    .radius
+                                    .toStringAsFixed(0) +
+                                " meters")),
                   ],
                 ),
-                Container(child: Observer(builder: (_) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildRemovePlaceButton(viewmodel, _controller),
-                      buildAddPlaceButton(viewmodel),
-                    ],
-                  );
-                })),
+                Container(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    buildRemovePlaceButton(context, animationController),
+                    buildAddPlaceButton(context),
+                  ],
+                )),
               ],
             ),
           ),
@@ -81,18 +75,21 @@ Widget buildPlaceCard(
   );
 }
 
-ElevatedButton buildAddPlaceButton(GoogleMapViewModel viewmodel) {
-  if ((viewmodel.isSelectedPlaceAlive == false)) {
+ElevatedButton buildAddPlaceButton(BuildContext context) {
+  if ((Provider.of<AlarmProvider>(context, listen: false)
+          .isSelectedPlaceAlive ==
+      false)) {
     return ElevatedButton(
       onPressed: () {
-        viewmodel.addPlaceToDB();
+        Provider.of<AlarmProvider>(context, listen: false).addPlaceToDB();
       },
       child: Text("Add Alarm"),
     );
   } else {
     return ElevatedButton(
       onPressed: () {
-        viewmodel.updateSelectedAlarm();
+        Provider.of<AlarmProvider>(context, listen: false)
+            .updateSelectedAlarm();
       },
       child: Text("Update Alarm"),
     );
@@ -100,11 +97,13 @@ ElevatedButton buildAddPlaceButton(GoogleMapViewModel viewmodel) {
 }
 
 Widget buildRemovePlaceButton(
-    GoogleMapViewModel viewmodel, AnimationController _controller) {
-  if (viewmodel.isSelectedPlaceAlive == true) {
+    BuildContext context, AnimationController _controller) {
+  if (Provider.of<AlarmProvider>(context, listen: false).isSelectedPlaceAlive ==
+      true) {
     return ElevatedButton(
       onPressed: () {
-        viewmodel.removeAlarmAndPlace();
+        Provider.of<AlarmProvider>(context, listen: false)
+            .removeAlarmAndPlace();
         _controller.forward();
       },
       child: Text("Remove Alarm"),
@@ -114,38 +113,46 @@ Widget buildRemovePlaceButton(
   }
 }
 
-SliderTheme buildCustomSlider(
-    BuildContext context, GoogleMapViewModel viewmodel) {
+SliderTheme buildCustomSlider(BuildContext context) {
   return SliderTheme(
       data: buildSliderThemeData(context),
-      child: Observer(builder: (_) {
-        return Slider(
-          value: viewmodel.radius,
-          min: 50,
-          max: 1000,
-          divisions: 19,
-          label: viewmodel.radius.round().toString() + " meters",
-          activeColor: context.colors.secondary,
-          onChanged: (double value) {
-            changeSelectedPlaceRadius(value, viewmodel, context);
-          },
-        );
-      }));
+      child: Slider(
+        value: Provider.of<AlarmProvider>(context, listen: false).radius,
+        min: 50,
+        max: 1000,
+        divisions: 19,
+        label: Provider.of<AlarmProvider>(context, listen: false)
+                .radius
+                .round()
+                .toString() +
+            " meters",
+        activeColor: context.colors.secondary,
+        onChanged: (double value) {
+          changeSelectedPlaceRadius(value, context);
+        },
+      ));
 }
 
-void changeSelectedPlaceRadius(
-    double value, GoogleMapViewModel viewmodel, BuildContext context) {
-  viewmodel.radius = value;
-  viewmodel.selectedPlace!.radius = viewmodel.radius;
+void changeSelectedPlaceRadius(double value, BuildContext context) {
+  Provider.of<AlarmProvider>(context, listen: false).radius = value;
+  Provider.of<AlarmProvider>(context, listen: false).selectedPlace!.radius =
+      Provider.of<AlarmProvider>(context, listen: false).radius;
   Circle newCircle = Circle(
-    circleId: viewmodel.selectedPlace!.circle.circleId,
-    radius: viewmodel.selectedPlace!.radius,
-    center: viewmodel.selectedPlace!.position,
+    circleId: Provider.of<AlarmProvider>(context, listen: false)
+        .selectedPlace!
+        .circle
+        .circleId,
+    radius: Provider.of<AlarmProvider>(context, listen: false)
+        .selectedPlace!
+        .radius,
+    center: Provider.of<AlarmProvider>(context, listen: false)
+        .selectedPlace!
+        .position,
     strokeWidth: 4,
     fillColor: context.colors.onPrimary.withOpacity(0.2),
     strokeColor: context.colors.secondaryVariant,
   );
-  viewmodel.changeRadius(newCircle);
+  Provider.of<AlarmProvider>(context, listen: false).changeRadius(newCircle);
 }
 
 BoxDecoration buildBoxDecoration(BuildContext context) {
