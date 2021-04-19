@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:flutter_template/core/init/notification/local_notification.dart';
+
 import '../../../core/base/extension/context_extension.dart';
 import 'package:flutter/cupertino.dart';
 import '../../map/model/map_place_model.dart';
@@ -151,20 +153,24 @@ class AlarmProvider extends ChangeNotifier {
       positionStream = Geolocator.getPositionStream(
               desiredAccuracy: LocationAccuracy.bestForNavigation,
               distanceFilter: 0,
-              intervalDuration: Duration(seconds: 3))
+              intervalDuration: Duration(seconds: 5))
           .listen((Position? position) {
         if (position != null) {
           currentPosition = position;
           print("POS: " + position.toString());
           calculateDistanceToAlarmPlaces(position);
           moveToBounderies();
+          // if (nearestAlarm != null) {
+          //   LocalNotifications.instance.showSilentNotification(
+          //       title: "Next Alarm",
+          //       body:
+          //           "Alarm #${nearestAlarm!.alarmId} in ${nearestAlarm!.distance!.toStringAsFixed(2)} meters ");
+          // }
         }
       });
     } else {
       positionStream!.resume();
     }
-
-    //startLocationStream();
   }
 
   Future<void> stopLocationStream() async {
@@ -409,8 +415,10 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<LatLngBounds> _bounds(Set<Marker> markers) async {
     var markerPositions = markers.map((m) => m.position).toList();
-    if (positionStream!.isPaused) {
-      await getCurrentPosition();
+    if (positionStream != null) {
+      if (positionStream!.isPaused) {
+        await getCurrentPosition();
+      }
     }
     if (currentPosition != null) markerPositions.add(currentPosition!.latlng);
 
@@ -420,7 +428,6 @@ class AlarmProvider extends ChangeNotifier {
   Future<void> moveToBounderies() async {
     if (markers.isNotEmpty) {
       var bounds = await _bounds(markers);
-      print("markers.length " + markers.length.toString());
       double padding = markers.length == 0 ? 200 : 100;
       await mapController!
           .animateCamera(CameraUpdate.newLatLngBounds(bounds, padding));

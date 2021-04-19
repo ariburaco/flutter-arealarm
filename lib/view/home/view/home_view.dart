@@ -31,28 +31,18 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     _lastLifecycleState = state;
-    // if (_lastLifecycleState == AppLifecycleState.paused) {
-    //   await Provider.of<AlarmProdivder>(context, listen: false)
-    //       .stopLocationStream();
-    // } else if (_lastLifecycleState == AppLifecycleState.resumed) {
-    //   Provider.of<AlarmProdivder>(context, listen: false).startLocationStream();
-    // }
+    if (_lastLifecycleState == AppLifecycleState.paused) {
+      await Provider.of<AlarmProvider>(context, listen: false)
+          .stopLocationStream();
+    } else if (_lastLifecycleState == AppLifecycleState.resumed) {
+      Provider.of<AlarmProvider>(context, listen: false).startLocationStream();
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
-  }
-
-  Future<void> showNotification(data) async {
-    print(data);
-    var rand = Random();
-    var hash = rand.nextInt(100);
-    DateTime now = DateTime.now().toUtc().add(Duration(seconds: 1));
-
-    LocalNotifications.instance
-        .showOngoingNotification(title: "$now", body: "$now", id: hash);
   }
 
   @override

@@ -45,7 +45,7 @@ public class LocationService extends Service implements LocationListener {
     double latitude = 0; // latitude
     double longitude = 0; // longitude
 
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
     private static final long MIN_TIME_BW_UPDATES = 10 * 1000;
     protected LocationManager locationManager;
 
@@ -55,16 +55,12 @@ public class LocationService extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            getLocation();
-            getNotification();
-            startForeground(101, builder.build());
-
-        }else{
-
-        }
+        getLocation();
+        getNotification();
+        startForeground(101, builder.build());
     }
+
+
 
 
     public static void addAlarmPTolaceList(AlarmPlace alarmPlace) {
@@ -84,6 +80,8 @@ public class LocationService extends Service implements LocationListener {
 
     public static void clearAllAlarmPlaces() {
         AlarmPlace.AlarmPlaces.clear();
+
+
     }
 
 
@@ -170,7 +168,7 @@ public class LocationService extends Service implements LocationListener {
             AlarmPlace.updateAlarmListDistances(location);
             AlarmPlace nearestPlace = AlarmPlace.getNearestLocation();
             double distance = Math.round(nearestPlace.distance * 100.0) / 100.0;
-            String notfy = "Distance to nearest target: " + distance + " at Alarm #" + nearestPlace.alarmId;
+            String notfy = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId;
             builder.setContentText(notfy);
             mNotificationManager.notify(101, builder.build());
             // sendMessageToActivity(nearestPlace.distance, "fromService");
@@ -198,10 +196,11 @@ public class LocationService extends Service implements LocationListener {
 
         builder = new NotificationCompat.Builder(this, channel)
                 .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-                .setContentTitle("Next Alarm");
+                .setContentTitle("Arealarm");
 
         Notification notification = builder
                 .setPriority(PRIORITY_MAX)
+                .setNotificationSilent()
                 //.setSound(uri)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 //.addAction(R.drawable.app_icon, "Stop", snoozePendingIntent)
@@ -216,7 +215,7 @@ public class LocationService extends Service implements LocationListener {
     private synchronized String createChannel() {
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        String name = "Current Location";
+        String name = "LocationService";
         int importance = NotificationManager.IMPORTANCE_HIGH;
 
         NotificationChannel mChannel = new NotificationChannel("snap map channel", name, importance);

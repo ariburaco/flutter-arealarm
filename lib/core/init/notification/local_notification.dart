@@ -35,6 +35,10 @@ class LocalNotifications {
       'silent channel',
       'silent channel',
       playSound: false,
+      importance: Importance.max,
+      priority: Priority.high,
+      autoCancel: false,
+      ongoing: true,
     );
     final iOSChannelSpecifics = IOSNotificationDetails(presentSound: false);
 
