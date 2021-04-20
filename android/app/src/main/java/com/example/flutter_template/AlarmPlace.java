@@ -2,6 +2,8 @@ package com.example.flutter_template;
 
 import android.location.Location;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -9,14 +11,48 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class AlarmPlace {
+public class AlarmPlace implements Parcelable {
     int alarmId;
     Location location;
     int isActiveAlarm;
     double radius;
     double distance;
 
-    public static List<AlarmPlace> AlarmPlaces = new ArrayList<AlarmPlace>();
+    protected AlarmPlace(Parcel in) {
+        alarmId = in.readInt();
+        location = (Location) in.readValue(Location.class.getClassLoader());
+        isActiveAlarm = in.readInt();
+        radius = in.readDouble();
+        distance = in.readDouble();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(alarmId);
+        dest.writeValue(location);
+        dest.writeInt(isActiveAlarm);
+        dest.writeDouble(radius);
+        dest.writeDouble(distance);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<AlarmPlace> CREATOR = new Parcelable.Creator<AlarmPlace>() {
+        @Override
+        public AlarmPlace createFromParcel(Parcel in) {
+            return new AlarmPlace(in);
+        }
+
+        @Override
+        public AlarmPlace[] newArray(int size) {
+            return new AlarmPlace[size];
+        }
+    };
+
 
     public AlarmPlace() {
         this.alarmId = -1;
@@ -33,52 +69,5 @@ public class AlarmPlace {
     }
 
 
-    public static void updateAlarmListDistances(Location currentLocation) {
-
-        if (currentLocation != null) {
-            for (AlarmPlace alarmplace : AlarmPlaces) {
-                alarmplace.distance = currentLocation.distanceTo(alarmplace.location);
-            }
-
-        }
-        else
-            Log.i("NULL LOCATION", "null");
-
-    }
-
-    public static AlarmPlace getNearestLocation() {
-        AlarmPlace nearestAlarmPlace = new AlarmPlace();
-        Collections.sort(AlarmPlaces, new Comparator<AlarmPlace>() {
-            @Override
-            public int compare(AlarmPlace l1, AlarmPlace l2) {
-                return Double.compare(l1.distance, l2.distance);
-            }
-        });
-
-        if (AlarmPlaces != null) {
-
-            if (AlarmPlaces.size() > 0) {
-                nearestAlarmPlace = AlarmPlaces.get(0);
-            }
-
-        }
-
-        return nearestAlarmPlace;
-
-    }
-
-
 }
 
-/*
-abstract class SortByDistance implements Comparator<AlarmPlace>
-{
-
-    @Override
-    public int compare(double a, double b)
-    {
-        return Double.compare(a, b);
-    }
-}
-
- */

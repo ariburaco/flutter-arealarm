@@ -48,6 +48,7 @@ public class MainActivity extends FlutterActivity {
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
         //LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         //stopService(servIntent);
@@ -56,21 +57,118 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBatteryOptimization();
-        for (Intent intent : POWERMANAGER_INTENTS)
-            if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
-                //startActivity(intent);
-                break;
-            }
+        //getBatteryOptimization();
+        //getAutoRun();
+
         startInitialization(this);
         context = getContext();
-
         serviceStartIntent = new Intent(MainActivity.this, LocationService.class);
-        //serviceStartIntent = new Intent(context, "com.example.flutter_template.LONGRUNSERVICE");
-
-        //serviceStartIntent.setAction(Constants.STARTFOREGROUND_ACTION);
+    }
 
 
+    @Override
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+        super.configureFlutterEngine(flutterEngine);
+
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(
+                (call, result) -> {
+
+                    switch (call.method) {
+                        case START_ALARM_SERVICE:
+                            AlarmPlace alarmPlace = getCallArguments(call);
+                            startBackgroundAlarmService(alarmPlace);
+
+
+                            break;
+                        case STOP_ALARM_SERVICE:
+                            stopBackgroundService();
+                            break;
+                        case STOP_ALL_ALARM_SERVICES:
+                            stopBackgroundService();
+                            break;
+
+                    }
+                }
+
+        );
+
+
+    }
+
+    private void stopBackgroundService() {
+        serviceStopIntent = new Intent(MainActivity.this, LocationService.class);
+        serviceStopIntent.setAction(Constants.STOPFOREGROUND_ACTION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContextCompat.startForegroundService(context, serviceStopIntent);
+        } else {
+            startService(serviceStopIntent);
+        }
+
+
+        //LocationService.clearAllAlarmPlaces();
+        /*
+       *  serviceStopIntent = new Intent(MainActivity.this, LocationService.class);
+        serviceStopIntent.setAction(Constants.STOPFOREGROUND_ACTION);
+        startService(serviceStopIntent);
+       * */
+    }
+
+
+    public AlarmPlace getCallArguments(MethodCall call) {
+        AlarmPlace alarmPlace = new AlarmPlace();
+        try {
+            if (call != null) {
+                int alarmId = call.argument("alarmId");
+                int isActive = call.argument("isActive");
+                double radius = call.argument("radius");
+                double latitude = call.argument("latitude");
+                double longitude = call.argument("longitude");
+                alarmPlace.setAlarmPlaces(alarmId, isActive, latitude, longitude, radius);
+
+            }
+        } catch (Exception e) {
+            Log.d("CALL_EX", e.toString());
+        }
+        return alarmPlace;
+    }
+
+    public void startBackgroundAlarmService(AlarmPlace alarmPlace) {
+        //if (!isMyServiceRunning(LocationService.class)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //startForegroundService(serviceStartIntent);
+
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("key", alarmPlace);
+            serviceStartIntent.putExtras(bundle);
+            ContextCompat.startForegroundService(context, serviceStartIntent);
+        } else {
+            startService(serviceStartIntent);
+        }
+        Log.d("SERVICE", "Started!");
+        // } else {
+        //    Log.d("SERVICE", "Already Running!");
+        // }
+
+    }
+
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private void getAutoRun() {
+        for (Intent intent : POWERMANAGER_INTENTS)
+            if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+                startActivity(intent);
+                break;
+            }
     }
 
     private void openPowerSettings() {
@@ -107,120 +205,5 @@ public class MainActivity extends FlutterActivity {
             new Intent().setComponent(new ComponentName("com.htc.pitroad", "com.htc.pitroad.landingpage.activity.LandingPageActivity")),
             new Intent().setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity"))
     };
-
-
-    @Override
-    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
-        super.configureFlutterEngine(flutterEngine);
-
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(
-                (call, result) -> {
-
-                    switch (call.method) {
-                        case START_ALARM_SERVICE:
-
-                            AlarmPlace alarmPlace = getCallArguments(call);
-                            if (alarmPlace.alarmId != -1) {
-
-
-                                if (!isMyServiceRunning(LocationService.class)) {
-                                    startBackgroundAlarmService();
-                                }
-                                LocationService.addAlarmPTolaceList(alarmPlace);
-
-
-                            }
-
-
-                            break;
-                        case STOP_ALARM_SERVICE:
-                            // stopBackgroundService();
-                            break;
-                        case STOP_ALL_ALARM_SERVICES:
-                            // stopBackgroundService();
-                            break;
-
-                    }
-                }
-
-        );
-
-
-    }
-
-    private void stopBackgroundService() {
-
-        LocationService.clearAllAlarmPlaces();
-        /*
-       *  serviceStopIntent = new Intent(MainActivity.this, LocationService.class);
-        serviceStopIntent.setAction(Constants.STOPFOREGROUND_ACTION);
-        startService(serviceStopIntent);
-       * */
-    }
-
-    public void getLocationAnswer() {
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
-    }
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            String message = intent.getStringExtra("Status");
-            Bundle b = intent.getBundleExtra("double");
-            double distance = b.getDouble("double");
-            if (distance != -1) {
-                //double longu = lastKnownLoc.getLongitude();
-                //double lati = lastKnownLoc.getLatitude();
-                String text = "Distance: " + distance;
-                // Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
-
-    public AlarmPlace getCallArguments(MethodCall call) {
-        AlarmPlace alarmPlace = new AlarmPlace();
-        try {
-            if (call != null) {
-                int alarmId = call.argument("alarmId");
-                int isActive = call.argument("isActive");
-                double radius = call.argument("radius");
-                double latitude = call.argument("latitude");
-                double longitude = call.argument("longitude");
-                alarmPlace.setAlarmPlaces(alarmId, isActive, latitude, longitude, radius);
-
-            }
-        } catch (Exception e) {
-            Log.d("CALL_EX", e.toString());
-        }
-        return alarmPlace;
-    }
-
-    public void startBackgroundAlarmService() {
-        if (!isMyServiceRunning(LocationService.class)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                //startForegroundService(serviceStartIntent);
-                ContextCompat.startForegroundService(context, serviceStartIntent);
-            } else {
-                startService(serviceStartIntent);
-            }
-            Log.d("SERVICE", "Started!");
-        } else {
-            Log.d("SERVICE", "Already Running!");
-        }
-        getLocationAnswer();
-    }
-
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
 }
