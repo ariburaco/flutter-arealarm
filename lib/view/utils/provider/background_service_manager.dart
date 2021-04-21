@@ -13,7 +13,7 @@ class BackgroundServiceManager {
 
   final platform = const MethodChannel(ServiceConstants.LocationServiceChannel);
 
-  Future<void> checkExistensAlarms(List<Alarm> alarmList) async {
+  Future<void> checkExistensAlarms(List<Alarm>? alarmList) async {
     if (alarmList != null) {
       for (var alarm in alarmList) {
         await addAlarmToBGService(alarm);
@@ -33,6 +33,30 @@ class BackgroundServiceManager {
     sendAlarmsToService(alarmArguments);
   }
 
+  Future<void> updateAlarmFromBGService(Alarm alarm) async {
+    Map<String, dynamic>? alarmArguments = <String, dynamic>{
+      'alarmId': alarm.alarmId,
+      'isActive': alarm.isAlarmActive,
+      'latitude': alarm.lat,
+      'longitude': alarm.long,
+      'radius': alarm.radius,
+    };
+
+    updateSelectedAlarm(alarmArguments);
+  }
+
+  Future<void> removeAlarmFromBGService(Alarm alarm) async {
+    Map<String, dynamic>? alarmArguments = <String, dynamic>{
+      'alarmId': alarm.alarmId,
+      'isActive': alarm.isAlarmActive,
+      'latitude': alarm.lat,
+      'longitude': alarm.long,
+      'radius': alarm.radius,
+    };
+
+    stopSelectedAlarm(alarmArguments);
+  }
+
   Future<void> sendAlarmsToService(Map<String, dynamic>? alarmArguments) async {
     try {
       await platform.invokeMethod(
@@ -42,17 +66,22 @@ class BackgroundServiceManager {
     }
   }
 
-  Future<void> stopAlarmService(
-      Alarm alarm, Map<String, dynamic>? alarmArguments) async {
-    alarmArguments = <String, dynamic>{
-      'alarmId': alarm.alarmId,
-    };
-
+  Future<void> stopSelectedAlarm(Map<String, dynamic>? alarmArguments) async {
+    print(alarmArguments);
     try {
       await platform.invokeMethod(
-          ServiceConstants.StopAlarmService, alarmArguments);
+          ServiceConstants.StopSelectedAlarmService, alarmArguments);
     } on PlatformException catch (e) {
-      print(e.toString() + "Service couldn't stopped!");
+      print(e.toString() + "Service NOT Started");
+    }
+  }
+
+  Future<void> updateSelectedAlarm(Map<String, dynamic>? alarmArguments) async {
+    try {
+      await platform.invokeMethod(
+          ServiceConstants.UpdateSelectedAlarmService, alarmArguments);
+    } on PlatformException catch (e) {
+      print(e.toString() + "Service NOT Started");
     }
   }
 

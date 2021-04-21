@@ -68,6 +68,21 @@ public class AlarmPlace implements Parcelable {
         this.radius = _radius;
     }
 
+    public void updateAlarm(AlarmPlace newAlarmPlace) {
+        this.alarmId = newAlarmPlace.alarmId;
+        this.isActiveAlarm = newAlarmPlace.isActiveAlarm;
+        this.location = new Location(Integer.toString(newAlarmPlace.alarmId));
+        this.location.setLongitude(newAlarmPlace.location.getLongitude());
+        this.location.setLatitude(newAlarmPlace.location.getLatitude());
+        this.radius = newAlarmPlace.radius;
+    }
+
+
+    public void calculateDistance(Location currentLocation){
+        if(currentLocation != null)
+            this.distance = currentLocation.distanceTo(this.location);
+    }
+
 
 }
 

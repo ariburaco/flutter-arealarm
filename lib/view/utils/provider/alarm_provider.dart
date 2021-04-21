@@ -16,7 +16,7 @@ class AlarmProvider extends ChangeNotifier {
   bool hasActiveAlarm = false;
 
   Position? currentPosition;
-
+  bool focusPlaces = true;
   StreamSubscription<Position>? positionStream;
 
 //
@@ -32,6 +32,11 @@ class AlarmProvider extends ChangeNotifier {
   double radius = 50;
 
   AnimationController? animationController;
+
+  void changeFocus(bool val) {
+    focusPlaces = val;
+    notifyListeners();
+  }
 
   Future<List<Alarm>> getAlarmList() async {
     await DatabaseManager.instance.databaseInit();
@@ -74,6 +79,7 @@ class AlarmProvider extends ChangeNotifier {
       selectedAlarm.isAlarmActive = 0;
       await updateAlarm(selectedAlarm.alarmId!, selectedAlarm);
     }
+
     checkSelectedIsPlaceAddedToDB();
     animationController!.forward();
     notifyListeners();
@@ -99,7 +105,7 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> deleteSelectedMapPlace(int alarmId) async {
     Alarm alarm = (await DatabaseManager.instance.getAlarm(alarmId))!;
-
+    BackgroundServiceManager.instance.removeAlarmFromBGService(alarm);
     alarm.isAlarmActive = 0;
     await updateAlarm(alarmId, alarm);
     // await DatabaseManager.instance.deleteAlarm(alarmId);
@@ -119,11 +125,7 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> updateAlarm(int id, Alarm newAlarm) async {
     final result = await DatabaseManager.instance.updateAlarm(id, newAlarm);
-    if (result) {
-      print("alarm updated!!");
-    } else {
-      print("alarm couldn't updated");
-    }
+
     await getAlarmList();
   }
 
@@ -149,27 +151,31 @@ class AlarmProvider extends ChangeNotifier {
   }
 
   void startLocationStream() {
-    if (positionStream == null) {
-      positionStream = Geolocator.getPositionStream(
-              desiredAccuracy: LocationAccuracy.bestForNavigation,
-              distanceFilter: 0,
-              intervalDuration: Duration(seconds: 5))
-          .listen((Position? position) {
-        if (position != null) {
-          currentPosition = position;
-          print("POS: " + position.toString());
-          calculateDistanceToAlarmPlaces(position);
-          moveToBounderies();
-          // if (nearestAlarm != null) {
-          //   LocalNotifications.instance.showSilentNotification(
-          //       title: "Next Alarm",
-          //       body:
-          //           "Alarm #${nearestAlarm!.alarmId} in ${nearestAlarm!.distance!.toStringAsFixed(2)} meters ");
-          // }
-        }
-      });
+    if (alarmList!.length > 0) {
+      if (positionStream == null) {
+        positionStream = Geolocator.getPositionStream(
+                desiredAccuracy: LocationAccuracy.bestForNavigation,
+                distanceFilter: 0,
+                intervalDuration: Duration(seconds: 5))
+            .listen((Position? position) {
+          if (position != null) {
+            currentPosition = position;
+            print("POS: " + position.toString());
+            calculateDistanceToAlarmPlaces(position);
+            moveToBounderies();
+            // if (nearestAlarm != null) {
+            //   LocalNotifications.instance.showSilentNotification(
+            //       title: "Next Alarm",
+            //       body:
+            //           "Alarm #${nearestAlarm!.alarmId} in ${nearestAlarm!.distance!.toStringAsFixed(2)} meters ");
+            // }
+          }
+        });
+      } else {
+        positionStream!.resume();
+      }
     } else {
-      positionStream!.resume();
+      stopLocationStream();
     }
   }
 
@@ -276,6 +282,7 @@ class AlarmProvider extends ChangeNotifier {
           long: selectedPlace?.position.longitude,
           address: selectedPlace?.address);
 
+      BackgroundServiceManager.instance.updateAlarmFromBGService(newAlarm);
       updateAlarm(selectedPlace!.id, newAlarm);
     } else {
       // TODO Show Snackbar Alarm Updated or Not!
@@ -426,13 +433,15 @@ class AlarmProvider extends ChangeNotifier {
   }
 
   Future<void> moveToBounderies() async {
-    if (markers.isNotEmpty) {
-      var bounds = await _bounds(markers);
-      double padding = markers.length == 0 ? 200 : 100;
-      await mapController!
-          .animateCamera(CameraUpdate.newLatLngBounds(bounds, padding));
-    } else {
-      navigateToCurrentPosition();
+    if (focusPlaces) {
+      if (markers.isNotEmpty) {
+        var bounds = await _bounds(markers);
+        double padding = markers.length == 0 ? 200 : 100;
+        await mapController!
+            .animateCamera(CameraUpdate.newLatLngBounds(bounds, padding));
+      } else {
+        navigateToCurrentPosition();
+      }
     }
   }
 

@@ -44,7 +44,7 @@ public class LocationService extends Service implements LocationListener {
     boolean isGPSEnabled = false;
     boolean canGetLocation = false;
     boolean isNetworkEnabled = false;
-
+    boolean isAlarmsActive = true;
     static Location location; // location
     double latitude = 0; // latitude
     double longitude = 0; // longitude
@@ -89,32 +89,74 @@ public class LocationService extends Service implements LocationListener {
 
     public void clearAllAlarmPlaces() {
         placeList.clear();
+        isAlarmsActive = false;
     }
 
-    private int getAlarmPlaceFromActivity(Intent intent) {
-        if (intent.hasExtra("key")) {
-
+    private void getAlarmPlaceFromActivity(Intent intent) {
+        if (intent.hasExtra("add")) {
+            isAlarmsActive = true;
             Bundle bundle = intent.getExtras();
-            AlarmPlace alarmPlace = (AlarmPlace) bundle.getParcelable("key");
+            AlarmPlace alarmPlace = (AlarmPlace) bundle.getParcelable("add");
             if (alarmPlace != null) {
                 addAlarmPTolaceList(alarmPlace);
-
-            }
-            return START_STICKY;
-        } else if (intent.getAction() != null) {
-            if (intent.getAction().equals(Constants.STOPFOREGROUND_ACTION)) {
-                //locationManager.removeUpdates(this);
-                clearAllAlarmPlaces();
-                stopForeground(true);
-                stopSelf();
-                return START_NOT_STICKY;
+                Log.i("ALARM", "Alarm ADDED");
             } else {
-                return START_STICKY;
+                Log.i("ALARM", "Alarm COULDNT ADD");
+            }
+
+        } else if (intent.hasExtra("remove")) {
+            Bundle bundle = intent.getExtras();
+            AlarmPlace alarmPlace = (AlarmPlace) bundle.getParcelable("remove");
+            if (alarmPlace != null) {
+                if (placeList.size() > 0) {
+                    int index = findMatchedIndexOnPlaces(alarmPlace);
+                    Log.i("index", "Alarm " + alarmPlace.alarmId);
+                    if (index != -1) {
+                        placeList.remove(alarmPlace);
+                        Log.i("ALARM", "Alarm DELETED");
+                    } else {
+                        Log.i("ALARM", "Alarm COULDNT DELETED");
+                    }
+                } else {
+                    Log.i("ALARM", "Alarms EMPTY");
+                }
+            }
+        } else if (intent.hasExtra("update")) {
+            Bundle bundle = intent.getExtras();
+            AlarmPlace alarmPlace = (AlarmPlace) bundle.getParcelable("update");
+            if (alarmPlace != null) {
+                if (placeList.size() > 0) {
+                    int index = findMatchedIndexOnPlaces(alarmPlace);
+                    if (index != -1) {
+                        placeList.get(index).updateAlarm(alarmPlace);
+
+                        Log.i("ALARM", "Alarm UPDATED " + placeList.get(index).radius);
+                    } else {
+                        Log.i("ALARM", "Alarm COULDNT UPDATE");
+                    }
+                } else {
+                    Log.i("ALARM", "Alarms EMPTY");
+                }
+            } else {
+                Log.i("ALARM", "NULL");
             }
         } else {
-            return START_STICKY;
+            if (intent.getAction().equals(Constants.STOPFOREGROUND_ACTION)) {
+                clearAllAlarmPlaces();
+                // stopForeground(true);
+                //stopSelf();
+            }
         }
+    }
 
+
+    int findMatchedIndexOnPlaces(AlarmPlace alarmPlace) {
+        for (int i = 0; i < placeList.size(); i++) {
+            if (alarmPlace.alarmId == placeList.get(i).alarmId) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 
@@ -186,25 +228,28 @@ public class LocationService extends Service implements LocationListener {
     }
 
     public void updateLocationNotification() {
+        if (isAlarmsActive) {
+            if (location != null) {
+                updateAlarmListDistances(location);
+                AlarmPlace nearestPlace = getNearestLocation();
+                if (nearestPlace != null) {
+                    double distance = Math.round(nearestPlace.distance * 10.0) / 10.0;
+                    String text = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId;
+                    builder.setContentText(text);
+                    mNotificationManager.notify(101, builder.build());
+                } else {
 
-        if (location != null) {
-            updateAlarmListDistances(location);
-            AlarmPlace nearestPlace = getNearestLocation();
-            if (nearestPlace != null) {
-
-                double distance = Math.round(nearestPlace.distance * 100.0) / 100.0;
-                String text = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId;
-                builder.setContentText(text);
-                mNotificationManager.notify(101, builder.build());
-
+                    Log.i("nearestPlace", "nearestPlace NULL");
+                }
+            } else {
+                Log.i("LOCATION CHANGED", "NULL");
             }
-            // sendMessageToActivity(nearestPlace.distance, "fromService");
-            //Log.i("LOCATION CHANGED", "Distance to nearest target: " + nearestPlace.distance + " at " + nearestPlace.alarmId);
         } else {
-            Log.i("LOCATION CHANGED", "NULL");
+            String text = "No Active Alarms";
+            builder.setContentText(text);
+            mNotificationManager.notify(101, builder.build());
         }
     }
-
 
     public Notification getNotification() {
         String channel;
@@ -238,29 +283,29 @@ public class LocationService extends Service implements LocationListener {
 
 
     public void updateAlarmListDistances(Location currentLocation) {
+        Log.i("placeList", "" + placeList.size());
+        if (placeList.size() > 0) {
 
-        if (currentLocation != null) {
-            for (AlarmPlace place : placeList) {
-                place.distance = currentLocation.distanceTo(place.location);
-            }
+            if (currentLocation != null) {
+                for (AlarmPlace place : placeList) {
+                    place.calculateDistance(currentLocation);
+                }
 
-        } else
-            Log.i("NULL LOCATION", "null");
+            } else
+                Log.i("NULL LOCATION", "null");
+        }
 
     }
 
     public AlarmPlace getNearestLocation() {
         AlarmPlace nearestAlarmPlace = new AlarmPlace();
+
         Collections.sort(placeList, (l1, l2) -> Double.compare(l1.distance, l2.distance));
-
         if (placeList != null) {
-
             if (placeList.size() > 0) {
                 nearestAlarmPlace = placeList.get(0);
             }
-
         }
-
         return nearestAlarmPlace;
 
     }
@@ -291,16 +336,6 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        /*Intent restartServiceIntent = new Intent(getApplicationContext(), LocationService.class);
-        restartServiceIntent.setPackage(getPackageName());
-
-        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmService.set(
-                AlarmManager.ELAPSED_REALTIME,
-                SystemClock.elapsedRealtime() + 1000,
-                restartServicePendingIntent);
-        */
         super.onTaskRemoved(rootIntent);
     }
 
@@ -319,7 +354,8 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return getAlarmPlaceFromActivity(intent);
+        getAlarmPlaceFromActivity(intent);
+        return START_STICKY;
     }
 
 

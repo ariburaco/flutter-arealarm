@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_template/view/map/widgets/focus_switch.dart';
 import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/place_card.dart';
@@ -36,6 +37,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return BaseView<GoogleMapViewModel>(
         viewModel: GoogleMapViewModel(),
         onModelReady: (viewmodel) {
@@ -50,6 +52,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
                 children: <Widget>[
                   buildGoogleMap(viewmodel),
                   buildPlaceCard(context, _offsetFloat, animationController),
+                  buildFocusSwitch(context),
                 ],
               ),
               floatingActionButton: Row(
