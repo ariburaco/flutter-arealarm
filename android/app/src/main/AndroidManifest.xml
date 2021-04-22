@@ -71,11 +71,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
-
-        <service
-            android:name="io.flutter.plugins.androidalarmmanager.AlarmService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <receiver android:name=".NotificationReceiver">
+            <intent-filter>
+                <action android:name="com.example.flutter_template.GOT_IT"/>
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".LocationService"
@@ -87,6 +87,7 @@
                 <action android:name="com.example.flutter_template.LONGRUNSERVICE" />
             </intent-filter>
         </service>
+
 
     </application>
 

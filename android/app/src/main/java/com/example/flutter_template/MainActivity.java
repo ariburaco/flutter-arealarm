@@ -37,9 +37,7 @@ import static io.flutter.view.FlutterMain.startInitialization;
 
 public class MainActivity extends FlutterActivity {
 
-
     private Intent serviceStartIntent;
-
     public static Context context;
 
     @Override
@@ -58,9 +56,16 @@ public class MainActivity extends FlutterActivity {
 
         startInitialization(this);
         context = getContext();
+        registerNotificationReciever();
         serviceStartIntent = new Intent(MainActivity.this, LocationService.class);
+
     }
 
+    private void registerNotificationReciever(){
+        IntentFilter filter = new IntentFilter(Constants.GOT_IT);
+        BroadcastReceiver mReceiver = new NotificationReceiver();
+        registerReceiver(mReceiver, filter);
+    }
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {

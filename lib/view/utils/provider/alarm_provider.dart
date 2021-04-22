@@ -105,6 +105,7 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> deleteSelectedMapPlace(int alarmId) async {
     Alarm alarm = (await DatabaseManager.instance.getAlarm(alarmId))!;
+    print("Alarm " + alarm.toString());
     BackgroundServiceManager.instance.removeAlarmFromBGService(alarm);
     alarm.isAlarmActive = 0;
     await updateAlarm(alarmId, alarm);

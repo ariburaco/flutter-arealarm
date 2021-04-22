@@ -10,7 +10,7 @@ public class Constants {
     public static final String UPDATE_ALARM_SERVICE = "updateSelectedAlarmService";
     public static final String STOP_ALL_ALARM_SERVICES = "stopAllAlarmServices";
 
-
+    public static final String GOT_IT = "com.example.flutter_template.GOT_IT";
 
 
 }

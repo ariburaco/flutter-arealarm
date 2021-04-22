@@ -66,7 +66,19 @@ class DatabaseManager {
     final alarms = await database!.query(
       _alarmTable,
       where: '$alarmId = ?',
-      columns: [alarmId],
+      columns: [
+        alarmId,
+        placeName,
+        isAlarmActive,
+        lat,
+        long,
+        radius,
+        lat,
+        long,
+        radius,
+        distance,
+        address
+      ],
       whereArgs: [id],
     );
 

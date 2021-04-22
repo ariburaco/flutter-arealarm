@@ -50,7 +50,7 @@ public class LocationService extends Service implements LocationListener {
     double longitude = 0; // longitude
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
-    private static final long MIN_TIME_BW_UPDATES = 5 * 1000;
+    private static final long MIN_TIME_BW_UPDATES = 2 * 1000;
 
     protected LocationManager locationManager;
     NotificationManager mNotificationManager;
@@ -58,6 +58,8 @@ public class LocationService extends Service implements LocationListener {
 
     public List<AlarmPlace> placeList = new ArrayList<>();
 
+    AlarmPlace nearestPlace;
+    boolean inRange = false;
 
     @Override
     public void onCreate() {
@@ -67,14 +69,30 @@ public class LocationService extends Service implements LocationListener {
     }
 
     private void startLocationServiceWithNotification() {
-
+        getServiceNotification();
         getLocation();
-        getNotification();
         startForeground(101, builder.build());
     }
 
+    private void createAlarmNotification(AlarmPlace currentAlarm) {
+        CustomNotification newNotification = new CustomNotification(this);
+        newNotification.showNotification(currentAlarm, "You're in the range of place #" + currentAlarm.alarmId);
+    }
 
-    public void addAlarmPTolaceList(AlarmPlace alarmPlace) {
+    private void checkInRange() {
+        if (nearestPlace != null) {
+            if (nearestPlace.alarmId != -1) {
+                if (nearestPlace.distance <= nearestPlace.radius) {
+                    inRange = true;
+                    createAlarmNotification(nearestPlace);
+                } else {
+                    inRange = false;
+                }
+            }
+        }
+    }
+
+    private void addAlarmPTolaceList(AlarmPlace alarmPlace) {
         if (alarmPlace != null) {
             if (!placeList.contains(alarmPlace)) {
                 placeList.add(alarmPlace);
@@ -99,6 +117,7 @@ public class LocationService extends Service implements LocationListener {
             AlarmPlace alarmPlace = (AlarmPlace) bundle.getParcelable("add");
             if (alarmPlace != null) {
                 addAlarmPTolaceList(alarmPlace);
+                // updateLocationNotification();
                 Log.i("ALARM", "Alarm ADDED");
             } else {
                 Log.i("ALARM", "Alarm COULDNT ADD");
@@ -110,9 +129,11 @@ public class LocationService extends Service implements LocationListener {
             if (alarmPlace != null) {
                 if (placeList.size() > 0) {
                     int index = findMatchedIndexOnPlaces(alarmPlace);
-                    Log.i("index", "Alarm " + alarmPlace.alarmId);
                     if (index != -1) {
-                        placeList.remove(alarmPlace);
+                        placeList.remove(index);
+                        if (alarmPlace != null) CustomNotification.cancelNotification(alarmPlace);
+
+                        updateLocationNotification();
                         Log.i("ALARM", "Alarm DELETED");
                     } else {
                         Log.i("ALARM", "Alarm COULDNT DELETED");
@@ -129,7 +150,7 @@ public class LocationService extends Service implements LocationListener {
                     int index = findMatchedIndexOnPlaces(alarmPlace);
                     if (index != -1) {
                         placeList.get(index).updateAlarm(alarmPlace);
-
+                        updateLocationNotification();
                         Log.i("ALARM", "Alarm UPDATED " + placeList.get(index).radius);
                     } else {
                         Log.i("ALARM", "Alarm COULDNT UPDATE");
@@ -231,17 +252,22 @@ public class LocationService extends Service implements LocationListener {
         if (isAlarmsActive) {
             if (location != null) {
                 updateAlarmListDistances(location);
-                AlarmPlace nearestPlace = getNearestLocation();
+                nearestPlace = getNearestLocation();
                 if (nearestPlace != null) {
-                    double distance = Math.round(nearestPlace.distance * 10.0) / 10.0;
-                    String text = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId;
-                    builder.setContentText(text);
-                    mNotificationManager.notify(101, builder.build());
+                    if (nearestPlace.alarmId != -1) {
+                        checkInRange();
+                        double distance = Math.round(nearestPlace.distance * 10.0) / 10.0;
+                        String text = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId;
+                        builder.setContentText(text);
+                        mNotificationManager.notify(101, builder.build());
+                        Log.i("nearestPlace", text);
+                    }
                 } else {
 
                     Log.i("nearestPlace", "nearestPlace NULL");
                 }
             } else {
+                location = getLocation();
                 Log.i("LOCATION CHANGED", "NULL");
             }
         } else {
@@ -251,7 +277,7 @@ public class LocationService extends Service implements LocationListener {
         }
     }
 
-    public Notification getNotification() {
+    public Notification getServiceNotification() {
         String channel;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             channel = createChannel();
@@ -259,12 +285,12 @@ public class LocationService extends Service implements LocationListener {
             channel = "";
         }
         //Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
+/*
         Intent snoozeIntent = new Intent(this, MainActivity.class);
         snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
         PendingIntent snoozePendingIntent =
                 PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
-
+*/
         builder = new NotificationCompat.Builder(this, channel)
                 .setSmallIcon(android.R.drawable.ic_menu_mylocation)
                 .setContentTitle("Arealarm");
@@ -274,7 +300,7 @@ public class LocationService extends Service implements LocationListener {
                 .setNotificationSilent()
                 //.setSound(uri)
                 .setCategory(Notification.CATEGORY_SERVICE)
-                .addAction(R.drawable.app_icon, "Stop", snoozePendingIntent)
+                //.addAction(R.drawable.app_icon, "Stop All", snoozePendingIntent)
                 .build();
 
 

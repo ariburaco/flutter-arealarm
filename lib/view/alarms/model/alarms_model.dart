@@ -67,4 +67,9 @@ class Alarm {
         address.hashCode ^
         distance.hashCode;
   }
+
+  @override
+  String toString() {
+    return "place#" + this.alarmId.toString() + " " + this.radius.toString();
+  }
 }
