@@ -88,7 +88,9 @@ public class CustomNotification {
     }
 
     public static void cancelNotification(AlarmPlace alarmPlace) {
-        notificationManager.cancel(alarmPlace.alarmId);
+        if(alarmPlace != null)
+            if(alarmPlace.alarmId > 0 )
+                notificationManager.cancel(alarmPlace.alarmId);
     }
 
 }

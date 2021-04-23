@@ -22,6 +22,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -39,14 +41,7 @@ public class MainActivity extends FlutterActivity {
 
     private Intent serviceStartIntent;
     public static Context context;
-
-    @Override
-    protected void onDestroy() {
-
-        super.onDestroy();
-        //LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-        //stopService(servIntent);
-    }
+    public static MethodChannel methodChannel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,12 +51,15 @@ public class MainActivity extends FlutterActivity {
 
         startInitialization(this);
         context = getContext();
+
+
+
         registerNotificationReciever();
         serviceStartIntent = new Intent(MainActivity.this, LocationService.class);
 
     }
 
-    private void registerNotificationReciever(){
+    private void registerNotificationReciever() {
         IntentFilter filter = new IntentFilter(Constants.GOT_IT);
         BroadcastReceiver mReceiver = new NotificationReceiver();
         registerReceiver(mReceiver, filter);
@@ -70,8 +68,8 @@ public class MainActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
-
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), Constants.CHANNEL).setMethodCallHandler(
+        methodChannel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), Constants.CHANNEL);
+        methodChannel.setMethodCallHandler(
                 (call, result) -> {
                     if (call != null) {
                         switch (call.method) {
@@ -92,10 +90,7 @@ public class MainActivity extends FlutterActivity {
                         Log.i("call", "configureFlutterEngine: call null");
                     }
                 }
-
         );
-
-
     }
 
     private void removeSelectedAlarmPlace(MethodCall call) {
@@ -150,6 +145,10 @@ public class MainActivity extends FlutterActivity {
             bundle.putParcelable("add", alarmPlace);
             serviceStartIntent.putExtras(bundle);
             ContextCompat.startForegroundService(context, serviceStartIntent);
+            DatabaseController databaseController = new DatabaseController(this);
+            List<AlarmPlace> alarmPlaces = databaseController.getAllAlarmList();
+            Log.i("alarmId", "startBackgroundAlarmService: alarmId" + alarmPlaces.get(0).alarmId);
+            databaseController.removeAlarm(alarmPlaces.get(0));
         } else {
             startService(serviceStartIntent);
         }

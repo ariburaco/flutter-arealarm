@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_template/view/utils/provider/background_service_manager.dart';
 import 'view/utils/database/database_manager.dart';
 import 'package:provider/provider.dart';
 import 'core/constants/application/app_constants.dart';
@@ -16,6 +17,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await DatabaseManager.instance.databaseInit();
   LocalNotifications.instance.initNotifications();
+  BackgroundServiceManager.instance.initBackgroundService();
 
   runApp(MultiProvider(
     providers: [...ApplicationProvider.instance.dependItems],

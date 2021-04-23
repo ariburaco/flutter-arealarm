@@ -11,7 +11,18 @@ class BackgroundServiceManager {
 
   BackgroundServiceManager._init();
 
-  final platform = const MethodChannel(ServiceConstants.LocationServiceChannel);
+  MethodChannel platform =
+      const MethodChannel(ServiceConstants.LocationServiceChannel);
+
+  void initBackgroundService() {
+    platform.setMethodCallHandler((MethodCall call) async {
+      switch (call.method) {
+        case 'charlie':
+          print("This method will be called when native fire " +
+              call.arguments['alice']);
+      }
+    });
+  }
 
   Future<void> checkExistensAlarms(List<Alarm>? alarmList) async {
     if (alarmList != null) {

@@ -161,7 +161,7 @@ class AlarmProvider extends ChangeNotifier {
             .listen((Position? position) {
           if (position != null) {
             currentPosition = position;
-            print("POS: " + position.toString());
+            //print("POS: " + position.toString());
             calculateDistanceToAlarmPlaces(position);
             moveToBounderies();
             // if (nearestAlarm != null) {
