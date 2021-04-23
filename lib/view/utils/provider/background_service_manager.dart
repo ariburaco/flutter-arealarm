@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import '../../../core/constants/services/service_constants.dart';
-import '../../alarms/model/alarms_model.dart';
 
 class BackgroundServiceManager {
   static BackgroundServiceManager? _instace;
@@ -14,95 +13,95 @@ class BackgroundServiceManager {
   MethodChannel platform =
       const MethodChannel(ServiceConstants.LocationServiceChannel);
 
-  void initBackgroundService() {
-    platform.setMethodCallHandler((MethodCall call) async {
-      switch (call.method) {
-        case 'charlie':
-          print("This method will be called when native fire " +
-              call.arguments['alice']);
-      }
-    });
+  Future<void> initBackgroundService() async {
+    await sendAlarmsToService();
+    // platform.setMethodCallHandler((MethodCall call) async {
+    //   switch (call.method) {
+    //     case 'charlie':
+    //       print("This method will be called when native fire " +
+    //           call.arguments['alice']);
+    //   }
+    // });
   }
 
-  Future<void> checkExistensAlarms(List<Alarm>? alarmList) async {
-    if (alarmList != null) {
-      for (var alarm in alarmList) {
-        await addAlarmToBGService(alarm);
-      }
-    }
-  }
+  // Future<void> checkExistensAlarms(List<Alarm>? alarmList) async {
+  //   if (alarmList != null) {
+  //     for (var alarm in alarmList) {
+  //       await addAlarmToBGService(alarm);
+  //     }
+  //   }
+  // }
 
-  Future<void> addAlarmToBGService(Alarm alarm) async {
-    Map<String, dynamic>? alarmArguments = <String, dynamic>{
-      'alarmId': alarm.alarmId,
-      'isActive': alarm.isAlarmActive,
-      'latitude': alarm.lat,
-      'longitude': alarm.long,
-      'radius': alarm.radius,
-    };
+  // Future<void> addAlarmToBGService(Alarm alarm) async {
+  //   Map<String, dynamic>? alarmArguments = <String, dynamic>{
+  //     'alarmId': alarm.alarmId,
+  //     'isActive': alarm.isAlarmActive,
+  //     'latitude': alarm.lat,
+  //     'longitude': alarm.long,
+  //     'radius': alarm.radius,
+  //   };
 
-    sendAlarmsToService(alarmArguments);
-  }
+  //   sendAlarmsToService(alarmArguments);
+  // }
 
-  Future<void> updateAlarmFromBGService(Alarm alarm) async {
-    Map<String, dynamic>? alarmArguments = <String, dynamic>{
-      'alarmId': alarm.alarmId,
-      'isActive': alarm.isAlarmActive,
-      'latitude': alarm.lat,
-      'longitude': alarm.long,
-      'radius': alarm.radius,
-    };
+  // Future<void> updateAlarmFromBGService(Alarm alarm) async {
+  //   Map<String, dynamic>? alarmArguments = <String, dynamic>{
+  //     'alarmId': alarm.alarmId,
+  //     'isActive': alarm.isAlarmActive,
+  //     'latitude': alarm.lat,
+  //     'longitude': alarm.long,
+  //     'radius': alarm.radius,
+  //   };
 
-    updateSelectedAlarm(alarmArguments);
-  }
+  //   updateSelectedAlarm(alarmArguments);
+  // }
 
-  Future<void> removeAlarmFromBGService(Alarm alarm) async {
-    Map<String, dynamic>? alarmArguments = <String, dynamic>{
-      'alarmId': alarm.alarmId,
-      'isActive': alarm.isAlarmActive,
-      'latitude': alarm.lat,
-      'longitude': alarm.long,
-      'radius': alarm.radius,
-    };
+  // Future<void> removeAlarmFromBGService(Alarm alarm) async {
+  //   Map<String, dynamic>? alarmArguments = <String, dynamic>{
+  //     'alarmId': alarm.alarmId,
+  //     'isActive': alarm.isAlarmActive,
+  //     'latitude': alarm.lat,
+  //     'longitude': alarm.long,
+  //     'radius': alarm.radius,
+  //   };
 
-    stopSelectedAlarm(alarmArguments);
-  }
+  //   stopSelectedAlarm(alarmArguments);
+  // }
 
-  Future<void> sendAlarmsToService(Map<String, dynamic>? alarmArguments) async {
+  Future<void> sendAlarmsToService() async {
     try {
-      await platform.invokeMethod(
-          ServiceConstants.StartAlarmService, alarmArguments);
+      await platform.invokeMethod(ServiceConstants.StartAlarmService);
     } on PlatformException catch (e) {
       print(e.toString() + "Service NOT Started");
     }
   }
 
-  Future<void> stopSelectedAlarm(Map<String, dynamic>? alarmArguments) async {
-    print(alarmArguments);
-    try {
-      await platform.invokeMethod(
-          ServiceConstants.StopSelectedAlarmService, alarmArguments);
-    } on PlatformException catch (e) {
-      print(e.toString() + "Service NOT Started");
-    }
-  }
+  // Future<void> stopSelectedAlarm(Map<String, dynamic>? alarmArguments) async {
+  //   print(alarmArguments);
+  //   try {
+  //     await platform.invokeMethod(
+  //         ServiceConstants.StopSelectedAlarmService, alarmArguments);
+  //   } on PlatformException catch (e) {
+  //     print(e.toString() + "Service NOT Started");
+  //   }
+  // }
 
-  Future<void> updateSelectedAlarm(Map<String, dynamic>? alarmArguments) async {
-    try {
-      await platform.invokeMethod(
-          ServiceConstants.UpdateSelectedAlarmService, alarmArguments);
-    } on PlatformException catch (e) {
-      print(e.toString() + "Service NOT Started");
-    }
-  }
+  // Future<void> updateSelectedAlarm(Map<String, dynamic>? alarmArguments) async {
+  //   try {
+  //     await platform.invokeMethod(
+  //         ServiceConstants.UpdateSelectedAlarmService, alarmArguments);
+  //   } on PlatformException catch (e) {
+  //     print(e.toString() + "Service NOT Started");
+  //   }
+  // }
 
-  Future<void> stopAllAlarmServices() async {
-    try {
-      await platform.invokeMethod(ServiceConstants.StopAllAlarmServices);
-    } on PlatformException catch (e) {
-      print(e.toString() + "All Service couldn't stopped!");
-    }
-  }
+  // Future<void> stopAllAlarmServices() async {
+  //   try {
+  //     await platform.invokeMethod(ServiceConstants.StopAllAlarmServices);
+  //   } on PlatformException catch (e) {
+  //     print(e.toString() + "All Service couldn't stopped!");
+  //   }
+  // }
 }
 
 

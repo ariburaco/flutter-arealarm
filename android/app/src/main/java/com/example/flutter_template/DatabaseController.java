@@ -12,6 +12,21 @@ import java.util.List;
 
 public class DatabaseController extends SQLiteOpenHelper {
 
+    private static DatabaseController sInstance;
+
+    // ...
+
+    public static synchronized DatabaseController getInstance(Context context) {
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (sInstance == null) {
+            sInstance = new DatabaseController(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+
     private static final int _version = 3;
     private static final String _alarmDatabaseName = "alarms_db2";
     private static final String _alarmTable = "alarms_table";
@@ -30,14 +45,32 @@ public class DatabaseController extends SQLiteOpenHelper {
 
     List<AlarmPlace> alarmList;
 
-    public DatabaseController(Context context) {
+    private DatabaseController(Context context) {
         super(context, _alarmDatabaseName, null, _version);
-        //3rd argument to be passed is CursorFactory instance
+        String sql = "CREATE TABLE IF NOT EXISTS " + _alarmTable + "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + alarmId + "INTEGER" + ","
+                + placeName + "TEXT" + ","
+                + isAlarmActive + "INTEGER" + ","
+                + lat + "DOUBLE" + ","
+                + longu + "DOUBLE" + ","
+                + radius + "DOUBLE" + ","
+                + distance + "DOUBLE" + ","
+                + address + "TEXT" + ")";
+        this.getReadableDatabase().execSQL(sql);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
+        String sql = "CREATE TABLE IF NOT EXISTS " + _alarmTable + "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + alarmId + "INTEGER" + ","
+                + placeName + "TEXT" + ","
+                + isAlarmActive + "INTEGER" + ","
+                + lat + "DOUBLE" + ","
+                + longu + "DOUBLE" + ","
+                + radius + "DOUBLE" + ","
+                + distance + "DOUBLE" + ","
+                + address + "TEXT" + ")";
+        sqLiteDatabase.execSQL(sql);
     }
 
     @Override
@@ -63,8 +96,6 @@ public class DatabaseController extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-
-
                 AlarmPlace alarmplace = new AlarmPlace();
                 int alarmId = (cursor.getInt(1));
                 String placeName = (cursor.getString(2));
@@ -74,7 +105,7 @@ public class DatabaseController extends SQLiteOpenHelper {
                 double radius = (cursor.getDouble(6));
                 double distance = (cursor.getDouble(7));
 
-                alarmplace.setAlarmPlaces(alarmId, isAlarmActive , lat, longu, radius);
+                alarmplace.setAlarmPlaces(alarmId, isAlarmActive, lat, longu, radius);
                 alarmplace.distance = distance;
 
                 Log.i("DATABASE", "alarmId: " + alarmId + " radius: " + alarmplace.radius);
@@ -89,12 +120,9 @@ public class DatabaseController extends SQLiteOpenHelper {
     private void updateAlarm(int _alarmId, int _isAlarmActive) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-
-
         ContentValues values = new ContentValues();
         values.put(isAlarmActive, _isAlarmActive);
 
-        // updating row
         db.update(_alarmTable, values, alarmId + " = ?",
                 new String[]{Integer.toString(_alarmId)});
         db.close();

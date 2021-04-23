@@ -78,8 +78,6 @@ class _AlarmsViewState extends State<AlarmsView>
                   final radius = currentAlarm.radius!.toInt();
                   final address = currentAlarm.address!;
                   final distance = currentAlarm.distance!.toStringAsFixed(2);
-                  bool isActive =
-                      currentAlarm.isAlarmActive == 1 ? true : false;
 
                   return Padding(
                     padding: context.paddingLowest,

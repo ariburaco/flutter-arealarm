@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:flutter_template/core/init/notification/local_notification.dart';
-
 import '../../../core/base/extension/context_extension.dart';
 import 'package:flutter/cupertino.dart';
 import '../../map/model/map_place_model.dart';
@@ -8,21 +6,20 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../alarms/model/alarms_model.dart';
 import '../database/database_manager.dart';
-import 'background_service_manager.dart';
 
 class AlarmProvider extends ChangeNotifier {
   List<Alarm>? alarmList = [];
   Alarm? nearestAlarm;
   bool hasActiveAlarm = false;
-
+  bool addMarkerProcces = false;
   Position? currentPosition;
   bool focusPlaces = true;
   StreamSubscription<Position>? positionStream;
 
 //
   int count = 0;
-  Set<Marker> markers = {};
-  Set<Circle> circles = {};
+  List<Marker> markers = [];
+  List<Circle> circles = [];
   BuildContext? context;
   List<MapPlace> selectedPlaces = [];
   GoogleMapController? mapController;
@@ -39,17 +36,17 @@ class AlarmProvider extends ChangeNotifier {
   }
 
   Future<List<Alarm>> getAlarmList() async {
-    await DatabaseManager.instance.databaseInit();
     alarmList = await DatabaseManager.instance.getAlarmList();
     alarmList =
         alarmList!.where((element) => element.isAlarmActive == 1).toList();
-
+    calculateDistanceToAlarmPlaces(currentPosition);
     count = await getAlarmCount();
     if (count > 0) {
       hasActiveAlarm = true;
     } else
       hasActiveAlarm = false;
 
+    updateMarkersFromDB();
     notifyListeners();
     return alarmList!;
   }
@@ -85,6 +82,51 @@ class AlarmProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateMarkersFromDB() {
+    if (addMarkerProcces == false) {
+      Marker? missingMarker;
+      for (var marker in markers) {
+        var matchedAlarm = alarmList!.where(
+            (element) => marker.markerId.value == "place_${element.alarmId}");
+
+        if (matchedAlarm.length == 0) {
+          missingMarker = marker;
+        }
+      }
+
+      if (missingMarker != null) {
+        markers.remove(missingMarker);
+        print("Deleted Alarmplace Marker is: ${missingMarker.markerId}");
+      }
+
+      Circle? missingCircle;
+      for (var circle in circles) {
+        var matchedAlarm = alarmList!.where(
+            (element) => circle.circleId.value == "place_${element.alarmId}");
+
+        if (matchedAlarm.length == 0) {
+          missingCircle = circle;
+        }
+      }
+
+      if (missingCircle != null) {
+        circles.remove(missingCircle);
+        print("Deleted Alarmplace Circle is: ${missingCircle.circleId}");
+      }
+
+      // for (var circle in circles) {
+      //   var matchedAlarm = alarmList!.where(
+      //       (element) => circle.circleId.value == "place_${element.alarmId}");
+
+      //   if (matchedAlarm.length == 0) {
+      //     circles.remove(circle);
+      //     print("Deleted Alarmplace Circle is: ${circle.circleId}");
+      //   }
+      // }
+    }
+    notifyListeners();
+  }
+
   Future<void> deleteAllAlarms() async {
     if (alarmList != null) {
       for (var alarms in alarmList!) {
@@ -94,7 +136,7 @@ class AlarmProvider extends ChangeNotifier {
       circles.clear();
       animationController!.forward();
       stopLocationStream();
-      await BackgroundServiceManager.instance.stopAllAlarmServices();
+      // await BackgroundServiceManager.instance.stopAllAlarmServices();
       notifyListeners();
     }
   }
@@ -105,8 +147,7 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> deleteSelectedMapPlace(int alarmId) async {
     Alarm alarm = (await DatabaseManager.instance.getAlarm(alarmId))!;
-    print("Alarm " + alarm.toString());
-    BackgroundServiceManager.instance.removeAlarmFromBGService(alarm);
+    // BackgroundServiceManager.instance.removeAlarmFromBGService(alarm);
     alarm.isAlarmActive = 0;
     await updateAlarm(alarmId, alarm);
     // await DatabaseManager.instance.deleteAlarm(alarmId);
@@ -116,7 +157,7 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> addAlarmToDB(Alarm newAlarm) async {
     await DatabaseManager.instance.addAlarm(newAlarm);
-    await addAlarmAddedToBG(newAlarm);
+    //await addAlarmAddedToBG(newAlarm);
     await getAlarmList();
     resumeLocationStreamStatus();
 
@@ -126,18 +167,17 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> updateAlarm(int id, Alarm newAlarm) async {
     final result = await DatabaseManager.instance.updateAlarm(id, newAlarm);
-
-    await getAlarmList();
+    if (result) await getAlarmList();
   }
 
   Future<void> addAlarmAddedToBG(Alarm newAlarm) async {
-    await BackgroundServiceManager.instance.addAlarmToBGService(newAlarm);
+    //  await BackgroundServiceManager.instance.addAlarmToBGService(newAlarm);
   }
 
-  Future<void> addActiveAlarmsToBGService() async {
-    if (alarmList != null) if (alarmList!.isNotEmpty)
-      await BackgroundServiceManager.instance.checkExistensAlarms(alarmList!);
-  }
+  // Future<void> addActiveAlarmsToBGService() async {
+  //   if (alarmList != null) if (alarmList!.isNotEmpty)
+  //     await BackgroundServiceManager.instance.checkExistensAlarms(alarmList!);
+  // }
 
   void resumeLocationStreamStatus() {
     if (positionStream != null) {
@@ -161,15 +201,10 @@ class AlarmProvider extends ChangeNotifier {
             .listen((Position? position) {
           if (position != null) {
             currentPosition = position;
-            //print("POS: " + position.toString());
-            calculateDistanceToAlarmPlaces(position);
+
+            getAlarmList();
+            //establishExistentAlarms();
             moveToBounderies();
-            // if (nearestAlarm != null) {
-            //   LocalNotifications.instance.showSilentNotification(
-            //       title: "Next Alarm",
-            //       body:
-            //           "Alarm #${nearestAlarm!.alarmId} in ${nearestAlarm!.distance!.toStringAsFixed(2)} meters ");
-            // }
           }
         });
       } else {
@@ -196,10 +231,6 @@ class AlarmProvider extends ChangeNotifier {
       alarms.distance = Geolocator.distanceBetween(alarms.lat!, alarms.long!,
           currentPosition.latitude, currentPosition.longitude);
     }
-    getNearestAlarm();
-  }
-
-  void getNearestAlarm() {
     if (alarmList!.isNotEmpty) {
       alarmList!.sort((a, b) => a.distance!.compareTo(b.distance!));
       nearestAlarm = alarmList!.first;
@@ -212,7 +243,7 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> establishExistentAlarms() async {
     final existentAlarms = await getAlarmList();
-    await addActiveAlarmsToBGService();
+    // await addActiveAlarmsToBGService();
 
     for (var alarm in existentAlarms) {
       int id = alarm.alarmId!;
@@ -268,6 +299,7 @@ class AlarmProvider extends ChangeNotifier {
     } else {
       // TODO Show Snackbar Alarm Added or Not!
     }
+    addMarkerProcces = false;
     checkSelectedIsPlaceAddedToDB();
     notifyListeners();
   }
@@ -283,7 +315,7 @@ class AlarmProvider extends ChangeNotifier {
           long: selectedPlace?.position.longitude,
           address: selectedPlace?.address);
 
-      BackgroundServiceManager.instance.updateAlarmFromBGService(newAlarm);
+      // BackgroundServiceManager.instance.updateAlarmFromBGService(newAlarm);
       updateAlarm(selectedPlace!.id, newAlarm);
     } else {
       // TODO Show Snackbar Alarm Updated or Not!
@@ -315,6 +347,7 @@ class AlarmProvider extends ChangeNotifier {
   }
 
   Future<void> addPlaceMarker(LatLng position, BuildContext context) async {
+    addMarkerProcces = true;
     animationController!.reverse();
     count++;
     String placeId = "place_$count";
@@ -348,6 +381,7 @@ class AlarmProvider extends ChangeNotifier {
     addMapPlaces(currentMapPlace);
     await checkSelectedIsPlaceAddedToDB();
     moveToBounderies();
+
     notifyListeners();
   }
 
@@ -365,6 +399,7 @@ class AlarmProvider extends ChangeNotifier {
       print("No Match for marker");
     }
     checkSelectedIsPlaceAddedToDB();
+
     notifyListeners();
   }
 
@@ -436,7 +471,7 @@ class AlarmProvider extends ChangeNotifier {
   Future<void> moveToBounderies() async {
     if (focusPlaces) {
       if (markers.isNotEmpty) {
-        var bounds = await _bounds(markers);
+        var bounds = await _bounds(markers.toSet());
         double padding = markers.length == 0 ? 200 : 100;
         await mapController!
             .animateCamera(CameraUpdate.newLatLngBounds(bounds, padding));
@@ -494,10 +529,9 @@ class AlarmProvider extends ChangeNotifier {
   }
 
   Future<LatLng> getCurrentPosition() async {
-    Position position = await Geolocator.getCurrentPosition(
+    currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
 
-    currentPosition = position;
     notifyListeners();
     return currentPosition!.latlng;
   }

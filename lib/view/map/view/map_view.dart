@@ -79,8 +79,10 @@ class _GoogleMapViewState extends State<GoogleMapView>
     return GoogleMap(
       myLocationEnabled: true,
       myLocationButtonEnabled: true,
-      markers: Provider.of<AlarmProvider>(context, listen: false).markers,
-      circles: Provider.of<AlarmProvider>(context, listen: false).circles,
+      markers:
+          Provider.of<AlarmProvider>(context, listen: false).markers.toSet(),
+      circles:
+          Provider.of<AlarmProvider>(context, listen: false).circles.toSet(),
       compassEnabled: true,
       gestureRecognizers: googleGestures.toSet(),
       mapType: MapType.normal,
@@ -122,7 +124,6 @@ class _GoogleMapViewState extends State<GoogleMapView>
       curve: Curves.easeInOut,
     ));
     animationController.forward();
-    _offsetFloat.addListener(() {});
   }
 
   @override

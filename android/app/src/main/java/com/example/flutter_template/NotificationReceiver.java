@@ -18,6 +18,9 @@ import static android.app.PendingIntent.getActivity;
 import static androidx.core.content.ContextCompat.startActivity;
 
 class NotificationReceiver extends BroadcastReceiver {
+
+    DatabaseController databaseController;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         //context.unregisterReceiver(this);
@@ -27,20 +30,6 @@ class NotificationReceiver extends BroadcastReceiver {
         }
     }
 
-    private void sendMessageToFlutter(Context context){
-        Intent dialogIntent = new Intent();
-        dialogIntent.setClassName("com.example.flutter_template", "com.example.flutter_template.MainActivity");
-        dialogIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(dialogIntent);
-
-        MethodChannel methodChannel = MainActivity.methodChannel;
-        HashMap<String, Object> arguments = new HashMap<>();
-        arguments.put("alice", "aliceeee");
-        arguments.put("bob", "boeeeb");
-        methodChannel.invokeMethod("charlie", arguments);
-
-    }
-
     private void cancelTheAlarm(Context context, Intent intent){
         if (intent.hasExtra("remove")) {
             Bundle comingBundle = intent.getExtras();
@@ -48,14 +37,11 @@ class NotificationReceiver extends BroadcastReceiver {
             removePlaceIntent.putExtras(comingBundle);
             AlarmPlace alarmPlace = (AlarmPlace) comingBundle.getParcelable("remove");
             String text = "Removed Alarm "  + alarmPlace.alarmId;
-            Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+
            try {
-               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                   ContextCompat.startForegroundService(context, removePlaceIntent);
-                   //sendMessageToFlutter(context);
-               } else {
-                   context.startService(removePlaceIntent);
-               }
+               DatabaseController.getInstance(context).removeAlarm(alarmPlace);
+               CustomNotification.cancelNotification(alarmPlace);
+               Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
            }catch (Exception exception){
                Log.i("exception", exception.toString());
            }

@@ -17,7 +17,6 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await DatabaseManager.instance.databaseInit();
   LocalNotifications.instance.initNotifications();
-  BackgroundServiceManager.instance.initBackgroundService();
 
   runApp(MultiProvider(
     providers: [...ApplicationProvider.instance.dependItems],

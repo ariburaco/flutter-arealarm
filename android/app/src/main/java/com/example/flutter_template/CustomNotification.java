@@ -27,7 +27,6 @@ public class CustomNotification {
     private String title = "Arealarm";
     private String contentText = "You have reached the place!";
 
-
     public Context context;
     public static int notificationId = 1001;
 
@@ -38,7 +37,6 @@ public class CustomNotification {
     public CustomNotification(Context _context) {
         context = _context;
         createNotificationChannel();
-
     }
 
     private void createNotificationChannel() {

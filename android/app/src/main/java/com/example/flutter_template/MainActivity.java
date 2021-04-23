@@ -48,22 +48,13 @@ public class MainActivity extends FlutterActivity {
         super.onCreate(savedInstanceState);
         //getBatteryOptimization();
         //getAutoRun();
-
         startInitialization(this);
         context = getContext();
-
-
-
-        registerNotificationReciever();
         serviceStartIntent = new Intent(MainActivity.this, LocationService.class);
-
+        startBackgroundAlarmService();
     }
 
-    private void registerNotificationReciever() {
-        IntentFilter filter = new IntentFilter(Constants.GOT_IT);
-        BroadcastReceiver mReceiver = new NotificationReceiver();
-        registerReceiver(mReceiver, filter);
-    }
+
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -74,16 +65,11 @@ public class MainActivity extends FlutterActivity {
                     if (call != null) {
                         switch (call.method) {
                             case Constants.START_ALARM_SERVICE:
-                                startBackgroundAlarmService(call);
+
                                 break;
-                            case Constants.STOP_ALARM_SERVICE:
-                                removeSelectedAlarmPlace(call);
-                                break;
-                            case Constants.UPDATE_ALARM_SERVICE:
-                                updateSelectedAlarmPlace(call);
-                                break;
+
                             case Constants.STOP_ALL_ALARM_SERVICES:
-                                stopBackgroundService();
+                               // stopBackgroundService();
                                 break;
                         }
                     } else {
@@ -93,35 +79,6 @@ public class MainActivity extends FlutterActivity {
         );
     }
 
-    private void removeSelectedAlarmPlace(MethodCall call) {
-        AlarmPlace removedAlarm = getCallArguments(call);
-        Intent removePlaceIntent = new Intent(MainActivity.this, LocationService.class);
-        Log.i("TAG", "removeSelectedAlarmPlace: " + removedAlarm.alarmId);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("remove", removedAlarm);
-        removePlaceIntent.putExtras(bundle);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(context, removePlaceIntent);
-        } else {
-            startService(removePlaceIntent);
-        }
-    }
-
-    private void updateSelectedAlarmPlace(MethodCall call) {
-        AlarmPlace updateAlarmPlace = getCallArguments(call);
-        Intent updatePlaceIntent = new Intent(MainActivity.this, LocationService.class);
-
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("update", updateAlarmPlace);
-        updatePlaceIntent.putExtras(bundle);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(context, updatePlaceIntent);
-        } else {
-            startService(updatePlaceIntent);
-        }
-    }
 
 
     private void stopBackgroundService() {
@@ -135,42 +92,14 @@ public class MainActivity extends FlutterActivity {
     }
 
 
-    public void startBackgroundAlarmService(MethodCall call) {
-        AlarmPlace alarmPlace = getCallArguments(call);
-        Log.i("TAG", "ADD alarmPlaceID: " + alarmPlace.alarmId);
+    public void startBackgroundAlarmService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //startForegroundService(serviceStartIntent);
-
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("add", alarmPlace);
-            serviceStartIntent.putExtras(bundle);
             ContextCompat.startForegroundService(context, serviceStartIntent);
-            DatabaseController databaseController = new DatabaseController(this);
-            List<AlarmPlace> alarmPlaces = databaseController.getAllAlarmList();
-            Log.i("alarmId", "startBackgroundAlarmService: alarmId" + alarmPlaces.get(0).alarmId);
-            databaseController.removeAlarm(alarmPlaces.get(0));
         } else {
             startService(serviceStartIntent);
         }
         Log.d("SERVICE", "Started!");
-
     }
-
-    public AlarmPlace getCallArguments(MethodCall call) {
-        AlarmPlace alarmPlace = new AlarmPlace();
-        try {
-            int alarmId = call.argument("alarmId");
-            int isActive = call.argument("isActive");
-            double radius = call.argument("radius");
-            double latitude = call.argument("latitude");
-            double longitude = call.argument("longitude");
-            alarmPlace.setAlarmPlaces(alarmId, isActive, latitude, longitude, radius);
-        } catch (Exception e) {
-            Log.d("CALL_EXCEPTION", e.toString());
-        }
-        return alarmPlace;
-    }
-
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);

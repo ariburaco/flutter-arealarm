@@ -1,3 +1,5 @@
+import 'package:flutter_template/view/utils/provider/background_service_manager.dart';
+
 import '../../alarms/model/alarms_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -36,7 +38,7 @@ class DatabaseManager {
     String sql =
         '''CREATE TABLE IF NOT EXISTS $_alarmTable ( id INTEGER PRIMARY KEY AUTOINCREMENT,
          $alarmId INTEGER,
-         $placeName VARCHAR(100),
+         $placeName TEXT,
          $isAlarmActive INTEGER,
          $lat DOUBLE,
          $long DOUBLE,
