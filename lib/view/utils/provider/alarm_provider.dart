@@ -13,7 +13,7 @@ class AlarmProvider extends ChangeNotifier {
   bool hasActiveAlarm = false;
   bool addMarkerProcces = false;
   Position? currentPosition;
-  bool focusPlaces = true;
+  bool focusPlaces = false;
   StreamSubscription<Position>? positionStream;
 
 //
@@ -39,7 +39,12 @@ class AlarmProvider extends ChangeNotifier {
     alarmList = await DatabaseManager.instance.getAlarmList();
     alarmList =
         alarmList!.where((element) => element.isAlarmActive == 1).toList();
-    calculateDistanceToAlarmPlaces(currentPosition);
+
+    if (currentPosition != null)
+      calculateDistanceToAlarmPlaces(currentPosition);
+    else
+      getCurrentPosition();
+
     count = await getAlarmCount();
     if (count > 0) {
       hasActiveAlarm = true;

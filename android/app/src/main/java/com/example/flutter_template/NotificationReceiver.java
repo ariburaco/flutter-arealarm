@@ -17,9 +17,7 @@ import io.flutter.plugin.common.MethodChannel;
 import static android.app.PendingIntent.getActivity;
 import static androidx.core.content.ContextCompat.startActivity;
 
-class NotificationReceiver extends BroadcastReceiver {
-
-    DatabaseController databaseController;
+public class NotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

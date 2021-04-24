@@ -11,15 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseController extends SQLiteOpenHelper {
-
     private static DatabaseController sInstance;
 
-    // ...
-
     public static synchronized DatabaseController getInstance(Context context) {
-        // Use the application context, which will ensure that you
-        // don't accidentally leak an Activity's context.
-        // See this article for more information: http://bit.ly/6LRzfx
         if (sInstance == null) {
             sInstance = new DatabaseController(context.getApplicationContext());
         }
@@ -27,11 +21,10 @@ public class DatabaseController extends SQLiteOpenHelper {
     }
 
 
-    private static final int _version = 3;
-    private static final String _alarmDatabaseName = "alarms_db2";
+    private static final int _version = 1;
+    private static final String _alarmDatabaseName = "alarms_db";
     private static final String _alarmTable = "alarms_table";
 
-    // Alarm Table Columns
     private static final String id = "id";
     private static final String alarmId = "alarmId";
     private static final String placeName = "placeName";
@@ -42,43 +35,21 @@ public class DatabaseController extends SQLiteOpenHelper {
     private static final String address = "address";
     private static final String distance = "distance";
 
-
     List<AlarmPlace> alarmList;
 
-    private DatabaseController(Context context) {
+    public DatabaseController(Context context) {
         super(context, _alarmDatabaseName, null, _version);
-        String sql = "CREATE TABLE IF NOT EXISTS " + _alarmTable + "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + alarmId + "INTEGER" + ","
-                + placeName + "TEXT" + ","
-                + isAlarmActive + "INTEGER" + ","
-                + lat + "DOUBLE" + ","
-                + longu + "DOUBLE" + ","
-                + radius + "DOUBLE" + ","
-                + distance + "DOUBLE" + ","
-                + address + "TEXT" + ")";
-        this.getReadableDatabase().execSQL(sql);
+        createTable(this.getReadableDatabase());
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String sql = "CREATE TABLE IF NOT EXISTS " + _alarmTable + "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + alarmId + "INTEGER" + ","
-                + placeName + "TEXT" + ","
-                + isAlarmActive + "INTEGER" + ","
-                + lat + "DOUBLE" + ","
-                + longu + "DOUBLE" + ","
-                + radius + "DOUBLE" + ","
-                + distance + "DOUBLE" + ","
-                + address + "TEXT" + ")";
-        sqLiteDatabase.execSQL(sql);
+        createTable(sqLiteDatabase);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        // Drop older table if existed
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + _alarmDatabaseName);
-
-        // Create tables again
         onCreate(sqLiteDatabase);
     }
 
@@ -88,7 +59,6 @@ public class DatabaseController extends SQLiteOpenHelper {
 
     public List<AlarmPlace> getAllAlarmList() {
         alarmList = new ArrayList<>();
-        // Select All Query
         String selectQuery = "SELECT * FROM " + _alarmTable + " WHERE " + isAlarmActive + " = 1";
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -130,6 +100,21 @@ public class DatabaseController extends SQLiteOpenHelper {
 
     public void removeAlarm(AlarmPlace _alarmPlace) {
         updateAlarm(_alarmPlace.alarmId, 0);
+    }
+
+    private void createTable(SQLiteDatabase sqLiteDatabase) {
+        String sql = "CREATE TABLE IF NOT EXISTS " + _alarmTable
+                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + alarmId + " INTEGER, "
+                + placeName + " TEXT, "
+                + isAlarmActive + " INTEGER, "
+                + lat + " DOUBLE, "
+                + longu + " DOUBLE, "
+                + radius + " DOUBLE, "
+                + distance + " DOUBLE, "
+                + address + " TEXT"
+                + ")";
+        sqLiteDatabase.execSQL(sql);
     }
 
 }

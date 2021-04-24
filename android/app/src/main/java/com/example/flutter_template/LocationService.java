@@ -211,6 +211,8 @@ public class LocationService extends Service implements LocationListener {
 
     public Notification getServiceNotification() {
         String channel;
+
+        mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             channel = createChannel();
         else {
@@ -262,7 +264,7 @@ public class LocationService extends Service implements LocationListener {
     @NonNull
     @TargetApi(26)
     private synchronized String createChannel() {
-        mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
 
         String name = "LocationService";
         int importance = NotificationManager.IMPORTANCE_HIGH;

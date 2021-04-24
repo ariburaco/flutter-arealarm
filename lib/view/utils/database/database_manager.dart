@@ -10,8 +10,8 @@ class DatabaseManager {
     return _instace!;
   }
 
-  int _version = 3;
-  String _alarmDatabaseName = "alarms_db2";
+  int _version = 1;
+  String _alarmDatabaseName = "alarms_db";
   String _alarmTable = "alarms_table";
 
   // Alarm Table Columns

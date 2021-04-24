@@ -1,5 +1,6 @@
 package com.example.flutter_template;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,10 +15,13 @@ import android.widget.Toast;
 
 import com.tekartik.sqflite.Constant;
 
+import java.util.PriorityQueue;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import static android.app.Notification.EXTRA_NOTIFICATION_ID;
+import static android.app.Notification.PRIORITY_MAX;
 import static android.provider.Settings.System.getString;
 import static androidx.core.content.ContextCompat.getSystemService;
 
@@ -40,7 +44,7 @@ public class CustomNotification {
     }
 
     private void createNotificationChannel() {
-
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "alarmServices";
             String description = "alarmServiceDescs";
@@ -51,9 +55,10 @@ public class CustomNotification {
             channel.setLightColor(Color.RED);
             channel.enableVibration(true);
             channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }
+
+
     }
 
 
@@ -71,17 +76,20 @@ public class CustomNotification {
 
         builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.app_icon)
+                .setOngoing(true)
+                .setPriority(PRIORITY_MAX)
                 .setContentTitle(title)
                 .setContentText(contentText)
                 .addAction(action)
-
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(text))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_INSISTENT;
 
         notificationId = removedAlarm.alarmId;
         notificationManagerCompat = NotificationManagerCompat.from(context);
-        notificationManager.notify(notificationId, builder.build());
+        notificationManager.notify(notificationId, notification);
 
     }
 
