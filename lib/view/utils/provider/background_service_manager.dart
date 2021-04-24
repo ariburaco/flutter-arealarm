@@ -14,7 +14,7 @@ class BackgroundServiceManager {
       const MethodChannel(ServiceConstants.LocationServiceChannel);
 
   Future<void> initBackgroundService() async {
-    await sendAlarmsToService();
+    //await sendAlarmsToService();
     // platform.setMethodCallHandler((MethodCall call) async {
     //   switch (call.method) {
     //     case 'charlie':
@@ -68,7 +68,7 @@ class BackgroundServiceManager {
   //   stopSelectedAlarm(alarmArguments);
   // }
 
-  Future<void> sendAlarmsToService() async {
+  Future<void> startAlarmService() async {
     try {
       await platform.invokeMethod(ServiceConstants.StartAlarmService);
     } on PlatformException catch (e) {

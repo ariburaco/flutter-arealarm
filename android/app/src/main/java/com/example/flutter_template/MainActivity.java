@@ -51,7 +51,7 @@ public class MainActivity extends FlutterActivity {
         startInitialization(this);
         context = getContext();
         serviceStartIntent = new Intent(MainActivity.this, LocationService.class);
-        startBackgroundAlarmService();
+
     }
 
 
@@ -65,7 +65,7 @@ public class MainActivity extends FlutterActivity {
                     if (call != null) {
                         switch (call.method) {
                             case Constants.START_ALARM_SERVICE:
-
+                                startBackgroundAlarmService();
                                 break;
 
                             case Constants.STOP_ALL_ALARM_SERVICES:

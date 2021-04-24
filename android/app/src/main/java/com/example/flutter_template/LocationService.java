@@ -53,11 +53,11 @@ public class LocationService extends Service implements LocationListener {
     boolean isAlarmsActive = true;
     boolean inRange = false;
 
-    double latitude = 0; // latitude
-    double longitude = 0; // longitude
+    double latitude = 0;
+    double longitude = 0;
 
-    Location location; // location
-    protected LocationManager locationManager;
+    Location location;
+    LocationManager locationManager;
 
     NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
@@ -68,6 +68,7 @@ public class LocationService extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
+
         getActiveAlarmsFromDB();
         startLocationServiceWithNotification();
         registerNotificationReciever();
@@ -88,36 +89,24 @@ public class LocationService extends Service implements LocationListener {
             isAlarmsActive = false;
     }
 
-    private void removeAlarmFromDB(AlarmPlace _alarmPlace) {
-        if (_alarmPlace != null)
-            DatabaseController.getInstance(getApplicationContext()).removeAlarm(_alarmPlace);
-        else
-            Log.i("Database", "removeAlarmFromDB null _alarmplace");
-    }
-
-    private void removeAllAlarms() {
-        for (AlarmPlace alarmPlace : placeList) {
-            removeAlarmFromDB(alarmPlace);
-        }
-    }
-
     private void startLocationServiceWithNotification() {
-        getServiceNotification();
         getLocation();
+        getServiceNotification();
         startForeground(SERVICE_NOTIFICATION, builder.build());
     }
 
-    private void createAlarmNotification(AlarmPlace currentAlarm) {
+    private void createAlarmNotification() {
         CustomNotification newNotification = new CustomNotification(this);
-        newNotification.showNotification(currentAlarm, "You're in the range of place #" + currentAlarm.alarmId);
-        Log.i("NOTIFY", "You're in the range of place #" + currentAlarm.alarmId);
+        newNotification.showNotification(nearestPlace, "You're in the range of place #" + nearestPlace.alarmId);
+        Log.i("NOTIFY", "You're in the range of place #" + nearestPlace.alarmId);
     }
 
     private void checkInRange() {
         if (nearestPlace.alarmId != -1) {
             if (nearestPlace.distance <= nearestPlace.radius) {
                 inRange = true;
-                createAlarmNotification(nearestPlace);
+
+                createAlarmNotification();
             } else {
                 inRange = false;
             }
@@ -133,31 +122,15 @@ public class LocationService extends Service implements LocationListener {
             if (!isGPSEnabled) { // && !isNetworkEnabled
             } else {
                 canGetLocation = true;
-                /*
-                if (!isNetworkEnabled) {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                if (isGPSEnabled) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
                             this);
+                    Log.d("GPS", "GPS Enabled");
                     if (locationManager != null) {
-                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         if (location != null) {
                             latitude = location.getLatitude();
                             longitude = location.getLongitude();
-                        }
-                    }
-                }
-                **/
-
-                if (isGPSEnabled) {
-                    if (location == null) {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
-                                this);
-                        Log.d("GPS", "GPS Enabled");
-                        if (locationManager != null) {
-                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
-                            }
                         }
                     }
                 }
@@ -174,7 +147,7 @@ public class LocationService extends Service implements LocationListener {
         location = loc;
         getActiveAlarmsFromDB();
         updateLocationNotification();
-        // Log.i("locationCHANGED", "Current Loc. " + location);
+        Log.i("LOCATION", "onLocationChanged: " + location);
     }
 
     public void updateLocationNotification() {
@@ -204,7 +177,7 @@ public class LocationService extends Service implements LocationListener {
         }
     }
 
-    public  void notifyService(String text){
+    public void notifyService(String text) {
         builder.setContentText(text);
         mNotificationManager.notify(SERVICE_NOTIFICATION, builder.build());
     }
@@ -218,27 +191,19 @@ public class LocationService extends Service implements LocationListener {
         else {
             channel = "";
         }
-        //Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        /*
-        Intent snoozeIntent = new Intent(this, MainActivity.class);
-        snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
-        PendingIntent snoozePendingIntent =
-                PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
-        */
+
         builder = new NotificationCompat.Builder(this, channel)
                 .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-                .setContentTitle("Arealarm");
+                .setContentTitle("Arealarm Service");
 
         Notification notification = builder
                 .setPriority(PRIORITY_MAX)
                 .setNotificationSilent()
                 //.setSound(uri)
                 .setCategory(Notification.CATEGORY_SERVICE)
-                //.addAction(R.drawable.app_icon, "Stop All", snoozePendingIntent)
                 .build();
         return notification;
     }
-
 
     public void updateAlarmListDistances(Location currentLocation) {
         if (placeList.size() > 0) {
@@ -257,30 +222,20 @@ public class LocationService extends Service implements LocationListener {
             }
         }
         return nearestAlarmPlace;
-
     }
-
 
     @NonNull
     @TargetApi(26)
     private synchronized String createChannel() {
-
-
-        String name = "LocationService";
+        String name = "Background Location Service";
         int importance = NotificationManager.IMPORTANCE_HIGH;
-
-        NotificationChannel mChannel = new NotificationChannel("snap map channel", name, importance);
-        //Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        // mChannel.enableLights(true);
-
-        //mChannel.setLightColor(Color.BLUE);
+        NotificationChannel mChannel = new NotificationChannel("Arealarm Channel", name, importance);
         if (mNotificationManager != null) {
             mNotificationManager.createNotificationChannel(mChannel);
         } else {
             stopSelf();
         }
-        return "snap map channel";
+        return "Arealarm Channel";
     }
 
 

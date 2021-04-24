@@ -18,6 +18,7 @@ public class AlarmPlace implements Parcelable {
     double radius;
     double distance;
 
+
     protected AlarmPlace(Parcel in) {
         alarmId = in.readInt();
         location = (Location) in.readValue(Location.class.getClassLoader());

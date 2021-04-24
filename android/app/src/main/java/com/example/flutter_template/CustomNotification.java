@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import java.util.PriorityQueue;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import static android.app.Notification.AUDIO_ATTRIBUTES_DEFAULT;
 import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static android.app.Notification.PRIORITY_MAX;
 import static android.provider.Settings.System.getString;
@@ -36,7 +39,8 @@ public class CustomNotification {
 
     private static NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
-    public  NotificationManagerCompat notificationManagerCompat;
+
+    long[] vibrationPattern = new long[]{500, 500, 500, 500, 500, 500, 500, 500, 100};
 
     public CustomNotification(Context _context) {
         context = _context;
@@ -46,15 +50,17 @@ public class CustomNotification {
     private void createNotificationChannel() {
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "alarmServices";
-            String description = "alarmServiceDescs";
+            CharSequence name = "Arealarm Place Alarm";
             int importance = NotificationManager.IMPORTANCE_HIGH;
+            Uri alarmSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
+            channel.setSound(alarmSoundUri, null);
+
             channel.enableLights(true);
             channel.setLightColor(Color.RED);
             channel.enableVibration(true);
-            channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            channel.setVibrationPattern(vibrationPattern);
             notificationManager.createNotificationChannel(channel);
         }
 
@@ -74,21 +80,27 @@ public class CustomNotification {
                 new NotificationCompat.Action.Builder(0, "Got it!", pendingIntentYes)
                         .build();
 
+        Uri alarmSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
         builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.app_icon)
                 .setOngoing(true)
+                .setSound(alarmSoundUri)
+                .setVibrate(vibrationPattern)
                 .setPriority(PRIORITY_MAX)
                 .setContentTitle(title)
                 .setContentText(contentText)
                 .addAction(action)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(text))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                        .bigText(text));
+
         Notification notification = builder.build();
+
         notification.flags |= Notification.FLAG_INSISTENT;
+        notification.sound = alarmSoundUri;
+        notification.vibrate = vibrationPattern;
 
         notificationId = removedAlarm.alarmId;
-        notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManager.notify(notificationId, notification);
 
     }
