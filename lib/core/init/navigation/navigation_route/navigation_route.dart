@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../view/home/view/home_view.dart';
-import '../../../components/cards/not_found_navigation_widget.dart';
 import '../../../constants/navigation/navigation_constants.dart';
 
 class NavigationRoute {
@@ -16,7 +15,7 @@ class NavigationRoute {
         return normalNavigate(HomeView());
       default:
         return MaterialPageRoute(
-          builder: (context) => NotFoundNavigationWidget(),
+          builder: (context) => Container(),
         );
     }
   }

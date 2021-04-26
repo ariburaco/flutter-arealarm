@@ -1,3 +1,14 @@
 {
-    "welcome": "Welcome to App"
+    "welcome": "Welcome",
+    "focus": "Focus on Target",
+    "configureAlarm": "Configure Alarm",
+    "addAlarm": "Add Alarm",
+    "meters": "meters",
+    "updateAlarm": "Update Alarm",
+    "removeAlarm": "Remove Alarm",
+    "nearestAlarm": "Nearest Alarm",
+    "leftMeters": "meters left.",
+    "alarm": "Alarm",
+    "language": "Language",
+    "settings": "Settings"
 }

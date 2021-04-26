@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_template/core/init/lang/locale_keys.g.dart';
 import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/base/extension/context_extension.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 Widget buildPlaceCard(
   BuildContext context,
@@ -34,7 +36,7 @@ Widget buildPlaceCard(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                        "Configure Alarm #${Provider.of<AlarmProvider>(context, listen: false).selectedPlace != null ? Provider.of<AlarmProvider>(context, listen: false).selectedPlace!.id : ""}",
+                        "${LocaleKeys.configureAlarm.tr()} #${Provider.of<AlarmProvider>(context, listen: false).selectedPlace != null ? Provider.of<AlarmProvider>(context, listen: false).selectedPlace!.id : ""}",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     IconButton(
                         onPressed: () {
@@ -55,7 +57,7 @@ Widget buildPlaceCard(
                             Provider.of<AlarmProvider>(context, listen: false)
                                     .radius
                                     .toStringAsFixed(0) +
-                                " meters")),
+                                " ${LocaleKeys.meters.tr()}")),
                   ],
                 ),
                 Container(
@@ -83,7 +85,7 @@ ElevatedButton buildAddPlaceButton(BuildContext context) {
       onPressed: () {
         Provider.of<AlarmProvider>(context, listen: false).addPlaceToDB();
       },
-      child: Text("Add Alarm"),
+      child: Text(LocaleKeys.addAlarm.tr()),
     );
   } else {
     return ElevatedButton(
@@ -91,7 +93,7 @@ ElevatedButton buildAddPlaceButton(BuildContext context) {
         Provider.of<AlarmProvider>(context, listen: false)
             .updateSelectedAlarm();
       },
-      child: Text("Update Alarm"),
+      child: Text(LocaleKeys.updateAlarm.tr()),
     );
   }
 }
@@ -106,7 +108,7 @@ Widget buildRemovePlaceButton(
             .removeAlarmAndPlace();
         _controller.forward();
       },
-      child: Text("Remove Alarm"),
+      child: Text(LocaleKeys.removeAlarm.tr()),
     );
   } else {
     return Text("");
@@ -125,7 +127,7 @@ SliderTheme buildCustomSlider(BuildContext context) {
                 .radius
                 .round()
                 .toString() +
-            " meters",
+            " ${LocaleKeys.meters.tr()}",
         activeColor: context.colors.secondary,
         onChanged: (double value) {
           changeSelectedPlaceRadius(value, context);

@@ -15,7 +15,6 @@ class AppThemeLight extends AppTheme with ILightTheme {
   // ThemeData get theme => redTheme;
   @override
   ThemeData get theme => ThemeData(
-        fontFamily: ApplicationConstants.FONT_FAMILY,
         colorScheme: _appColorScheme,
         textTheme: textTheme(),
         appBarTheme: ThemeData.light().appBarTheme.copyWith(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_template/view/settings/view/settings_view.dart';
 import 'package:flutter_template/view/utils/provider/background_service_manager.dart';
 import 'package:mobx/mobx.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -30,7 +31,7 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
     pages = <Widget>[
       GoogleMapView(),
       AlarmsView(),
-      Container(color: Colors.blue),
+      SettingsView(),
     ];
     getPermissions();
     BackgroundServiceManager.instance.startAlarmService();

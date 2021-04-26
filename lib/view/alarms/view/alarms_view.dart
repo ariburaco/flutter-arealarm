@@ -1,7 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_template/core/init/lang/locale_keys.g.dart';
 import 'package:provider/provider.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../core/components/icons/icon_normal.dart';
@@ -108,7 +109,7 @@ class _AlarmsViewState extends State<AlarmsView>
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: AutoSizeText(
-                                    "Alarm #$placeName",
+                                    LocaleKeys.alarm.tr() + " #$placeName",
                                     maxLines: 1,
                                     minFontSize: 18,
                                     style: context.textTheme.subtitle2,
@@ -126,7 +127,8 @@ class _AlarmsViewState extends State<AlarmsView>
                                   child: ShimmerText(
                                     text: distance == "-1.00"
                                         ? "..."
-                                        : "${distance.toString()} meters left",
+                                        : "${distance.toString()} " +
+                                            LocaleKeys.leftMeters.tr(),
                                     duration: 3000,
                                   ),
                                 )
@@ -200,12 +202,13 @@ class _AlarmsViewState extends State<AlarmsView>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Nearest Alarm",
+            LocaleKeys.nearestAlarm.tr(),
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           ShimmerText(
             text: nearestAlarm != null
-                ? "in ${nearestAlarm.distance!.toStringAsFixed(2)} meters"
+                ? "${nearestAlarm.distance!.toStringAsFixed(2)} " +
+                    LocaleKeys.meters.tr()
                 : "?",
             fontSize: 20,
             duration: 3000,
@@ -230,7 +233,7 @@ class _AlarmsViewState extends State<AlarmsView>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ShimmerText(
-            text: "Arealarm",
+            text: LocaleKeys.alarm.tr(),
             fontSize: 30,
             duration: 4000,
           ),

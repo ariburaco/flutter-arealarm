@@ -1,3 +1,15 @@
 {
-    "welcome": "Uygulamaya HOşgeldiniz"
+    "welcome": "Uygulamaya Hoşgeldiniz",
+    "focus": "Geçerli Konumlara Odaklan",
+    "configureAlarm": "Alarm Ayarları",
+    "addAlarm": "Alarm Ekle",
+    "meters": "metre",
+    "updateAlarm": "Alarmı Güncelle",
+    "removeAlarm": "Alarmı Kaldır",
+    "nearestAlarm": "En yakın Alarm",
+    "leftMeters": "metre kaldı.",
+    "alarm": "Alarm",
+    "language": "Dil",
+    "settings": "Ayarlar"
+
 }
