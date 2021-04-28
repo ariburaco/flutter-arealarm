@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
-import '../../alarms/model/alarms_model.dart';
-import '../model/map_place_model.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/base/model/base_view_model.dart';
 import 'package:mobx/mobx.dart';
 part 'map_view_model.g.dart';

@@ -30,6 +30,10 @@ class AlarmProvider extends ChangeNotifier {
 
   AnimationController? animationController;
 
+  bool getFocusMode() {
+    return focusPlaces;
+  }
+
   void changeFocus(bool val) {
     focusPlaces = val;
     notifyListeners();

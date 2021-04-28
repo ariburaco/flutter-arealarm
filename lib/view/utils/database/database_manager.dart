@@ -1,3 +1,4 @@
+import 'package:flutter_template/view/settings/model/settings_model.dart';
 import 'package:flutter_template/view/utils/provider/background_service_manager.dart';
 
 import '../../alarms/model/alarms_model.dart';
@@ -24,6 +25,15 @@ class DatabaseManager {
   String address = "address";
   String distance = "distance";
 
+  String _settingsTable = "settings_table";
+// Settings Table Columns
+  String appName = "appName";
+  String appVersion = "appVersion";
+  String language = "language";
+  String theme = "theme";
+  String focusMode = "focusMode";
+  String description = "description";
+
   Database? database;
   DatabaseManager._init();
 
@@ -35,7 +45,7 @@ class DatabaseManager {
   }
 
   Future<void> _createDatabase(Database db) async {
-    String sql =
+    String sql1 =
         '''CREATE TABLE IF NOT EXISTS $_alarmTable ( id INTEGER PRIMARY KEY AUTOINCREMENT,
          $alarmId INTEGER,
          $placeName TEXT,
@@ -45,7 +55,8 @@ class DatabaseManager {
          $radius DOUBLE,
          $distance DOUBLE,
          $address TEXT )''';
-    await db.execute(sql);
+    await db.execute(sql1);
+    initSettings(db);
   }
 
   Future<bool> addAlarm(Alarm _alarm) async {
@@ -133,6 +144,32 @@ class DatabaseManager {
     );
 
     return alarms > 0 ? true : false;
+  }
+
+  ///////////////////////// Settings DB /////////////////////////
+
+  Future<bool> initSettings(Database db) async {
+    if (database == null) databaseInit();
+    String sql2 = '''CREATE TABLE IF NOT EXISTS $_alarmTable (
+         $appName TEXT,
+         $appVersion TEXT,
+         $language TEXT,
+         $theme TEXT,
+         $focusMode INTEGER,
+         $description TEXT )''';
+
+    await db.execute(sql2);
+
+    Settings initSettings = new Settings();
+    initSettings.appName = "Arealarm";
+    initSettings.appVersion = "0.9.0";
+    initSettings.appLanguage = "EN";
+    initSettings.focusMode = 0;
+
+    final isAdded =
+        await database!.insert(_settingsTable, initSettings.toJson());
+
+    return isAdded >= 0 ? true : false;
   }
 
   Future<void> close() async {

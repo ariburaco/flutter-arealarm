@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_template/view/settings/view/settings_view.dart';
+import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
 import 'package:flutter_template/view/utils/provider/background_service_manager.dart';
 import 'package:mobx/mobx.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import '../../../core/base/model/base_view_model.dart';
-import '../../../core/constants/services/service_constants.dart';
 import '../../alarms/view/alarms_view.dart';
 import '../../map/view/map_view.dart';
 
@@ -26,6 +26,7 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
 
   @override
   void init() {
+    Provider.of<AlarmProvider>(context, listen: true).context = context;
     pageController =
         new PageController(initialPage: currentPageIndex, keepPage: true);
     pages = <Widget>[
