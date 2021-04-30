@@ -1,5 +1,5 @@
-import 'package:flutter_template/core/constants/application/app_constants.dart';
-import 'package:flutter_template/view/settings/model/settings_model.dart';
+import 'package:Arealarm/core/constants/application/app_constants.dart';
+import 'package:Arealarm/view/settings/model/settings_model.dart';
 import '../../alarms/model/alarms_model.dart';
 import 'package:sqflite/sqflite.dart';
 

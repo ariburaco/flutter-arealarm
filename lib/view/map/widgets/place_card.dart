@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_template/core/init/lang/locale_keys.g.dart';
-import '../../utils/provider/alarm_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../core/base/extension/context_extension.dart';
+import 'package:Arealarm/core/init/lang/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../../../core/base/extension/context_extension.dart';
+import '../../utils/provider/alarm_provider.dart';
 
 Widget buildPlaceCard(
   BuildContext context,

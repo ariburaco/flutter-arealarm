@@ -1,7 +1,7 @@
+import 'package:Arealarm/view/settings/view/settings_view.dart';
+import 'package:Arealarm/view/utils/provider/alarm_provider.dart';
+import 'package:Arealarm/view/utils/provider/background_service_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_template/view/settings/view/settings_view.dart';
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
-import 'package:flutter_template/view/utils/provider/background_service_manager.dart';
 import 'package:mobx/mobx.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -58,6 +58,8 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
     if (locationStatus == PermissionStatus.granted) {
       BackgroundServiceManager.instance.startAlarmService();
     }
+
+    //await Permission.notification.request();
 
     await Permission.ignoreBatteryOptimizations.request();
     // if (await Permission.location.isRestricted) {

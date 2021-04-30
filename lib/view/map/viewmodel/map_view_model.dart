@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../utils/provider/alarm_provider.dart';
-import 'package:provider/provider.dart';
-import '../../../core/base/model/base_view_model.dart';
 import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
+
+import '../../../core/base/model/base_view_model.dart';
+import '../../utils/provider/alarm_provider.dart';
+
 part 'map_view_model.g.dart';
 
 class GoogleMapViewModel = _GoogleMapViewModelBase with _$GoogleMapViewModel;

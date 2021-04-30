@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'package:Arealarm/core/init/lang/language_manager.dart';
+import 'package:Arealarm/view/settings/model/settings_model.dart';
+
+import '../../../core/constants/application/app_constants.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter_template/core/constants/application/app_constants.dart';
-import 'package:flutter_template/core/init/lang/language_manager.dart';
-import 'package:flutter_template/view/settings/model/settings_model.dart';
 import '../../../core/base/extension/context_extension.dart';
 import 'package:flutter/cupertino.dart';
 import '../../map/model/map_place_model.dart';

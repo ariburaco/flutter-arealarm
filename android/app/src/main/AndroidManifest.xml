@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.flutter_template">
+    package="com.phibox.arealarm">
 
     <application
 
@@ -38,7 +38,7 @@
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
             <meta-data
-                android:name="com.example.flutter_template"
+                android:name="com.phibox.arealarm"
                 android:resource="@drawable/phi_icon" />
 
         </activity>
@@ -64,7 +64,7 @@
         </receiver>
         <receiver android:name=".NotificationReceiver">
             <intent-filter>
-                <action android:name="com.example.flutter_template.GOT_IT"/>
+                <action android:name="com.phibox.arealarm.GOT_IT"/>
             </intent-filter>
         </receiver>
 

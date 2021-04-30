@@ -1,11 +1,11 @@
+import 'package:Arealarm/core/base/extension/context_extension.dart';
+import 'package:Arealarm/core/base/view/base_view.dart';
+import 'package:Arealarm/core/init/lang/locale_keys.g.dart';
+import 'package:Arealarm/view/settings/viewmodel/settings_viewmodel.dart';
+import 'package:Arealarm/view/utils/provider/alarm_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_template/core/base/extension/context_extension.dart';
-import 'package:flutter_template/core/base/view/base_view.dart';
-import 'package:flutter_template/core/init/lang/locale_keys.g.dart';
-import 'package:flutter_template/view/settings/viewmodel/settings_viewmodel.dart';
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
 
 class SettingsView extends StatefulWidget {

@@ -1,6 +1,6 @@
+import 'package:Arealarm/core/base/extension/context_extension.dart';
+import 'package:Arealarm/view/utils/provider/alarm_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_template/core/base/extension/context_extension.dart';
-import 'package:flutter_template/view/utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
 
 Positioned buildFocusSwitch(BuildContext context) {
