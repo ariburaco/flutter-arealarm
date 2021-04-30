@@ -12,6 +12,6 @@ class IconNormal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(icon, color: context.colors.primaryVariant);
+    return Icon(icon, color: context.theme.colorScheme.primaryVariant);
   }
 }

@@ -10,5 +10,6 @@
     "leftMeters": "meters left.",
     "alarm": "Alarm",
     "language": "Language",
-    "settings": "Settings"
+    "settings": "Settings",
+    "focusMode": "Focus"
 }

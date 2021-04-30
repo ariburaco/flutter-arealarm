@@ -82,6 +82,10 @@ ElevatedButton buildAddPlaceButton(BuildContext context) {
           .isSelectedPlaceAlive ==
       false)) {
     return ElevatedButton(
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all<Color>(
+            context.theme.colorScheme.secondary),
+      ),
       onPressed: () {
         Provider.of<AlarmProvider>(context, listen: false).addPlaceToDB();
       },
@@ -89,6 +93,10 @@ ElevatedButton buildAddPlaceButton(BuildContext context) {
     );
   } else {
     return ElevatedButton(
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all<Color>(
+            context.theme.colorScheme.secondary),
+      ),
       onPressed: () {
         Provider.of<AlarmProvider>(context, listen: false)
             .updateSelectedAlarm();
@@ -103,6 +111,10 @@ Widget buildRemovePlaceButton(
   if (Provider.of<AlarmProvider>(context, listen: false).isSelectedPlaceAlive ==
       true) {
     return ElevatedButton(
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all<Color>(
+            context.theme.colorScheme.secondary),
+      ),
       onPressed: () {
         Provider.of<AlarmProvider>(context, listen: false)
             .removeAlarmAndPlace();
@@ -121,14 +133,14 @@ SliderTheme buildCustomSlider(BuildContext context) {
       child: Slider(
         value: Provider.of<AlarmProvider>(context, listen: false).radius,
         min: 50,
-        max: 1000,
-        divisions: 19,
+        max: 2500,
+        divisions: 49,
         label: Provider.of<AlarmProvider>(context, listen: false)
                 .radius
                 .round()
                 .toString() +
             " ${LocaleKeys.meters.tr()}",
-        activeColor: context.colors.secondary,
+        activeColor: context.theme.colorScheme.secondaryVariant,
         onChanged: (double value) {
           changeSelectedPlaceRadius(value, context);
         },
@@ -151,15 +163,15 @@ void changeSelectedPlaceRadius(double value, BuildContext context) {
         .selectedPlace!
         .position,
     strokeWidth: 4,
-    fillColor: context.colors.onPrimary.withOpacity(0.2),
-    strokeColor: context.colors.secondaryVariant,
+    fillColor: context.theme.colorScheme.primary.withOpacity(0.2),
+    strokeColor: context.theme.colorScheme.primary,
   );
   Provider.of<AlarmProvider>(context, listen: false).changeRadius(newCircle);
 }
 
 BoxDecoration buildBoxDecoration(BuildContext context) {
   return BoxDecoration(
-    color: context.colors.background,
+    color: context.theme.colorScheme.primaryVariant,
     borderRadius: BorderRadius.only(
         topLeft: Radius.circular(10),
         topRight: Radius.circular(10),
@@ -178,12 +190,11 @@ BoxDecoration buildBoxDecoration(BuildContext context) {
 
 SliderThemeData buildSliderThemeData(BuildContext context) {
   return SliderTheme.of(context).copyWith(
-    valueIndicatorColor: Colors.blue, // This is what you are asking for
-    inactiveTrackColor: Color(0xFF8D8E98), // Custom Gray Color
-    activeTrackColor: Colors.white,
-    thumbColor: Colors.red,
-    overlayColor: Color(0x29EB1555), // Custom Thumb overlay Color
-    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
-    overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0),
+    valueIndicatorColor: context.theme.colorScheme.secondary,
+    inactiveTrackColor: Color(0xFF8D8E98),
+    activeTrackColor: context.theme.colorScheme.primary,
+    overlayColor: context.theme.colorScheme.secondaryVariant,
+    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0),
+    overlayShape: RoundSliderOverlayShape(overlayRadius: 5.0),
   );
 }

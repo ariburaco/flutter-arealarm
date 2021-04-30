@@ -11,7 +11,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../alarms/model/alarms_model.dart';
 import '../database/database_manager.dart';
-import 'background_service_manager.dart';
 
 class AlarmProvider extends ChangeNotifier {
   List<Alarm>? alarmList = [];
@@ -319,8 +318,8 @@ class AlarmProvider extends ChangeNotifier {
           center: position,
           radius: radius,
           strokeWidth: 4,
-          fillColor: context!.colors.onPrimary.withOpacity(0.2),
-          strokeColor: context!.colors.secondaryVariant);
+          fillColor: context!.theme.colorScheme.primary.withOpacity(0.2),
+          strokeColor: context!.theme.colorScheme.primary);
 
       markers.add(marker);
       circles.add(circle);
@@ -418,8 +417,8 @@ class AlarmProvider extends ChangeNotifier {
         center: position,
         radius: radius,
         strokeWidth: 4,
-        fillColor: context.colors.onPrimary.withOpacity(0.2),
-        strokeColor: context.colors.secondaryVariant);
+        fillColor: context.theme.colorScheme.primary.withOpacity(0.2),
+        strokeColor: context.theme.colorScheme.primary);
 
     markers.add(marker);
     circles.add(circle);

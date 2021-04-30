@@ -1,5 +1,7 @@
 import 'package:Arealarm/core/base/extension/context_extension.dart';
+import 'package:Arealarm/core/init/lang/locale_keys.g.dart';
 import 'package:Arealarm/view/utils/provider/alarm_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +33,7 @@ Positioned buildFocusSwitch(BuildContext context) {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Focus",
+            LocaleKeys.focusMode.tr(),
             style: context.textTheme.subtitle1,
           ),
           Switch(

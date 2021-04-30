@@ -67,11 +67,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   CurvedNavigationBar buildCurvedNaviationBar(
       BuildContext context, HomeViewModel viewModel) {
     return CurvedNavigationBar(
-        buttonBackgroundColor: Colors.amber,
+        buttonBackgroundColor: context.theme.colorScheme.secondary,
         key: _scaffoldyKey,
         index: viewModel.currentPageIndex,
         height: context.width * 0.15,
-        color: context.colors.secondary,
+        color: context.theme.colorScheme.primary,
         backgroundColor: Colors.transparent,
         animationDuration: context.lowDuration,
         onTap: (index) {

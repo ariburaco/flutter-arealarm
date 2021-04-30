@@ -13,5 +13,6 @@ abstract class  LocaleKeys {
   static const alarm = 'alarm';
   static const language = 'language';
   static const settings = 'settings';
+  static const focusMode = 'focusMode';
 
 }

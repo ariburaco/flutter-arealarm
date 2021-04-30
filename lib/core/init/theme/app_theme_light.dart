@@ -60,14 +60,14 @@ class AppThemeLight extends AppTheme with ILightTheme {
 
   ColorScheme get _appColorScheme {
     return ColorScheme(
-        primary: colorSchemeLight!.black,
+        primary: Color(0xFFFBB040),
+        secondary: Color(0xFF563B97),
         primaryVariant: Colors.white,
-        secondary: Colors.green,
-        secondaryVariant: colorSchemeLight!.azure,
+        secondaryVariant: Colors.black,
+        onPrimary: Color(0xFFF9D3A0),
         surface: Colors.blue,
         background: Color(0xfff6f9fc),
         error: Colors.red[900]!,
-        onPrimary: Colors.greenAccent,
         onSecondary: Colors.black,
         onSurface: Colors.white30,
         onBackground: Colors.black12,

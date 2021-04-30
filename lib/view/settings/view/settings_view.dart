@@ -54,7 +54,7 @@ class _SettingsViewState extends State<SettingsView> {
 
   Card buildLanguageChoice(BuildContext context) {
     return Card(
-      color: context.colors.onPrimary,
+      color: context.theme.colorScheme.primary,
       child: Padding(
         padding: context.paddingLowHorizontal,
         child: Row(
@@ -90,7 +90,7 @@ class _SettingsViewState extends State<SettingsView> {
 
   Card buildFocusSettings(BuildContext context) {
     return Card(
-      color: context.colors.onPrimary,
+      color: context.theme.colorScheme.primary,
       child: Padding(
         padding: context.paddingLowHorizontal,
         child: Row(

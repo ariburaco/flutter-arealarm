@@ -67,7 +67,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
   FloatingActionButton buildFloatingActionButton(
       BuildContext context, GoogleMapViewModel viewmodel) {
     return FloatingActionButton(
-        backgroundColor: context.colors.secondaryVariant,
+        backgroundColor: context.theme.colorScheme.primary,
         child: IconNormal(icon: Icons.location_pin),
         onPressed: () {
           Provider.of<AlarmProvider>(context, listen: false).moveToBounderies();
@@ -76,7 +76,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   Widget buildGoogleMap(GoogleMapViewModel viewmodel) {
     return GoogleMap(
-      trafficEnabled: true,
+      trafficEnabled: false,
       myLocationEnabled: true,
       myLocationButtonEnabled: true,
       markers:
@@ -112,7 +112,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   void animationControllerInit() {
     animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     )..repeat(reverse: true);
 

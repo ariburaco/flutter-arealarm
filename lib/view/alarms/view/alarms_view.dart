@@ -57,7 +57,7 @@ class _AlarmsViewState extends State<AlarmsView>
                 ],
               ),
               floatingActionButton: FloatingActionButton(
-                  backgroundColor: context.colors.secondaryVariant,
+                  backgroundColor: context.theme.colorScheme.secondary,
                   child: IconNormal(icon: Icons.delete),
                   onPressed: () async {
                     await Provider.of<AlarmProvider>(context, listen: false)
@@ -67,14 +67,12 @@ class _AlarmsViewState extends State<AlarmsView>
   }
 
   Widget buildAlarmList(AlarmsViewModel viewModel) {
-    if (Provider.of<AlarmProvider>(context, listen: true).alarmList!.length >
-        0) {
+    if (Provider.of<AlarmProvider>(context, listen: true).count > 0) {
       return Consumer<AlarmProvider>(
           builder: (_, data, __) => ListView.builder(
                 itemCount: data.alarmList!.length,
                 itemBuilder: (BuildContext context, int index) {
                   final currentAlarm = data.alarmList![index];
-
                   final placeName = currentAlarm.alarmId!;
                   // final radius = currentAlarm.radius!.toInt();
                   final address = currentAlarm.address!;
@@ -96,7 +94,7 @@ class _AlarmsViewState extends State<AlarmsView>
                               child: Icon(
                                 Icons.location_pin,
                                 size: 50,
-                                color: context.randomColor,
+                                color: context.theme.colorScheme.primary,
                               ),
                             ),
                           ),
@@ -142,7 +140,7 @@ class _AlarmsViewState extends State<AlarmsView>
                                 child: IconButton(
                                   icon: Icon(
                                     Icons.delete,
-                                    color: context.theme.hintColor,
+                                    color: context.theme.colorScheme.secondary,
                                     size: 30,
                                   ),
                                   onPressed: () {
@@ -158,15 +156,7 @@ class _AlarmsViewState extends State<AlarmsView>
               ));
     } else {
       return Center(
-        child: Container(
-            child: IconButton(
-          icon: Icon(Icons.add),
-          iconSize: context.highValue,
-          onPressed: () {
-            //context.read<AlarmProdivder>().getAlarmList();
-            //Provider.of<AlarmProdivder>(context, listen: false).getAlarmList();
-          },
-        )),
+        child: Container(),
       );
     }
   }
@@ -190,7 +180,10 @@ class _AlarmsViewState extends State<AlarmsView>
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: [context.colors.onPrimary, context.colors.onError],
+          colors: [
+            context.theme.colorScheme.primaryVariant,
+            context.theme.colorScheme.onPrimary
+          ],
         ));
   }
 
@@ -217,11 +210,7 @@ class _AlarmsViewState extends State<AlarmsView>
       );
     } else {
       return Center(
-        child: ShimmerText(
-          text: "text",
-          duration: 2000,
-          fontSize: 50,
-        ),
+        child: Container(),
       );
     }
   }
