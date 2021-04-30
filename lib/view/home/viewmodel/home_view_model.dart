@@ -27,6 +27,7 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
   @override
   void init() {
     Provider.of<AlarmProvider>(context, listen: true).context = context;
+
     pageController =
         new PageController(initialPage: currentPageIndex, keepPage: true);
     pages = <Widget>[
@@ -34,8 +35,8 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
       AlarmsView(),
       SettingsView(),
     ];
+    Provider.of<AlarmProvider>(context, listen: false).getCurrentSettings();
     getPermissions();
-    BackgroundServiceManager.instance.startAlarmService();
   }
 
   PageView buildPageView() {
@@ -53,12 +54,12 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
   }
 
   Future<void> getPermissions() async {
-    print(
-        "First Batter optimiziation status: ${Permission.ignoreBatteryOptimizations.status}");
-    await Permission.ignoreBatteryOptimizations.request();
-    var answer = await Permission.ignoreBatteryOptimizations.status.isGranted;
-    print("second Batter optimiziation status: $answer");
+    var locationStatus = await Permission.locationAlways.request();
+    if (locationStatus == PermissionStatus.granted) {
+      BackgroundServiceManager.instance.startAlarmService();
+    }
 
+    await Permission.ignoreBatteryOptimizations.request();
     // if (await Permission.location.isRestricted) {
     //   // The OS restricts access, for example because of parental controls.
     // }

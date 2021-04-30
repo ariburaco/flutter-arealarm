@@ -1,10 +1,8 @@
-import 'dart:math';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
-import '../../../core/init/notification/local_notification.dart';
 import '../../../core/base/extension/context_extension.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../core/components/icons/icon_normal.dart';

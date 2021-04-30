@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_template/core/constants/application/app_constants.dart';
+import 'package:flutter_template/core/init/lang/language_manager.dart';
+import 'package:flutter_template/view/settings/model/settings_model.dart';
 import '../../../core/base/extension/context_extension.dart';
 import 'package:flutter/cupertino.dart';
 import '../../map/model/map_place_model.dart';
@@ -6,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../alarms/model/alarms_model.dart';
 import '../database/database_manager.dart';
+import 'background_service_manager.dart';
 
 class AlarmProvider extends ChangeNotifier {
   List<Alarm>? alarmList = [];
@@ -13,9 +18,8 @@ class AlarmProvider extends ChangeNotifier {
   bool hasActiveAlarm = false;
   bool addMarkerProcces = false;
   Position? currentPosition;
-  bool focusPlaces = false;
-  StreamSubscription<Position>? positionStream;
 
+  StreamSubscription<Position>? positionStream;
 //
   int count = 0;
   List<Marker> markers = [];
@@ -30,13 +34,49 @@ class AlarmProvider extends ChangeNotifier {
 
   AnimationController? animationController;
 
-  bool getFocusMode() {
-    return focusPlaces;
-  }
+  bool _focusPlaces = false;
+  Locale _appLanguage = LanguageManager.instance.supportedLocales.first;
+  Settings? _currentSettings;
+
+  bool get getFocusMode => _focusPlaces;
+  Locale get getAppLanguage => _appLanguage;
+  Settings get getAppSettings => _currentSettings = new Settings();
 
   void changeFocus(bool val) {
-    focusPlaces = val;
+    _focusPlaces = val;
+    updateSettings();
+
     notifyListeners();
+  }
+
+  void changeCurrentLanguage(Locale _lang) {
+    _appLanguage = _lang;
+    context!.setLocale(_appLanguage);
+    updateSettings();
+
+    notifyListeners();
+  }
+
+  Future<void> getCurrentSettings() async {
+    _currentSettings = await DatabaseManager.instance.getSettings();
+    if (_currentSettings != null) {
+      _focusPlaces = _currentSettings!.focusMode == 1 ? true : false;
+      var match = LanguageManager.instance.supportedLocales.where(
+          (element) => element.languageCode == _currentSettings!.appLanguage);
+      if (match.isNotEmpty) {
+        _appLanguage = match.first;
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<void> updateSettings() async {
+    final currentSettings = Settings();
+    currentSettings.appLanguage = _appLanguage.languageCode;
+    currentSettings.focusMode = _focusPlaces == true ? 1 : 0;
+    currentSettings.appName = ApplicationConstants.APP_NAME;
+    currentSettings.appVersion = ApplicationConstants.APP_VERSION;
+    await DatabaseManager.instance.updateSettigs(currentSettings);
   }
 
   Future<List<Alarm>> getAlarmList() async {
@@ -478,7 +518,7 @@ class AlarmProvider extends ChangeNotifier {
   }
 
   Future<void> moveToBounderies() async {
-    if (focusPlaces) {
+    if (_focusPlaces) {
       if (markers.isNotEmpty) {
         var bounds = await _bounds(markers.toSet());
         double padding = markers.length == 0 ? 200 : 100;
@@ -549,33 +589,33 @@ class AlarmProvider extends ChangeNotifier {
     final ImageConfiguration imageConfiguration =
         createLocalImageConfiguration(context!);
     var bitmap = await BitmapDescriptor.fromAssetImage(
-        imageConfiguration, 'assets/imgs/loc.png');
+        imageConfiguration, 'assets/icon/pin.png');
     pinLocationIcon = bitmap;
     notifyListeners();
   }
 
-  Future<void> askLocationPermissions() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  // Future<void> askLocationPermissions() async {
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     return Future.error('Location services are disabled.');
+  //   }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error(
-            'Location permissions are permanently denied, we cannot request permissions.');
-      }
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.deniedForever) {
+  //       return Future.error(
+  //           'Location permissions are permanently denied, we cannot request permissions.');
+  //     }
 
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-  }
+  //     if (permission == LocationPermission.denied) {
+  //       return Future.error('Location permissions are denied');
+  //     }
+  //   }
+  // }
 }
 
 extension ConvertToLatLng on Position {

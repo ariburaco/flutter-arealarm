@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_template/view/map/widgets/focus_switch.dart';
 import '../../utils/provider/alarm_provider.dart';
 import 'package:provider/provider.dart';
@@ -77,6 +76,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
 
   Widget buildGoogleMap(GoogleMapViewModel viewmodel) {
     return GoogleMap(
+      trafficEnabled: true,
       myLocationEnabled: true,
       myLocationButtonEnabled: true,
       markers:

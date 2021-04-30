@@ -24,7 +24,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.util.Log;
-
+import com.example.flutter_template.R;
 import com.tekartik.sqflite.Constant;
 
 import java.util.ArrayList;
@@ -193,10 +193,12 @@ public class LocationService extends Service implements LocationListener {
         }
 
         builder = new NotificationCompat.Builder(this, channel)
-                .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-                .setContentTitle("Arealarm Service");
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Arealarm Service")
+                .setContentText("No Active Alarms");
 
         Notification notification = builder
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(PRIORITY_MAX)
                 .setNotificationSilent()
                 //.setSound(uri)

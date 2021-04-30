@@ -83,7 +83,7 @@ public class CustomNotification {
         Uri alarmSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
         builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.app_icon)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
                 .setSound(alarmSoundUri)
                 .setVibrate(vibrationPattern)

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../utils/provider/alarm_provider.dart';
-import 'package:provider/provider.dart';
 import '../model/alarms_model.dart';
 import '../../../core/base/model/base_view_model.dart';
 import 'package:mobx/mobx.dart';

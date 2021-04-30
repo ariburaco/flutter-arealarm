@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../../constants/application/app_constants.dart';
 import 'app_theme.dart';
 import 'light/light_theme_interface.dart';
 

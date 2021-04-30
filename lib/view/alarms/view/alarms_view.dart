@@ -76,7 +76,7 @@ class _AlarmsViewState extends State<AlarmsView>
                   final currentAlarm = data.alarmList![index];
 
                   final placeName = currentAlarm.alarmId!;
-                  final radius = currentAlarm.radius!.toInt();
+                  // final radius = currentAlarm.radius!.toInt();
                   final address = currentAlarm.address!;
                   final distance = currentAlarm.distance!.toStringAsFixed(2);
 

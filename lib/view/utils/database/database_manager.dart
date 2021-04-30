@@ -1,6 +1,5 @@
+import 'package:flutter_template/core/constants/application/app_constants.dart';
 import 'package:flutter_template/view/settings/model/settings_model.dart';
-import 'package:flutter_template/view/utils/provider/background_service_manager.dart';
-
 import '../../alarms/model/alarms_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -29,7 +28,7 @@ class DatabaseManager {
 // Settings Table Columns
   String appName = "appName";
   String appVersion = "appVersion";
-  String language = "language";
+  String appLanguage = "appLanguage ";
   String theme = "theme";
   String focusMode = "focusMode";
   String description = "description";
@@ -40,11 +39,13 @@ class DatabaseManager {
   Future<void> databaseInit() async {
     database = await openDatabase(_alarmDatabaseName, version: _version,
         onCreate: (db, version) async {
-      await _createDatabase(db);
+      await _createTableSettings(db);
+      await _createTableAlarms(db);
+      // await initSettings();
     });
   }
 
-  Future<void> _createDatabase(Database db) async {
+  Future<void> _createTableAlarms(Database db) async {
     String sql1 =
         '''CREATE TABLE IF NOT EXISTS $_alarmTable ( id INTEGER PRIMARY KEY AUTOINCREMENT,
          $alarmId INTEGER,
@@ -56,7 +57,18 @@ class DatabaseManager {
          $distance DOUBLE,
          $address TEXT )''';
     await db.execute(sql1);
-    initSettings(db);
+  }
+
+  Future<void> _createTableSettings(Database db) async {
+    String sql2 = '''CREATE TABLE IF NOT EXISTS $_settingsTable (
+         $appName TEXT,
+         $appVersion TEXT,
+         $appLanguage  TEXT,
+         $theme TEXT,
+         $focusMode INTEGER,
+         $description TEXT )''';
+
+    await db.execute(sql2);
   }
 
   Future<bool> addAlarm(Alarm _alarm) async {
@@ -148,28 +160,48 @@ class DatabaseManager {
 
   ///////////////////////// Settings DB /////////////////////////
 
-  Future<bool> initSettings(Database db) async {
+  Future<void> initSettings() async {
     if (database == null) databaseInit();
-    String sql2 = '''CREATE TABLE IF NOT EXISTS $_alarmTable (
-         $appName TEXT,
-         $appVersion TEXT,
-         $language TEXT,
-         $theme TEXT,
-         $focusMode INTEGER,
-         $description TEXT )''';
 
-    await db.execute(sql2);
+    final isSettingsEnable = await getSettingsCount();
+    if (isSettingsEnable == 0) {
+      Settings initSettings = new Settings();
+      initSettings.appName = ApplicationConstants.APP_NAME;
+      initSettings.appVersion = ApplicationConstants.APP_VERSION;
+      initSettings.appLanguage = "en";
+      initSettings.focusMode = 0;
+      await database!.insert(_settingsTable, initSettings.toJson());
+    }
+  }
 
-    Settings initSettings = new Settings();
-    initSettings.appName = "Arealarm";
-    initSettings.appVersion = "0.9.0";
-    initSettings.appLanguage = "EN";
-    initSettings.focusMode = 0;
+  Future<void> updateSettigs(Settings _settings) async {
+    if (database == null) databaseInit();
 
-    final isAdded =
-        await database!.insert(_settingsTable, initSettings.toJson());
+    final isSettingsEnable = await getSettingsCount();
+    if (isSettingsEnable > 0) {
+      await database!.update(_settingsTable, _settings.toJson());
+    } else {
+      initSettings();
+    }
+  }
 
-    return isAdded >= 0 ? true : false;
+  Future<Settings?> getSettings() async {
+    if (database == null) databaseInit();
+    final settings = await database!.query(_settingsTable,
+        columns: [appName, appVersion, focusMode, appLanguage]);
+
+    if (settings.isNotEmpty)
+      return Settings.fromJson(settings.first);
+    else
+      return null;
+  }
+
+  Future<int> getSettingsCount() async {
+    if (database == null) databaseInit();
+    final settings = await database!.query(
+      _settingsTable,
+    );
+    return settings.length;
   }
 
   Future<void> close() async {

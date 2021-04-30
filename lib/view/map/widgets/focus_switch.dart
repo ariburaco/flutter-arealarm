@@ -37,7 +37,7 @@ Positioned buildFocusSwitch(BuildContext context) {
           Switch(
               splashRadius: 20,
               value: Provider.of<AlarmProvider>(context, listen: false)
-                  .getFocusMode(),
+                  .getFocusMode,
               onChanged: (bool val) {
                 Provider.of<AlarmProvider>(context, listen: false)
                     .changeFocus(val);

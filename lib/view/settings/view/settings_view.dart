@@ -68,7 +68,8 @@ class _SettingsViewState extends State<SettingsView> {
             Padding(
               padding: context.paddingLowHorizontal,
               child: DropdownButton<Locale>(
-                value: context.locale,
+                value: Provider.of<AlarmProvider>(context, listen: false)
+                    .getAppLanguage,
                 items: context.supportedLocales.map((locale) {
                   return DropdownMenuItem(
                     child: new Text(locale.toLanguageTag()),
@@ -76,7 +77,8 @@ class _SettingsViewState extends State<SettingsView> {
                   );
                 }).toList(),
                 onChanged: (Locale? locale) {
-                  context.setLocale(locale!);
+                  Provider.of<AlarmProvider>(context, listen: false)
+                      .changeCurrentLanguage(locale!);
                 },
               ),
             )
@@ -102,7 +104,7 @@ class _SettingsViewState extends State<SettingsView> {
             Switch(
                 splashRadius: 20,
                 value: Provider.of<AlarmProvider>(context, listen: false)
-                    .getFocusMode(),
+                    .getFocusMode,
                 onChanged: (bool val) {
                   Provider.of<AlarmProvider>(context, listen: false)
                       .changeFocus(val);
