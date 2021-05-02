@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -143,8 +144,8 @@ public class LocationService extends Service implements LocationListener {
                 if (nearestPlace != null) {
                     if (nearestPlace.alarmId != -1) {
                         checkInRange();
-                        double distance = Math.round(nearestPlace.distance * 10.0) / 10.0;
-                        String text = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId + " radius: " + nearestPlace.radius;
+                        double distance = Math.round(nearestPlace.distance - nearestPlace.radius);
+                        String text = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId;
                         notifyService(text);
                         Log.i("nearestPlace", text);
                     }

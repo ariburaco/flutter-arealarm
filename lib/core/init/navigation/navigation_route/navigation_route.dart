@@ -1,3 +1,4 @@
+import 'package:Arealarm/view/welcome/view/welcome_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../view/home/view/home_view.dart';
@@ -11,8 +12,10 @@ class NavigationRoute {
 
   Route<dynamic> generateRoute(RouteSettings args) {
     switch (args.name) {
-      case NavigationConstants.TEST_VIEW:
+      case NavigationConstants.HOME_VIEW:
         return normalNavigate(HomeView());
+      case NavigationConstants.WELCOME_VIEW:
+        return normalNavigate(WelcomeView());
       default:
         return MaterialPageRoute(
           builder: (context) => Container(),

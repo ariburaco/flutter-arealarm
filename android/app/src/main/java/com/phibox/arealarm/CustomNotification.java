@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -18,17 +19,17 @@ import static android.app.Notification.PRIORITY_MAX;
 
 
 public class CustomNotification {
-    private String CHANNEL_ID = "10";
+    private String CHANNEL_ID = "6666";
     private String title = "Arealarm";
     private String contentText = "You have reached the place!";
 
     public Context context;
-    public static int notificationId = 1001;
+    public static int notificationId = 6666;
 
     private static NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
 
-    long[] vibrationPattern = new long[]{500, 500, 500, 500, 500, 500, 500, 500, 100};
+    long[] vibrationPattern = new long[]{500, 500};
 
     public CustomNotification(Context _context) {
         context = _context;
@@ -38,12 +39,17 @@ public class CustomNotification {
     private void createNotificationChannel() {
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Arealarm Place Alarm";
+            CharSequence name = "Phibox Arealarm Alarm";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             Uri alarmSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .build();
+
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setSound(alarmSoundUri, null);
+            channel.setSound(alarmSoundUri, audioAttributes);
 
             channel.enableLights(true);
             channel.setLightColor(Color.RED);

@@ -74,9 +74,10 @@ class _AlarmsViewState extends State<AlarmsView>
                 itemBuilder: (BuildContext context, int index) {
                   final currentAlarm = data.alarmList![index];
                   final placeName = currentAlarm.alarmId!;
-                  // final radius = currentAlarm.radius!.toInt();
+                  final radius = currentAlarm.radius!.toInt();
                   final address = currentAlarm.address!;
-                  final distance = currentAlarm.distance!.toStringAsFixed(2);
+                  final distance =
+                      (currentAlarm.distance! - radius).toStringAsFixed(1);
 
                   return Padding(
                     padding: context.paddingLowest,
@@ -191,6 +192,11 @@ class _AlarmsViewState extends State<AlarmsView>
     if (Provider.of<AlarmProvider>(context, listen: true).count > 0) {
       final nearestAlarm =
           Provider.of<AlarmProvider>(context, listen: true).nearestAlarm;
+
+      final placeName = nearestAlarm!.alarmId;
+      final radius = nearestAlarm.radius!.toInt();
+
+      final distance = (nearestAlarm.distance! - radius).toStringAsFixed(1);
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -200,8 +206,7 @@ class _AlarmsViewState extends State<AlarmsView>
           ),
           ShimmerText(
             text: nearestAlarm != null
-                ? "${nearestAlarm.distance!.toStringAsFixed(2)} " +
-                    LocaleKeys.meters.tr()
+                ? "$distance " + LocaleKeys.meters.tr()
                 : "?",
             fontSize: 20,
             duration: 3000,

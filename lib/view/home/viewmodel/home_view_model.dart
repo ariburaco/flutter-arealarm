@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import '../../../core/base/model/base_view_model.dart';
 import '../../alarms/view/alarms_view.dart';
 import '../../map/view/map_view.dart';
-
 part 'home_view_model.g.dart';
 
 class HomeViewModel = _HomeViewModelBase with _$HomeViewModel;
