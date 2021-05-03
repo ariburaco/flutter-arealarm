@@ -2,6 +2,7 @@ import 'package:Arealarm/core/base/extension/context_extension.dart';
 import 'package:Arealarm/core/base/view/base_view.dart';
 import 'package:Arealarm/view/welcome/view_model/welcome_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class WelcomeView extends StatefulWidget {
   WelcomeView({Key? key}) : super(key: key);
@@ -11,21 +12,19 @@ class WelcomeView extends StatefulWidget {
 }
 
 class _WelcomeViewState extends State<WelcomeView> {
-  PageController? pageController;
-  int currentPageIndex = 0;
-  void changePage(int index) {
-    currentPageIndex = index;
-  }
+  WelcomeViewModel? welcomeViewModel;
 
   @override
   Widget build(BuildContext context) {
     return BaseView<WelcomeViewModel>(
       viewModel: WelcomeViewModel(),
       onModelReady: (model) {
-        model.setContext(context);
-        model.init();
+        welcomeViewModel = model;
+        welcomeViewModel!.setContext(context);
+        welcomeViewModel!.init();
       },
-      onPageBuilder: (BuildContext context, WelcomeViewModel value) => Scaffold(
+      onPageBuilder: (BuildContext context, WelcomeViewModel viewModel) =>
+          Scaffold(
         body: SafeArea(
           child: Center(
             child: Column(
@@ -35,32 +34,38 @@ class _WelcomeViewState extends State<WelcomeView> {
                   height: context.normalValue,
                 ),
                 Container(
-                    height: context.height / 2,
-                    child: PageView(
-                        controller: pageController,
-                        onPageChanged: (index) {
-                          changePage(index);
-                        },
-                        children: [
-                          Container(
+                    height: context.height * 0.6,
+                    child: Observer(builder: (_) {
+                      return PageView(
+                          controller: welcomeViewModel!.pageController,
+                          onPageChanged: (index) {
+                            // welcomeViewModel!.getLocationPermissions();
+                          },
+                          children: [
+                            buildLocationPermission(context),
+                            Container(
                               color: context.theme.colorScheme.onBackground,
-                              child: Text("First")),
-                          Container(
-                              color: context.theme.colorScheme.onBackground,
-                              child: Text("Second")),
-                          Container(
-                              color: context.theme.colorScheme.onBackground,
-                              child: Text("Third"))
-                        ])),
-                Padding(
-                  padding: context.paddingHighVertical,
-                  child: Container(
-                    child: ElevatedButton(
-                        onPressed: () {}, child: Text("Get Access")),
-                  ),
-                ),
+                              child: Padding(
+                                padding: context.paddingLowVertical,
+                                child: Container(
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        welcomeViewModel!.getStarted();
+                                      },
+                                      child: Text(
+                                        "Get Started",
+                                        style: context.textTheme.button,
+                                      )),
+                                ),
+                              ),
+                            ),
+                            Container(
+                                color: context.theme.colorScheme.onBackground,
+                                child: Text("Third"))
+                          ]);
+                    })),
                 SizedBox(
-                  height: context.lowestValue,
+                  height: context.highValue,
                 ),
                 buildProgressBar(context),
                 SizedBox(
@@ -70,6 +75,35 @@ class _WelcomeViewState extends State<WelcomeView> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Container buildLocationPermission(BuildContext context) {
+    return Container(
+      color: context.theme.colorScheme.onBackground,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            width: 200,
+            height: 150,
+          ),
+          Padding(
+            padding: context.paddingLowVertical,
+            child: Container(
+              child: ElevatedButton(
+                  onPressed: () {
+                    welcomeViewModel!.getLocationPermissions();
+                    welcomeViewModel!.changePage(1);
+                  },
+                  child: Text(
+                    "Get Location Permissions",
+                    style: context.textTheme.button,
+                  )),
+            ),
+          ),
+        ],
       ),
     );
   }

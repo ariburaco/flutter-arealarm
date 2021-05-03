@@ -35,7 +35,6 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
       SettingsView(),
     ];
     Provider.of<AlarmProvider>(context, listen: false).getCurrentSettings();
-    getPermissions();
   }
 
   PageView buildPageView() {
@@ -50,19 +49,5 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
   @action
   void changePage(int index) {
     currentPageIndex = index;
-  }
-
-  Future<void> getPermissions() async {
-    var locationStatus = await Permission.locationAlways.request();
-    if (locationStatus == PermissionStatus.granted) {
-      BackgroundServiceManager.instance.startAlarmService();
-    }
-
-    //await Permission.notification.request();
-
-    await Permission.ignoreBatteryOptimizations.request();
-    // if (await Permission.location.isRestricted) {
-    //   // The OS restricts access, for example because of parental controls.
-    // }
   }
 }
