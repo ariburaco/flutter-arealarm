@@ -26,7 +26,7 @@ abstract class _HomeViewModelBase with Store, BaseViewModel {
   @override
   void init() {
     Provider.of<AlarmProvider>(context, listen: true).context = context;
-
+    BackgroundServiceManager.instance.startAlarmService();
     pageController =
         new PageController(initialPage: currentPageIndex, keepPage: true);
     pages = <Widget>[
