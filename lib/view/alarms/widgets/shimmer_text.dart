@@ -7,11 +7,13 @@ class ShimmerText extends StatelessWidget {
     Key? key,
     required this.text,
     required this.duration,
-    this.fontSize,
     this.textStyle,
+    required this.color,
+    this.fontSize,
   }) : super(key: key);
 
   final String text;
+  final Color color;
   final int duration;
   final double? fontSize;
   final TextStyle? textStyle;
@@ -28,7 +30,7 @@ class ShimmerText extends StatelessWidget {
             text,
             style: textStyle == null
                 ? TextStyle(
-                    color: context.colors.primary,
+                    color: color,
                     fontSize: fontSize,
                   )
                 : textStyle,

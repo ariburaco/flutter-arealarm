@@ -25,6 +25,21 @@ mixin _$WelcomeViewModel on _WelcomeViewModelBase, Store {
     });
   }
 
+  final _$isGrantedAtom = Atom(name: '_WelcomeViewModelBase.isGranted');
+
+  @override
+  bool get isGranted {
+    _$isGrantedAtom.reportRead();
+    return super.isGranted;
+  }
+
+  @override
+  set isGranted(bool value) {
+    _$isGrantedAtom.reportWrite(value, super.isGranted, () {
+      super.isGranted = value;
+    });
+  }
+
   final _$pageControllerAtom =
       Atom(name: '_WelcomeViewModelBase.pageController');
 
@@ -39,6 +54,39 @@ mixin _$WelcomeViewModel on _WelcomeViewModelBase, Store {
     _$pageControllerAtom.reportWrite(value, super.pageController, () {
       super.pageController = value;
     });
+  }
+
+  final _$permissionTextAtom =
+      Atom(name: '_WelcomeViewModelBase.permissionText');
+
+  @override
+  String get permissionText {
+    _$permissionTextAtom.reportRead();
+    return super.permissionText;
+  }
+
+  @override
+  set permissionText(String value) {
+    _$permissionTextAtom.reportWrite(value, super.permissionText, () {
+      super.permissionText = value;
+    });
+  }
+
+  final _$getLocationPermissionsAsyncAction =
+      AsyncAction('_WelcomeViewModelBase.getLocationPermissions');
+
+  @override
+  Future<void> getLocationPermissions() {
+    return _$getLocationPermissionsAsyncAction
+        .run(() => super.getLocationPermissions());
+  }
+
+  final _$checkPermissionsAsyncAction =
+      AsyncAction('_WelcomeViewModelBase.checkPermissions');
+
+  @override
+  Future<void> checkPermissions() {
+    return _$checkPermissionsAsyncAction.run(() => super.checkPermissions());
   }
 
   final _$_WelcomeViewModelBaseActionController =
@@ -59,7 +107,9 @@ mixin _$WelcomeViewModel on _WelcomeViewModelBase, Store {
   String toString() {
     return '''
 currentPageIndex: ${currentPageIndex},
-pageController: ${pageController}
+isGranted: ${isGranted},
+pageController: ${pageController},
+permissionText: ${permissionText}
     ''';
   }
 }

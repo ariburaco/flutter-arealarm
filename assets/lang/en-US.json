@@ -11,5 +11,9 @@
     "alarm": "Alarm",
     "language": "Language",
     "settings": "Settings",
-    "focusMode": "Focus"
+    "focusMode": "Focus",
+    "getStarted": "Get Started",
+    "getLocationPermissions": "Get Location Permissions",
+    "permissionsAwaiting": "Permission awaiting!",
+    "permissionsGranted": "Permissions Granted!"
 }

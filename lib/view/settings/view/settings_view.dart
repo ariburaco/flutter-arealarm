@@ -46,10 +46,28 @@ class _SettingsViewState extends State<SettingsView> {
                   children: [
                     buildFocusSettings(context),
                     buildLanguageChoice(context),
+                    buildCheckPermissions(context, viewmodel)
                   ],
                 )),
               ),
             ));
+  }
+
+  Padding buildCheckPermissions(
+      BuildContext context, SettingsViewModel viewmodel) {
+    return Padding(
+        padding: context.paddingLowHorizontal,
+        child: ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(
+                  context.theme.colorScheme.secondary),
+              foregroundColor: MaterialStateProperty.all<Color>(
+                  context.theme.colorScheme.primary),
+            ),
+            onPressed: viewmodel.gotoWelcomPage,
+            child: Text(
+              LocaleKeys.getLocationPermissions.tr(),
+            )));
   }
 
   Card buildLanguageChoice(BuildContext context) {

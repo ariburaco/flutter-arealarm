@@ -14,5 +14,9 @@ abstract class  LocaleKeys {
   static const language = 'language';
   static const settings = 'settings';
   static const focusMode = 'focusMode';
+  static const getStarted = 'getStarted';
+  static const getLocationPermissions = 'getLocationPermissions';
+  static const permissionsAwaiting = 'permissionsAwaiting';
+  static const permissionsGranted = 'permissionsGranted';
 
 }

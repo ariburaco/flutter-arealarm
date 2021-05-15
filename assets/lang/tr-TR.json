@@ -11,6 +11,10 @@
     "alarm": "Alarm",
     "language": "Dil",
     "settings": "Ayarlar",
-    "focusMode": "Odakla"
+    "focusMode": "Odakla",
+    "getStarted": "Başla!",
+    "getLocationPermissions": "Konum İzinlerini Al",
+    "permissionsAwaiting": "İzinler Bekleniyor!",
+    "permissionsGranted": "İzinler Alındı!"
 
 }

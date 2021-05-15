@@ -67,6 +67,7 @@ class _GoogleMapViewState extends State<GoogleMapView>
   FloatingActionButton buildFloatingActionButton(
       BuildContext context, GoogleMapViewModel viewmodel) {
     return FloatingActionButton(
+        heroTag: null,
         backgroundColor: context.theme.colorScheme.primary,
         child: IconNormal(icon: Icons.location_pin),
         onPressed: () {

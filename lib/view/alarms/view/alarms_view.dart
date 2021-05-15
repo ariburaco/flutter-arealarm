@@ -57,6 +57,7 @@ class _AlarmsViewState extends State<AlarmsView>
                 ],
               ),
               floatingActionButton: FloatingActionButton(
+                  heroTag: null,
                   backgroundColor: context.theme.colorScheme.secondary,
                   child: IconNormal(icon: Icons.delete),
                   onPressed: () async {
@@ -110,25 +111,29 @@ class _AlarmsViewState extends State<AlarmsView>
                                   child: AutoSizeText(
                                     LocaleKeys.alarm.tr() + " #$placeName",
                                     maxLines: 1,
-                                    minFontSize: 18,
-                                    style: context.textTheme.subtitle2,
+                                    minFontSize: 30,
+                                    style: TextStyle(
+                                        color: context
+                                            .theme.colorScheme.primaryVariant),
                                   ),
                                 ),
+                                // Padding(
+                                //   padding: const EdgeInsets.all(8.0),
+                                //   child: Text(
+                                //     address.toString(),
+                                //     style: context.textTheme.subtitle1,
+                                //   ),
+                                // ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    address.toString(),
-                                    style: context.textTheme.subtitle1,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ShimmerText(
-                                    text: distance == "-1.00"
+                                  child: AutoSizeText(
+                                    distance == "-1.00"
                                         ? "..."
                                         : "${distance.toString()} " +
                                             LocaleKeys.leftMeters.tr(),
-                                    duration: 3000,
+                                    style: TextStyle(
+                                        color: context
+                                            .theme.colorScheme.onPrimary),
                                   ),
                                 )
                               ],
@@ -182,8 +187,8 @@ class _AlarmsViewState extends State<AlarmsView>
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            context.theme.colorScheme.primaryVariant,
-            context.theme.colorScheme.onPrimary
+            context.theme.colorScheme.secondary,
+            context.theme.colorScheme.primary
           ],
         ));
   }
@@ -205,6 +210,7 @@ class _AlarmsViewState extends State<AlarmsView>
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           ShimmerText(
+            color: context.theme.colorScheme.onPrimary,
             text: nearestAlarm != null
                 ? "$distance " + LocaleKeys.meters.tr()
                 : "?",
@@ -227,6 +233,7 @@ class _AlarmsViewState extends State<AlarmsView>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ShimmerText(
+            color: context.theme.colorScheme.onPrimary,
             text: LocaleKeys.alarm.tr(),
             fontSize: 30,
             duration: 4000,
