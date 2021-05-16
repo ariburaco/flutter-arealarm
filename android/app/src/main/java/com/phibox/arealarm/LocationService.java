@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -41,6 +42,7 @@ public class LocationService extends Service implements LocationListener {
 
     double latitude = 0;
     double longitude = 0;
+    boolean isServiceEnabled = false;
 
     Location location;
     LocationManager locationManager;
@@ -49,21 +51,32 @@ public class LocationService extends Service implements LocationListener {
     NotificationCompat.Builder builder;
     List<AlarmPlace> placeList = new ArrayList<>();
     AlarmPlace nearestPlace;
+    BroadcastReceiver actionReciever;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
+        startService();
+    }
 
+    private void startService(){
         getActiveAlarmsFromDB();
         startLocationServiceWithNotification();
         registerNotificationReciever();
     }
 
+
+
     private void registerNotificationReciever() {
-        IntentFilter filter = new IntentFilter(Constants.GOT_IT);
-        BroadcastReceiver mReceiver = new NotificationReceiver();
-        registerReceiver(mReceiver, filter);
+        IntentFilter gotItIntent = new IntentFilter(Constants.GOT_IT);
+        actionReciever = new NotificationReceiver();
+        registerReceiver(actionReciever, gotItIntent);
+    }
+
+
+    private void unregisterNotificationReciever(){
+        unregisterReceiver(actionReciever);
     }
 
     private void getActiveAlarmsFromDB() {
@@ -79,6 +92,7 @@ public class LocationService extends Service implements LocationListener {
         getLocation();
         getServiceNotification();
         startForeground(SERVICE_NOTIFICATION, builder.build());
+        isServiceEnabled = true;
     }
 
     private void createAlarmNotification() {
@@ -91,7 +105,6 @@ public class LocationService extends Service implements LocationListener {
         if (nearestPlace.alarmId != -1) {
             if (nearestPlace.distance <= nearestPlace.radius) {
                 inRange = true;
-
                 createAlarmNotification();
             } else {
                 inRange = false;
@@ -145,7 +158,8 @@ public class LocationService extends Service implements LocationListener {
                     if (nearestPlace.alarmId != -1) {
                         checkInRange();
                         double distance = Math.round(nearestPlace.distance - nearestPlace.radius);
-                        String text = "Nearest target: " + distance + " meters at Alarm #" + nearestPlace.alarmId;
+                        if (distance <= 0) distance = 0;
+                        String text = "Nearest Alarm in " + distance + " meters at #" + nearestPlace.alarmId;
                         notifyService(text);
                         Log.i("nearestPlace", text);
                     }
@@ -164,8 +178,11 @@ public class LocationService extends Service implements LocationListener {
     }
 
     public void notifyService(String text) {
-        builder.setContentText(text);
-        mNotificationManager.notify(SERVICE_NOTIFICATION, builder.build());
+        if (isServiceEnabled) {
+            builder.setContentText(text);
+            mNotificationManager.notify(SERVICE_NOTIFICATION, builder.build());
+
+        }
     }
 
     public Notification getServiceNotification() {
@@ -177,16 +194,28 @@ public class LocationService extends Service implements LocationListener {
         else {
             channel = "";
         }
+        Intent stopIntent = new Intent(getApplicationContext(), LocationService.class);
+        stopIntent.setAction(Constants.STOP_SERVICE);
+        //stopIntent.putExtra("stopInt", 10);
+
+        PendingIntent pendingIntentStop = PendingIntent.getService(this, 111, stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Action stopAction =
+                new NotificationCompat.Action.Builder(0, "STOP", pendingIntentStop)
+                        .build();
+
 
         builder = new NotificationCompat.Builder(this, channel)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("Arealarm Service")
+                .addAction(stopAction)
                 .setContentText("No Active Alarms");
 
         Notification notification = builder
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(PRIORITY_MAX)
                 .setNotificationSilent()
+
                 //.setSound(uri)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
@@ -203,7 +232,7 @@ public class LocationService extends Service implements LocationListener {
 
     public AlarmPlace getNearestLocation() {
         AlarmPlace nearestAlarmPlace = new AlarmPlace();
-        Collections.sort(placeList, (l1, l2) -> Double.compare(l1.distance, l2.distance));
+        Collections.sort(placeList, (l1, l2) -> Double.compare((l1.distance - l1.radius), (l2.distance - l2.radius)));
         if (placeList != null) {
             if (placeList.size() > 0) {
                 nearestAlarmPlace = placeList.get(0);
@@ -247,6 +276,37 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            String stopAction = intent.getAction();
+            if (stopAction != null) {
+                if (intent.getAction().equals(Constants.STOP_SERVICE)) {
+                    Log.i("LOG_TAG", "Received Stop Foreground Intent");
+                    unregisterNotificationReciever();
+                    locationManager.removeUpdates(this);
+                    stopForeground(true);
+                    stopSelf();
+                    isServiceEnabled = false;
+
+
+                    return START_NOT_STICKY;
+                } else {
+                    Log.i("No Match ", "STOP_SERVICE");
+
+                }
+
+            } else {
+                Log.i("Null ", "No stopAction");
+
+            }
+
+
+        } else {
+
+
+            Log.i("Start ", "Start Servieccececece");
+
+        }
+
         return START_STICKY;
     }
 

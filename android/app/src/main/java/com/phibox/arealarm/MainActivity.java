@@ -83,16 +83,6 @@ public class MainActivity extends FlutterActivity {
 
 
 
-    private void stopBackgroundService() {
-        Intent serviceStopIntent = new Intent(MainActivity.this, LocationService.class);
-        serviceStopIntent.setAction(Constants.STOPFOREGROUND_ACTION);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(context, serviceStopIntent);
-        } else {
-            startService(serviceStopIntent);
-        }
-    }
-
 
     public void startBackgroundAlarmService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -110,6 +100,7 @@ public class MainActivity extends FlutterActivity {
                 return true;
             }
         }
+
         return false;
     }
 

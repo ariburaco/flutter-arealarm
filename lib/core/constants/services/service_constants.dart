@@ -1,5 +1,5 @@
 class ServiceConstants {
-  static const LocationServiceChannel = 'com.example.flutter_template/location';
+  static const LocationServiceChannel = 'com.phibox.arealarm/location';
 
   static const StartAlarmService = 'startAlarmService';
   static const StopAllAlarmServices = 'stopAllAlarmServices';

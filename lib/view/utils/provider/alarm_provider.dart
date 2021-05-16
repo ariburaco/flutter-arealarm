@@ -279,10 +279,14 @@ class AlarmProvider extends ChangeNotifier {
     for (var alarms in alarmList!) {
       alarms.distance = Geolocator.distanceBetween(alarms.lat!, alarms.long!,
           currentPosition.latitude, currentPosition.longitude);
+      // alarms.distance = alarms.distance! - alarms.radius!;
     }
     if (alarmList!.isNotEmpty) {
-      alarmList!.sort((a, b) => a.distance!.compareTo(b.distance!));
+      alarmList!.sort((a, b) =>
+          (a.distance! - a.radius!).compareTo((b.distance! - b.radius!)));
       nearestAlarm = alarmList!.first;
+    } else {
+      nearestAlarm = null;
     }
     notifyListeners();
   }

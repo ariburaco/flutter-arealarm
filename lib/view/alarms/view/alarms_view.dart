@@ -77,9 +77,10 @@ class _AlarmsViewState extends State<AlarmsView>
                   final placeName = currentAlarm.alarmId!;
                   final radius = currentAlarm.radius!.toInt();
                   final address = currentAlarm.address!;
-                  final distance =
-                      (currentAlarm.distance! - radius).toStringAsFixed(1);
+                  var distance = (currentAlarm.distance! - radius);
+                  if (distance <= 0) distance = 0;
 
+                  var distanceStr = distance.toStringAsFixed(1);
                   return Padding(
                     padding: context.paddingLowest,
                     child: AnimatedContainer(
@@ -127,10 +128,8 @@ class _AlarmsViewState extends State<AlarmsView>
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: AutoSizeText(
-                                    distance == "-1.00"
-                                        ? "..."
-                                        : "${distance.toString()} " +
-                                            LocaleKeys.leftMeters.tr(),
+                                    "${distanceStr.toString()} " +
+                                        LocaleKeys.leftMeters.tr(),
                                     style: TextStyle(
                                         color: context
                                             .theme.colorScheme.onPrimary),
@@ -198,27 +197,33 @@ class _AlarmsViewState extends State<AlarmsView>
       final nearestAlarm =
           Provider.of<AlarmProvider>(context, listen: true).nearestAlarm;
 
-      final placeName = nearestAlarm!.alarmId;
-      final radius = nearestAlarm.radius!.toInt();
+      if (nearestAlarm != null) {
+        final radius = nearestAlarm.radius!.toInt();
+        var distance = (nearestAlarm.distance! - radius);
+        if (distance <= 0) distance = 0;
 
-      final distance = (nearestAlarm.distance! - radius).toStringAsFixed(1);
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            LocaleKeys.nearestAlarm.tr(),
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          ShimmerText(
-            color: context.theme.colorScheme.onPrimary,
-            text: nearestAlarm != null
-                ? "$distance " + LocaleKeys.meters.tr()
-                : "?",
-            fontSize: 20,
-            duration: 3000,
-          ),
-        ],
-      );
+        var distanceStr = distance.toStringAsFixed(1);
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              LocaleKeys.nearestAlarm.tr(),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            ShimmerText(
+              color: context.theme.colorScheme.onPrimary,
+              text: "$distanceStr " + LocaleKeys.meters.tr(),
+              fontSize: 20,
+              duration: 3000,
+            ),
+          ],
+        );
+      } else {
+        return Center(
+          child: Container(),
+        );
+      }
     } else {
       return Center(
         child: Container(),
