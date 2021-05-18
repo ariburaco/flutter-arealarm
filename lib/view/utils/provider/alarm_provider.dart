@@ -32,6 +32,7 @@ class AlarmProvider extends ChangeNotifier {
   bool isSelectedPlaceAlive = false;
   double radius = 50;
 
+  TextEditingController noteTextController = TextEditingController();
   AnimationController? animationController;
 
   bool _focusPlaces = false;
@@ -346,14 +347,17 @@ class AlarmProvider extends ChangeNotifier {
           radius: selectedPlace?.radius,
           lat: selectedPlace?.position.latitude,
           long: selectedPlace?.position.longitude,
-          address: selectedPlace?.address);
+          address: noteTextController.text);
 
       addAlarmToDB(newAlarm);
     } else {
       // TODO Show Snackbar Alarm Added or Not!
     }
     addMarkerProcces = false;
+    moveBoundriesDirectly();
+    //noteTextController = new TextEditingController();
     checkSelectedIsPlaceAddedToDB();
+    animationController!.forward();
     notifyListeners();
   }
 
@@ -366,7 +370,7 @@ class AlarmProvider extends ChangeNotifier {
           radius: selectedPlace?.radius,
           lat: selectedPlace?.position.latitude,
           long: selectedPlace?.position.longitude,
-          address: selectedPlace?.address);
+          address: noteTextController.text);
 
       // BackgroundServiceManager.instance.updateAlarmFromBGService(newAlarm);
       updateAlarm(selectedPlace!.id, newAlarm);
@@ -401,6 +405,7 @@ class AlarmProvider extends ChangeNotifier {
 
   Future<void> addPlaceMarker(LatLng position, BuildContext context) async {
     addMarkerProcces = true;
+    noteTextController = new TextEditingController();
     animationController!.reverse();
     count++;
     String placeId = "place_$count";
@@ -433,7 +438,6 @@ class AlarmProvider extends ChangeNotifier {
     selectedPlace = currentMapPlace;
     addMapPlaces(currentMapPlace);
     await checkSelectedIsPlaceAddedToDB();
-    moveToBounderies();
 
     notifyListeners();
   }
@@ -447,6 +451,9 @@ class AlarmProvider extends ChangeNotifier {
     if (matchedPlace.length > 0) {
       selectedPlace = matchedPlace.first;
       radius = selectedPlace!.radius;
+      var addressMatch =
+          alarmList!.where((element) => element.alarmId == selectedPlace!.id);
+      noteTextController.text = addressMatch.first.address!;
       print("selected place radius: $radius");
     } else {
       print("No Match for marker");
@@ -531,6 +538,17 @@ class AlarmProvider extends ChangeNotifier {
       } else {
         navigateToCurrentPosition();
       }
+    }
+  }
+
+  Future<void> moveBoundriesDirectly() async {
+    if (markers.isNotEmpty) {
+      var bounds = await _bounds(markers.toSet());
+      double padding = markers.length == 0 ? 200 : 100;
+      await mapController!
+          .animateCamera(CameraUpdate.newLatLngBounds(bounds, padding));
+    } else {
+      navigateToCurrentPosition();
     }
   }
 

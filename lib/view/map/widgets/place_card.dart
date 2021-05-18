@@ -18,15 +18,15 @@ Widget buildPlaceCard(
       // onTapDown: (TapDownDetails details) => _onTapDown(details),
       //onVerticalDragDown: (DragDownDetails details) => _onTapDown(details),
       child: Padding(
-        padding: EdgeInsets.only(top: 400.0),
+        padding: EdgeInsets.only(top: context.height * 0.4),
         child: Container(
-          height: 180,
-          width: 320,
+          height: context.height * 0.25,
+          width: context.width * 0.8,
           // color: context.colors.background,
           decoration: buildBoxDecoration(context),
 
           child: Padding(
-            padding: context.paddingLow,
+            padding: context.paddingLowest,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,6 +58,25 @@ Widget buildPlaceCard(
                                     .radius
                                     .toStringAsFixed(0) +
                                 " ${LocaleKeys.meters.tr()}")),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(child: Text("Note")),
+                    Container(
+                      width: context.width * 0.6,
+                      height: 30,
+                      child: TextField(
+                        controller:
+                            Provider.of<AlarmProvider>(context, listen: false)
+                                .noteTextController,
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(5),
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter a note'),
+                      ),
+                    )
                   ],
                 ),
                 Container(
@@ -133,8 +152,8 @@ SliderTheme buildCustomSlider(BuildContext context) {
       child: Slider(
         value: Provider.of<AlarmProvider>(context, listen: false).radius,
         min: 50,
-        max: 2500,
-        divisions: 49,
+        max: 1500,
+        divisions: 29,
         label: Provider.of<AlarmProvider>(context, listen: false)
                 .radius
                 .round()

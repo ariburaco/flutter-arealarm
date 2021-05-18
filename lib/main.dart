@@ -1,6 +1,7 @@
 import 'package:Arealarm/view/welcome/view/welcome_view.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'core/init/cache/HiveStorage.dart';
 import 'view/utils/database/database_manager.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await DatabaseManager.instance.databaseInit();
   await HiveStorage.instance.checkFirstUsage();
+  await MobileAds.instance.initialize();
 
   //LocalNotifications.instance.initNotifications();
 

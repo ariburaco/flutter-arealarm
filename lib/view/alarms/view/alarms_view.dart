@@ -1,6 +1,7 @@
 import 'package:Arealarm/core/init/lang/locale_keys.g.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../core/base/extension/context_extension.dart';
@@ -48,6 +49,7 @@ class _AlarmsViewState extends State<AlarmsView>
                     padding: context.paddingLow,
                     child: buildNextAlarmIndicator(viewModel),
                   ),
+                  createaBannerAd(),
                   Expanded(
                     child: Padding(
                       padding: EdgeInsets.only(bottom: 50.0),
@@ -65,6 +67,45 @@ class _AlarmsViewState extends State<AlarmsView>
                         .deleteAllAlarms();
                   }),
             ));
+  }
+
+  Container createaBannerAd() {
+    final BannerAd myBanner = BannerAd(
+      adUnitId: 'ca-app-pub-9331991014591087/5000831383',
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: AdListener(),
+    );
+
+    final AdSize adSize = AdSize(width: 300, height: 50);
+
+    final AdListener listener = AdListener(
+      // Called when an ad is successfully received.
+      onAdLoaded: (Ad ad) => print('Ad loaded.'),
+      // Called when an ad request failed.
+      onAdFailedToLoad: (Ad ad, LoadAdError error) {
+        ad.dispose();
+        print('Ad failed to load: $error');
+      },
+      // Called when an ad opens an overlay that covers the screen.
+      onAdOpened: (Ad ad) => print('Ad opened.'),
+      // Called when an ad removes an overlay that covers the screen.
+      onAdClosed: (Ad ad) => print('Ad closed.'),
+      // Called when an ad is in the process of leaving the application.
+      onApplicationExit: (Ad ad) => print('Left application.'),
+    );
+
+    myBanner.load();
+    final AdWidget adWidget = AdWidget(ad: myBanner);
+
+    final Container adContainer = Container(
+      alignment: Alignment.center,
+      child: adWidget,
+      width: myBanner.size.width.toDouble(),
+      height: myBanner.size.height.toDouble(),
+    );
+
+    return adContainer;
   }
 
   Widget buildAlarmList(AlarmsViewModel viewModel) {
@@ -93,7 +134,7 @@ class _AlarmsViewState extends State<AlarmsView>
                           Expanded(
                             flex: 1,
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: context.paddingLowest,
                               child: Icon(
                                 Icons.location_pin,
                                 size: 50,
@@ -108,7 +149,7 @@ class _AlarmsViewState extends State<AlarmsView>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: context.paddingLowest,
                                   child: AutoSizeText(
                                     LocaleKeys.alarm.tr() + " #$placeName",
                                     maxLines: 1,
@@ -118,15 +159,20 @@ class _AlarmsViewState extends State<AlarmsView>
                                             .theme.colorScheme.primaryVariant),
                                   ),
                                 ),
-                                // Padding(
-                                //   padding: const EdgeInsets.all(8.0),
-                                //   child: Text(
-                                //     address.toString(),
-                                //     style: context.textTheme.subtitle1,
-                                //   ),
-                                // ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: context.paddingLowest,
+                                  child: AutoSizeText(
+                                    address.toString(),
+                                    maxLines: 1,
+                                    minFontSize: 18,
+                                    style: context.textTheme.subtitle2!
+                                        .copyWith(
+                                            color: context.theme.colorScheme
+                                                .primaryVariant),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: context.paddingLowest,
                                   child: AutoSizeText(
                                     "${distanceStr.toString()} " +
                                         LocaleKeys.leftMeters.tr(),
@@ -141,7 +187,7 @@ class _AlarmsViewState extends State<AlarmsView>
                           Expanded(
                             flex: 1,
                             child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: context.paddingLowest,
                                 child: IconButton(
                                   icon: Icon(
                                     Icons.delete,

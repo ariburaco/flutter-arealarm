@@ -71,7 +71,8 @@ class _GoogleMapViewState extends State<GoogleMapView>
         backgroundColor: context.theme.colorScheme.primary,
         child: IconNormal(icon: Icons.location_pin),
         onPressed: () {
-          Provider.of<AlarmProvider>(context, listen: false).moveToBounderies();
+          Provider.of<AlarmProvider>(context, listen: false)
+              .moveBoundriesDirectly();
         });
   }
 
@@ -93,6 +94,8 @@ class _GoogleMapViewState extends State<GoogleMapView>
       onLongPress: (LatLng pos) {
         Provider.of<AlarmProvider>(context, listen: false)
             .addPlaceMarker(pos, context);
+        Provider.of<AlarmProvider>(context, listen: false)
+            .navigateToPosition(pos);
       },
       onMapCreated: (map) => Provider.of<AlarmProvider>(context, listen: false)
           .mapsInit(map, animationController),
