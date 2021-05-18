@@ -4,7 +4,7 @@
     <application
 
         android:icon="@mipmap/ic_launcher"
-        android:label="Arealarm">
+        android:label="Arealarm from Phibox">
 
 
         <activity

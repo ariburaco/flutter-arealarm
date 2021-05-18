@@ -67,13 +67,11 @@ public class LocationService extends Service implements LocationListener {
     }
 
 
-
     private void registerNotificationReciever() {
         IntentFilter gotItIntent = new IntentFilter(Constants.GOT_IT);
         actionReciever = new NotificationReceiver();
         registerReceiver(actionReciever, gotItIntent);
     }
-
 
     private void unregisterNotificationReciever(){
         unregisterReceiver(actionReciever);
@@ -286,8 +284,6 @@ public class LocationService extends Service implements LocationListener {
                     stopForeground(true);
                     stopSelf();
                     isServiceEnabled = false;
-
-
                     return START_NOT_STICKY;
                 } else {
                     Log.i("No Match ", "STOP_SERVICE");
