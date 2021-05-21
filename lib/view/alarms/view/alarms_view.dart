@@ -1,3 +1,4 @@
+import 'package:Arealarm/core/init/ads_manager/ads_manager.dart';
 import 'package:Arealarm/core/init/lang/locale_keys.g.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class _AlarmsViewState extends State<AlarmsView>
                     padding: context.paddingLow,
                     child: buildNextAlarmIndicator(viewModel),
                   ),
-                  createaBannerAd(),
+                  AdsManager.instance.createaBannerAd(context),
                   Expanded(
                     child: Padding(
                       padding: EdgeInsets.only(bottom: 50.0),
@@ -67,45 +68,6 @@ class _AlarmsViewState extends State<AlarmsView>
                         .deleteAllAlarms();
                   }),
             ));
-  }
-
-  Container createaBannerAd() {
-    final BannerAd myBanner = BannerAd(
-      adUnitId: 'ca-app-pub-9331991014591087/5000831383',
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: AdListener(),
-    );
-
-    final AdSize adSize = AdSize(width: 300, height: 50);
-
-    final AdListener listener = AdListener(
-      // Called when an ad is successfully received.
-      onAdLoaded: (Ad ad) => print('Ad loaded.'),
-      // Called when an ad request failed.
-      onAdFailedToLoad: (Ad ad, LoadAdError error) {
-        ad.dispose();
-        print('Ad failed to load: $error');
-      },
-      // Called when an ad opens an overlay that covers the screen.
-      onAdOpened: (Ad ad) => print('Ad opened.'),
-      // Called when an ad removes an overlay that covers the screen.
-      onAdClosed: (Ad ad) => print('Ad closed.'),
-      // Called when an ad is in the process of leaving the application.
-      onApplicationExit: (Ad ad) => print('Left application.'),
-    );
-
-    myBanner.load();
-    final AdWidget adWidget = AdWidget(ad: myBanner);
-
-    final Container adContainer = Container(
-      alignment: Alignment.center,
-      child: adWidget,
-      width: myBanner.size.width.toDouble(),
-      height: myBanner.size.height.toDouble(),
-    );
-
-    return adContainer;
   }
 
   Widget buildAlarmList(AlarmsViewModel viewModel) {

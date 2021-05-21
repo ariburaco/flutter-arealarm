@@ -1,3 +1,4 @@
+import 'package:Arealarm/core/init/ads_manager/ads_manager.dart';
 import 'package:Arealarm/view/map/widgets/focus_switch.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -38,30 +39,34 @@ class _GoogleMapViewState extends State<GoogleMapView>
     super.build(context);
 
     return BaseView<GoogleMapViewModel>(
-        viewModel: GoogleMapViewModel(),
-        onModelReady: (viewmodel) {
-          viewmodel.setContext(context);
-          viewmodel.init();
-          // mapsViewModel.getCurrenPosition();
-        },
-        onPageBuilder: (BuildContext context, GoogleMapViewModel viewmodel) =>
-            Scaffold(
-              body: Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  buildGoogleMap(viewmodel),
-                  buildPlaceCard(context, _offsetFloat, animationController),
-                  buildFocusSwitch(context),
-                ],
-              ),
-              floatingActionButton: Row(
-                children: [
-                  Padding(
-                      padding: EdgeInsets.only(left: 20, bottom: 20),
-                      child: buildFloatingActionButton(context, viewmodel)),
-                ],
-              ),
-            ));
+      viewModel: GoogleMapViewModel(),
+      onModelReady: (viewmodel) {
+        viewmodel.setContext(context);
+        viewmodel.init();
+        // mapsViewModel.getCurrenPosition();
+      },
+      onPageBuilder: (BuildContext context, GoogleMapViewModel viewmodel) =>
+          Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Positioned(
+              top: 0,
+              height: context.height - 100,
+              width: context.width,
+              child: buildGoogleMap(viewmodel)),
+          buildPlaceCard(context, _offsetFloat, animationController),
+          buildFocusSwitch(context),
+          // Positioned(
+          //     top: 0,
+          //     left: 0,
+          //     child: AdsManager.instance.createaBannerAd(context)),
+          Positioned(
+              bottom: 20,
+              left: 20,
+              child: buildFloatingActionButton(context, viewmodel)),
+        ],
+      ),
+    );
   }
 
   FloatingActionButton buildFloatingActionButton(

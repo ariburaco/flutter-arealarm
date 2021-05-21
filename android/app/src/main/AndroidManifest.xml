@@ -4,7 +4,7 @@
     <application
 
         android:icon="@mipmap/ic_launcher"
-        android:label="Arealarm from Phibox">
+        android:label="Arealarm">
 
 
         <activity
@@ -52,7 +52,7 @@
             android:value="2" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB11H77p9Tnxw15cgjXClbexnoQirKUxOA" />
+            android:value="AIzaSyDsWqYWHzOYr2GUh7ChIrlYE0S--xMCU5A" />
 
         <meta-data
             android:name="flutterEmbedding"

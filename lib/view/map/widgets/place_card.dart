@@ -63,7 +63,7 @@ Widget buildPlaceCard(
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(child: Text("Note")),
+                    Container(child: Text(LocaleKeys.note.tr())),
                     Container(
                       width: context.width * 0.6,
                       height: 30,
@@ -74,7 +74,7 @@ Widget buildPlaceCard(
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(5),
                             border: OutlineInputBorder(),
-                            hintText: 'Enter a note'),
+                            hintText: LocaleKeys.optional.tr()),
                       ),
                     )
                   ],

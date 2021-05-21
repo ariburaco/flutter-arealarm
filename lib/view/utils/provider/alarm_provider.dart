@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:Arealarm/core/init/ads_manager/ads_manager.dart';
 import 'package:Arealarm/core/init/lang/language_manager.dart';
 import 'package:Arealarm/view/settings/model/settings_model.dart';
 
@@ -43,6 +44,10 @@ class AlarmProvider extends ChangeNotifier {
   Locale get getAppLanguage => _appLanguage;
   Settings get getAppSettings => _currentSettings = new Settings();
 
+  void getDeviceLocale() {
+    _appLanguage = (LanguageManager.instance.getDeviceLocale(context))!;
+  }
+
   void changeFocus(bool val) {
     _focusPlaces = val;
     updateSettings();
@@ -66,6 +71,8 @@ class AlarmProvider extends ChangeNotifier {
           (element) => element.languageCode == _currentSettings!.appLanguage);
       if (match.isNotEmpty) {
         _appLanguage = match.first;
+      } else {
+        getDeviceLocale();
       }
     }
     notifyListeners();
@@ -233,7 +240,7 @@ class AlarmProvider extends ChangeNotifier {
     if (positionStream != null) {
       if (positionStream!.isPaused) {
         positionStream!.resume();
-        print("RESUME THE STREAM");
+        //print("RESUME THE STREAM");
       }
     } else {
       startLocationStream();

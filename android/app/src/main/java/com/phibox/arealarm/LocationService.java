@@ -96,7 +96,7 @@ public class LocationService extends Service implements LocationListener {
     private void createAlarmNotification() {
         CustomNotification newNotification = new CustomNotification(this);
         newNotification.showNotification(nearestPlace, "You're in the range of place #" + nearestPlace.alarmId);
-        Log.i("NOTIFY", "You're in the range of place #" + nearestPlace.alarmId);
+       // Log.i("NOTIFY", "You're in the range of place #" + nearestPlace.alarmId);
     }
 
     private void checkInRange() {
@@ -122,7 +122,7 @@ public class LocationService extends Service implements LocationListener {
                 if (isGPSEnabled) {
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,
                             this);
-                    Log.d("GPS", "GPS Enabled");
+                    //Log.d("GPS", "GPS Enabled");
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         if (location != null) {
@@ -144,7 +144,7 @@ public class LocationService extends Service implements LocationListener {
         location = loc;
         getActiveAlarmsFromDB();
         updateLocationNotification();
-        Log.i("LOCATION", "onLocationChanged: " + location);
+        //Log.i("LOCATION", "onLocationChanged: " + location);
     }
 
     public void updateLocationNotification() {
@@ -159,15 +159,15 @@ public class LocationService extends Service implements LocationListener {
                         if (distance <= 0) distance = 0;
                         String text = "Nearest Alarm in " + distance + " meters at #" + nearestPlace.alarmId;
                         notifyService(text);
-                        Log.i("nearestPlace", text);
+                       // Log.i("nearestPlace", text);
                     }
                 } else {
 
-                    Log.i("nearestPlace", "nearestPlace NULL");
+                   // Log.i("nearestPlace", "nearestPlace NULL");
                 }
             } else {
                 location = getLocation();
-                Log.i("LOCATION CHANGED", "NULL");
+               // Log.i("LOCATION CHANGED", "NULL");
             }
         } else {
             String text = "No Active Alarms";
@@ -278,7 +278,7 @@ public class LocationService extends Service implements LocationListener {
             String stopAction = intent.getAction();
             if (stopAction != null) {
                 if (intent.getAction().equals(Constants.STOP_SERVICE)) {
-                    Log.i("LOG_TAG", "Received Stop Foreground Intent");
+                  //  Log.i("LOG_TAG", "Received Stop Foreground Intent");
                     unregisterNotificationReciever();
                     locationManager.removeUpdates(this);
                     stopForeground(true);
@@ -286,12 +286,12 @@ public class LocationService extends Service implements LocationListener {
                     isServiceEnabled = false;
                     return START_NOT_STICKY;
                 } else {
-                    Log.i("No Match ", "STOP_SERVICE");
+                 //   Log.i("No Match ", "STOP_SERVICE");
 
                 }
 
             } else {
-                Log.i("Null ", "No stopAction");
+               // Log.i("Null ", "No stopAction");
 
             }
 
@@ -299,7 +299,7 @@ public class LocationService extends Service implements LocationListener {
         } else {
 
 
-            Log.i("Start ", "Start Servieccececece");
+           // Log.i("Start ", "Start Servieccececece");
 
         }
 

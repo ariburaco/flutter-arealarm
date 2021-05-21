@@ -18,5 +18,7 @@ abstract class  LocaleKeys {
   static const getLocationPermissions = 'getLocationPermissions';
   static const permissionsAwaiting = 'permissionsAwaiting';
   static const permissionsGranted = 'permissionsGranted';
+  static const optional = 'optional';
+  static const note = 'note';
 
 }

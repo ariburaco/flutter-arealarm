@@ -9,4 +9,8 @@ class ApplicationConstants {
   static const EMAIL_REGIEX = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$';
   static const LOCATION_SVG_1 = 'assets/svgs/location1.svg';
   static const GET_STARTED_SVG = 'assets/svgs/get_started.svg';
+  static const ADMOB_BANNER_ID = 'ca-app-pub-9331991014591087/5000831383';
+  //static const ADMOB_INTERSTITIAL_ID = 'ca-app-pub-3940256099942544/8691691433';
+  // static const ADMOB_INTERSTITIAL_ID = 'ca-app-pub-3940256099942544/8691691433';
+  // static const ADMOB_AD_ID = 'ca-app-pub-3940256099942544/6300978111'; // Test Banner
 }

@@ -70,7 +70,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         buttonBackgroundColor: context.theme.colorScheme.secondary,
         key: _scaffoldyKey,
         index: viewModel.currentPageIndex,
-        height: context.width * 0.15,
+        height: 60,
         color: context.theme.colorScheme.primary,
         backgroundColor: Colors.transparent,
         animationDuration: context.lowDuration,

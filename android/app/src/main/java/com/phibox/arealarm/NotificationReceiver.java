@@ -20,7 +20,7 @@ public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.i("INTENT", "onReceive: Unknown" + intent.toString());
+
         String action = intent.getAction();
         if (Constants.GOT_IT.equals(action)) {
             cancelTheAlarm(context, intent);
@@ -28,10 +28,10 @@ public class NotificationReceiver extends BroadcastReceiver {
             //context.unregisterReceiver(this);
             stopService(context);
 
-            Log.i("TAG", "onReceive: STOP Intent");
+           // Log.i("TAG", "onReceive: STOP Intent");
         }else{
 
-            Log.i("TAG", "onReceive: Unknown" + intent);
+          //  Log.i("TAG", "onReceive: Unknown" + intent);
         }
     }
 
@@ -70,7 +70,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                Log.i("exception", exception.toString());
            }
         }else{
-            Log.i("No extras", "cancelTheAlarm: ");
+           // Log.i("No extras", "cancelTheAlarm: ");
         }
 
     }

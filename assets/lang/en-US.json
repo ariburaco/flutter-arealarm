@@ -15,5 +15,7 @@
     "getStarted": "Get Started",
     "getLocationPermissions": "Get Location Permissions",
     "permissionsAwaiting": "Permission awaiting!",
-    "permissionsGranted": "Permissions Granted!"
+    "permissionsGranted": "Permissions Granted!",
+    "optional": "Optional",
+    "note": "Note"
 }

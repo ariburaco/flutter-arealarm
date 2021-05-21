@@ -81,16 +81,13 @@ public class MainActivity extends FlutterActivity {
         );
     }
 
-
-
-
     public void startBackgroundAlarmService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ContextCompat.startForegroundService(context, serviceStartIntent);
         } else {
             startService(serviceStartIntent);
         }
-        Log.d("SERVICE", "Started!");
+        //Log.d("SERVICE", "Started!");
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
