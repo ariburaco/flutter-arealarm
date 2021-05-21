@@ -78,7 +78,7 @@ public class DatabaseController extends SQLiteOpenHelper {
                 alarmplace.setAlarmPlaces(alarmId, isAlarmActive, lat, longu, radius);
                 alarmplace.distance = distance;
 
-                Log.i("DATABASE", "alarmId: " + alarmId + " radius: " + alarmplace.radius);
+                //Log.i("DATABASE", "alarmId: " + alarmId + " radius: " + alarmplace.radius);
                 alarmList.add(alarmplace);
             } while (cursor.moveToNext());
         }

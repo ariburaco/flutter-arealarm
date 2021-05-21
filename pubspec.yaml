@@ -1,7 +1,7 @@
 name: Arealarm
-description: A new Flutter project.
+description: Arealarm App from PHIBOX.
 publish_to: none
-version: 2.0.1
+version: 3.0.1
 environment:
   sdk: '>=2.12.0 <3.0.0'
 dependencies:
